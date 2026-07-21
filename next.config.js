@@ -1,0 +1,35 @@
+module.exports = {
+    turbopack: {
+        root: process.cwd(),
+    },
+    allowedDevOrigins: ['192.168.20.135'],
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'lh3.googleusercontent.com',
+                port: '',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'drive.google.com',
+                port: '',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 's75-ava-talk.zadn.vn',
+                port: '',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 's240-ava-talk.zadn.vn',
+                port: '',
+                pathname: '/**',
+            },
+        ],
+    },
+    output: 'standalone',
+}

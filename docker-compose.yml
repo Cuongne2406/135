@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  main-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: air-manager
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  eportfolio:
+    build:
+      context: .
+      dockerfile: Dockerfile.eportfolio
+    container_name: air-eportfolio
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb+srv://AirStudent:9Rq2bovDKGytsonB@air-student.mzfi0.mongodb.net/air
+    restart: unless-stopped
