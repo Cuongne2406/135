@@ -112,7 +112,19 @@ export default function Profile({ data, onSave }) {
                 <div className="p-4 border border-[#e0e0e0] rounded-lg bg-white">
                     <div className="flex justify-between items-center pb-3 border-b border-[#e0e0e0]"><p className="font-semibold text-lg">Kĩ năng cá nhân</p></div>
                     <div className="flex gap-6 pt-4 flex-wrap max-md:flex-col">
-                        <div className="flex-1 min-w-[300px] flex flex-col gap-4">{Skill && Object.entries(Skill).map(([name, value]) => (<div key={name} className="grid grid-cols-[1fr_2fr_50px] items-center gap-3"><label className="text-sm text-[#555] whitespace-nowrap">{name}</label><input type="range" min="0" max="100" value={value} className="w-full h-1.5 bg-[#ddd] outline-none rounded-sm appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:bg-[#007bff] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:rounded-full" onChange={(e) => handleSkillChange(name, e.target.value)} /><span className="text-sm font-medium text-[#007bff] text-right">{value}%</span></div>))}</div>
+                        <div className="flex-1 min-w-[300px] flex flex-col gap-4">
+                            {Skill && Object.entries(Skill).map(([name, val]) => {
+                                const skillName = typeof val === 'object' && val !== null ? (val.name || name) : name;
+                                const skillValue = typeof val === 'object' && val !== null ? (val.score || 0) : (val || 0);
+                                return (
+                                    <div key={name} className="grid grid-cols-[1fr_2fr_50px] items-center gap-3">
+                                        <label className="text-sm text-[#555] whitespace-nowrap">{skillName}</label>
+                                        <input type="range" min="0" max="100" value={skillValue} className="w-full h-1.5 bg-[#ddd] outline-none rounded-sm appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:bg-[#007bff] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:rounded-full" onChange={(e) => handleSkillChange(name, e.target.value)} />
+                                        <span className="text-sm font-medium text-[#007bff] text-right">{skillValue}%</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
                         <div className="w-[200px] rounded-md border border-[#e0e0e0] max-md:w-full max-md:max-w-[250px]"><div className="w-full relative aspect-square rounded-sm overflow-hidden cursor-pointer group" onClick={() => setPopupState({ type: 'imgSkill' })}><Image src={buildUrl(ImgSkill)} fill alt="Skill Image" className="object-cover" /><div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"><Svg_Pen w={20} h={20} c="white" /></div></div></div>
                     </div>
                 </div>

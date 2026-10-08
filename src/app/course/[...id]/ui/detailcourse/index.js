@@ -21,7 +21,10 @@ import { reloadCourse } from '@/data/actions/reload';
 import Pay from '@/app/student/list/ui/pay';
 import Export from '../exportStudents';
 import SendCmt from '../sencmt';
-import { getEportfolioUrl } from '@/utils/env'
+import { getEportfolioUrl } from '@/utils/env';
+import TemplateSelector from '../templateSelector';
+import ReviewSheetModal from '../reviewSheet';
+import DriveFolderModal from '../driveFolderModal';
 
 const SortIcon = ({ direction }) => {
     if (!direction) {
@@ -47,6 +50,8 @@ export default function Detail({ data = [], params, book, users, studentsx }) {
     const listColumnsConfig = { mobile: 3, tablet: 5, desktop: 6 };
 
     const [loading, setLoading] = useState(false);
+    const [openReviewSheet, setOpenReviewSheet] = useState(false);
+    const [openDriveModal, setOpenDriveModal] = useState(false);
     const [notification, setNotification] = useState({
         open: false,
         status: true,
@@ -57,36 +62,15 @@ export default function Detail({ data = [], params, book, users, studentsx }) {
     const currentHour = today.getHours();
 
     const [sortConfig, setSortConfig] = useState({ key: 'Name', direction: 'ascending' });
-    const handleCompleteCourse = async () => {
-        if (!td.isCompleted) return;
-        setLoading(true);
-        try {
-            const response = await fetch(`/api/course/${data._id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ Status: true }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                setNotification({
-                    open: true,
-                    status: true,
-                    mes: result.mes || 'Xác nhận hoàn thành khóa học thành công!'
-                });
-                router.refresh();
-            } else {
-                throw new Error(result.mes || 'Có lỗi xảy ra, vui lòng thử lại.');
-            }
-        } catch (error) {
+    const handleCompleteCourseClick = () => {
+        if (td.isCompleted) {
+            setOpenReviewSheet(true);
+        } else {
             setNotification({
                 open: true,
                 status: false,
-                mes: error.message
+                mes: td.failReason || 'Khóa học chưa đủ điều kiện để xác nhận hoàn thành.'
             });
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -243,6 +227,14 @@ export default function Detail({ data = [], params, book, users, studentsx }) {
                                         content={"Hồ sơ điện tử"}
                                         placement='bottom'
                                         style={{ background: stu.StatusProfile ? 'var(--main_d)' : 'var(--red)', borderRadius: 3, margin: 0 }}
+                                    />
+                                </Link>
+                                <Link href={`/portfolio-lookbook?studentId=${stu.userId || stu._id}&studentName=${encodeURIComponent(stu.Name || '')}&subject=${encodeURIComponent(data.Book?.Name || '')}`} target='_blank'>
+                                    <WrapIcon
+                                        icon={<span style={{ fontSize: 13, lineHeight: '16px' }}>📖</span>}
+                                        content={"Kỷ yếu Lookbook A4"}
+                                        placement='bottom'
+                                        style={{ background: 'linear-gradient(135deg, #d97706, #ea580c)', borderRadius: 3, margin: 0 }}
                                     />
                                 </Link>
                                 <Pay _id={stu.userId} courseId={data._id} status={stu.StatusCourse} />
@@ -461,7 +453,7 @@ export default function Detail({ data = [], params, book, users, studentsx }) {
                                                 background: td.isCompleted ? 'var(--main_d)' : 'var(--border-color)',
                                                 cursor: td.isCompleted ? 'pointer' : 'not-allowed'
                                             }}
-                                            onClick={handleCompleteCourse}
+                                            onClick={handleCompleteCourseClick}
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width={16} height={16} fill='white'>
                                                 <path d="M96 80c0-26.5 21.5-48 48-48l288 0c26.5 0 48 21.5 48 48l0 304L96 384 96 80zm313 47c-9.4-9.4-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L409 161c9.4-9.4 9.4-24.6 0-33.9zM0 336c0-26.5 21.5-48 48-48l16 0 0 128 448 0 0-128 16 0c26.5 0 48 21.5 48 48l0 96c0 26.5-21.5 48-48 48L48 480c-26.5 0-48-21.5-48-48l0-96z" />
@@ -469,6 +461,35 @@ export default function Detail({ data = [], params, book, users, studentsx }) {
                                             <p className='text-sm font-normal text-[var(--text-primary)]' style={{ color: 'white' }}> Xác nhận hoàn thành</p>
                                         </div>}
                                     <Export />
+                                    <TemplateSelector course={data} book={book} />
+                                    <button
+                                        type="button"
+                                        onClick={() => setOpenDriveModal(true)}
+                                        className="px-3 py-2 bg-gradient-to-r from-teal-500 to-emerald-600 text-white flex items-center gap-1.5 rounded text-sm font-semibold cursor-pointer border-none shadow-xs hover:shadow-md hover:from-teal-600 hover:to-emerald-700 transition-all duration-150 whitespace-nowrap"
+                                        style={{ marginTop: 8 }}
+                                        title="Đổi Folder Google Drive ảnh cho lớp học (Bản Demo)"
+                                    >
+                                        <span>📁</span>
+                                        <span>Folder Drive (Demo)</span>
+                                    </button>
+                                    <Link
+                                        href="/preview-templates"
+                                        className="px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center gap-2 rounded text-sm font-semibold cursor-pointer border-none shadow-xs hover:shadow-md hover:from-blue-700 hover:to-indigo-700 transition-all duration-150 no-underline whitespace-nowrap"
+                                        style={{ marginTop: 8 }}
+                                        title="Xem & So Sánh 15 Mẫu Giao Diện"
+                                    >
+                                        <span>🎨</span>
+                                        <span>Kho Template (15)</span>
+                                    </Link>
+                                    <Link
+                                        href="/portfolio-lookbook"
+                                        className="px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white flex items-center gap-2 rounded text-sm font-semibold cursor-pointer border-none shadow-xs hover:shadow-md hover:from-amber-600 hover:to-orange-700 transition-all duration-150 no-underline whitespace-nowrap"
+                                        style={{ marginTop: 8 }}
+                                        title="Xem Kỷ Yếu ePortfolio Tạp Chí Khổ A4"
+                                    >
+                                        <span>📖</span>
+                                        <span>Kỷ Yếu Lookbook</span>
+                                    </Link>
                                 </>
 
                             }
@@ -559,6 +580,35 @@ export default function Detail({ data = [], params, book, users, studentsx }) {
                 onClose={() => setNotification({ ...notification, open: false })}
                 status={notification.status}
                 mes={notification.mes}
+            />
+
+            <ReviewSheetModal
+                isOpen={openReviewSheet}
+                onClose={() => setOpenReviewSheet(false)}
+                course={data}
+                students={sortedStudents}
+                onSuccess={() => {
+                    setNotification({
+                        open: true,
+                        status: true,
+                        mes: '⚡ Xuất bản Portfolio & hoàn thành khóa học thành công!'
+                    });
+                    reload();
+                }}
+            />
+
+            <DriveFolderModal
+                isOpen={openDriveModal}
+                onClose={() => setOpenDriveModal(false)}
+                course={data}
+                onSuccess={() => {
+                    setNotification({
+                        open: true,
+                        status: true,
+                        mes: '📁 Đã cập nhật Folder Drive cho khóa học (Bản demo)!'
+                    });
+                    reload();
+                }}
             />
         </div>
     )

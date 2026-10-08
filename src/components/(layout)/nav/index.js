@@ -36,6 +36,18 @@ const academicChildren = [
   { href: '/academic/report', content: 'Báo cáo chuyên cần' },
 ]
 
+const Svg_Palette = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" {...props}>
+    <path d="M512 256c0 .9 0 1.8 0 2.7c-.4 36.5-33.6 61.3-70.1 61.3L344 320c-26.5 0-48 21.5-48 48c0 3.4 .4 6.7 1 9.9c2.1 10.2 6.5 20 10.8 29.9c6.1 13.8 12.1 27.5 12.1 42c0 35.3-28.7 62.2-63.8 62.2c-2.4 0-4.8-.1-7.1-.4C115 496.2 0 388.9 0 256C0 114.6 114.6 0 256 0S512 114.6 512 256zM128 288a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm64-96a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm128 0a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm96 96a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>
+  </svg>
+);
+
+const Svg_Lookbook = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" {...props}>
+    <path d="M249.6 471.5c10.8 3.8 22.4-4.1 22.4-15.5V78.6c0-9.3-5.6-17.7-14.2-21.2C216.8 41.2 165.6 32 112 32 48 32 0 54.9 0 96v288c0 40 45.4 62.9 104.9 64 47.9 .9 96.9 8.2 144.7 23.5zm76.8 0c47.8-15.3 96.8-22.6 144.7-23.5 59.5-1.1 104.9-24 104.9-64V96c0-41.1-48-64-112-64-53.6 0-104.8 9.2-145.8 25.4-8.6 3.5-14.2 11.9-14.2 21.2v377.4c0 11.4 11.6 19.3 22.4 15.5z"/>
+  </svg>
+);
+
 const initialNavItems = [
   { href: '/student/list', icon: <Svg_Student w={22} h={22} c={'var(--text-secondary)'} />, content: 'Học sinh' },
   {
@@ -53,6 +65,18 @@ const initialNavItems = [
     </div>, content: 'Học vụ', children: academicChildren
   },
   { href: '/course', icon: <Svg_Course w={22} h={22} c={'var(--text-secondary)'} />, content: 'Khóa học' },
+  { 
+    href: '/preview-templates', 
+    icon: <Svg_Palette height={22} width={22} fill={'var(--text-secondary)'} />, 
+    content: 'Kho Template',
+    badge: '15 Mẫu'
+  },
+  { 
+    href: '/portfolio-lookbook', 
+    icon: <Svg_Lookbook height={22} width={22} fill={'var(--text-secondary)'} />, 
+    content: 'Kỷ yếu Lookbook',
+    badge: 'A4'
+  },
   { href: '/calendar', icon: <Svg_Canlendar w={22} h={22} c={'var(--text-secondary)'} />, content: 'Lịch dạy' },
   {
     href: '/client', icon: <div>
@@ -303,7 +327,7 @@ export default function Nav() {
                 </div>
               </div>
             )}
-            {orderedItems.map(({ href, icon, content, children }) => {
+            {orderedItems.map(({ href, icon, content, children, badge }) => {
               const hasChildren = children && children.length > 0
               const anyActive = hasChildren ? children.some(c => pathname === c.href) : isActive(href)
               const isExpanded = expandedParents[href]
@@ -318,6 +342,11 @@ export default function Nav() {
                     <div className="shrink-0">{icon}</div>
                     {!collapsed && (
                       <span className="text-sm font-medium text-[var(--text-primary)] truncate flex-1">{content}</span>
+                    )}
+                    {!collapsed && badge && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200 shrink-0">
+                        {badge}
+                      </span>
                     )}
                     {hasChildren && !collapsed && (
                       <button
@@ -348,7 +377,7 @@ export default function Nav() {
                   )}
                   {collapsed && !hasChildren && (
                     <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-md bg-gray-900 text-white text-xs whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg pointer-events-none">
-                      {content}
+                      {content} {badge ? `(${badge})` : ''}
                     </div>
                   )}
                   {collapsed && hasChildren && (

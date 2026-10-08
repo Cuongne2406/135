@@ -56,7 +56,7 @@ async function dataStudent(_id) {
                             return detail
                         })
                     }
-                    return { _id: course._id, ID: course.ID, Book: course.Book, Detail: mergedDetails, enrollmentStatus: enrollment.status, tuition: enrollment.tuition }
+                    return { _id: course._id, ID: course.ID, Book: course.Book, Detail: mergedDetails, enrollmentStatus: enrollment.status, tuition: enrollment.tuition, template: course.template || 'robot-mecha' }
                 }).filter(Boolean)
             }
     const createdAt = student._id ? new mongoose.Types.ObjectId(student._id).getTimestamp() : null

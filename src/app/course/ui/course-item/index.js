@@ -3,14 +3,15 @@ import Link from 'next/link';
 import { calculatePastLessons, formatDate } from '@/function';
 
 export default function CourseItem({ data = {} }) {
+    const { ID = '', Area = {}, Detail = [], Student = [], Book = { Name: 'Trống' } } = data || {};
     const teacherMap = new Map();
     const teachingAsMap = new Map();
 
-    data.Detail.forEach(item => {
-        if (item.Teacher && item.Teacher._id) {
+    Detail.forEach(item => {
+        if (item?.Teacher && item.Teacher._id) {
             teacherMap.set(item.Teacher._id, item.Teacher);
         }
-        if (item.TeachingAs && item.TeachingAs._id) {
+        if (item?.TeachingAs && item.TeachingAs._id) {
             teachingAsMap.set(item.TeachingAs._id, item.TeachingAs);
         }
     });
@@ -18,9 +19,10 @@ export default function CourseItem({ data = {} }) {
     const uniqueTeachingAs = Array.from(teachingAsMap.values());
 
     const pastLessonsCount = calculatePastLessons(data);
-    const { ID = '', Area = {}, Detail = [], Student = [], Book = { Name: 'Trống' } } = data;
-    const allDates = data.Detail.map(item => new Date(item.Day));
-    const dateRange = [formatDate(new Date(Math.min(...allDates))), formatDate(new Date(Math.max(...allDates)))];
+    const allDates = Detail.map(item => new Date(item?.Day)).filter(d => !isNaN(d.getTime()));
+    const dateRange = allDates.length > 0
+        ? [formatDate(new Date(Math.min(...allDates))), formatDate(new Date(Math.max(...allDates)))]
+        : ['', ''];
     const { lessonsDone, totalLessons, percent } = useMemo(() => {
         const today = new Date();
         const currentHour = today.getHours();

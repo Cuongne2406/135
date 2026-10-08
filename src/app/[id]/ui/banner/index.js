@@ -29,11 +29,11 @@ export default function Banner({ data, area }) {
                 />
                 <div style={{ alignContent: "center", flex: 1 }}>
                     <p className="text-sm">ID: {data.ID}</p>
-                    <div style={{ display: 'flex',alignItems: 'center', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <p className="text-[22px] font-medium">{data?.Name}</p>
                         <Update data={data} data_area={area} />
                     </div>
-                    <p className="text-sm">Trạng thái học: {data.Status[data.Status.length - 1].status == 2 ? "Đang học" : data.Status[data.Status.length - 1].status == 1 ? "Chờ lên khóa" : "Đã nghỉ"}</p>
+                    <p className="text-sm">Trạng thái học: {data.Status?.length ? (data.Status[data.Status.length - 1].status == 2 ? "Đang học" : data.Status[data.Status.length - 1].status == 1 ? "Chờ lên khóa" : "Đã nghỉ") : "Đang học"}</p>
                 </div>
                 <div style={{ display: "flex", alignItems: "end", gap: 8 }}>
                 </div>

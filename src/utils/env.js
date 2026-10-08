@@ -15,5 +15,5 @@ export function getMongoUri() {
 }
 
 export function getEportfolioUrl() {
-  return process.env.NEXT_PUBLIC_EPORTFOLIO_URL || 'http://localhost:3001';
+  return process.env.NEXT_PUBLIC_EPORTFOLIO_URL || 'http://localhost:3000';
 }

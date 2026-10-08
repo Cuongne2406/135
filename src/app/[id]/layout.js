@@ -27,9 +27,9 @@ export default async function UserLayout({ children, params }) {
                         <p style={{ paddingBottom: 8, borderBottom: 'thin solid var(--border-color)' }}
                             className="text-base font-semibold text-[var(--text-primary)]">Thông tin cá nhân</p>
                         <div style={{ padding: '8px 0', fontSize: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            <h5 style={{ color: data.DB ? 'var(--text-primary)' : 'var(--red)' }} >Ngày sinh: {data.BD ? formatDate(new Date(data.BD)) : 'Thiếu thông tin'}</h5>
+                            <h5 style={{ color: data.DB || data.BD ? 'var(--text-primary)' : 'var(--red)' }} >Ngày sinh: {data.BD ? formatDate(new Date(data.BD)) : 'Thiếu thông tin'}</h5>
                             <h5 style={{ color: data.School ? 'var(--text-primary)' : 'var(--red)' }} >Trường học: {data.School || 'Thiếu thông tin'}</h5>
-                            <h5 style={{ color: data.Area ? 'var(--text-primary)' : 'var(--red)' }} >Khu vực: {data.Area.name || 'Thiếu thông tin'}</h5>
+                            <h5 style={{ color: data.Area?.name ? 'var(--text-primary)' : 'var(--red)' }} >Khu vực: {data.Area?.name || 'Thiếu thông tin'}</h5>
                             <h5 style={{ color: data.Address ? 'var(--text-primary)' : 'var(--red)' }} >Địa chỉ: {data.Address || 'Thiếu thông tin'}</h5>
                             <h5 style={{ color: data.ParentName ? 'var(--text-primary)' : 'var(--red)' }} >Phụ huynh: {data.ParentName || 'Thiếu thông tin'}</h5>
                             <h5 style={{ color: data.Phone ? 'var(--text-primary)' : 'var(--red)' }} >Liên hệ: {data.Phone || 'Thiếu thông tin'}</h5>

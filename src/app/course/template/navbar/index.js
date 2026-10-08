@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
+import Link from 'next/link';
 import Nav from '../../ui/nav-item';
 import CourseItem from '../../ui/course-item';
 import Create from '../../ui/create';
@@ -123,10 +124,11 @@ export default function Navbar({ data = [], book = [], user, areas = [], trys, t
 
     const courseFilter = useCallback(
         (c) => {
-            if (area && c.Area._id !== area) return false;
+            if (!c) return false;
+            if (area && c.Area?._id !== area) return false;
 
             const q = search.trim().toLowerCase();
-            const hasMatch = !q || c.ID.toLowerCase().includes(q) || (c.TeacherHR && c.TeacherHR.name.toLowerCase().includes(q));
+            const hasMatch = !q || (c.ID && c.ID.toLowerCase().includes(q)) || (c.TeacherHR && c.TeacherHR.name && c.TeacherHR.name.toLowerCase().includes(q));
             if (!hasMatch) return false;
 
             if (startDate && endDate) {
@@ -259,7 +261,23 @@ export default function Navbar({ data = [], book = [], user, areas = [], trys, t
                             </>
                         ) : null}
                     </div>
-                    <div className='flex gap-2'>
+                    <div className='flex gap-2 items-center flex-wrap'>
+                        <Link
+                            href="/preview-templates"
+                            className="px-3.5 py-2.5 rounded-lg font-semibold text-xs cursor-pointer flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors no-underline"
+                            title="Xem và so sánh 15 mẫu Template ePortfolio"
+                        >
+                            <span>🎨</span>
+                            <span>Kho Template</span>
+                        </Link>
+                        <Link
+                            href="/portfolio-lookbook"
+                            className="px-3.5 py-2.5 rounded-lg font-semibold text-xs cursor-pointer flex items-center gap-1.5 bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition-colors no-underline"
+                            title="Xem ấn phẩm Kỷ yếu Tạp chí A4"
+                        >
+                            <span>📖</span>
+                            <span>Kỷ yếu Lookbook</span>
+                        </Link>
                         {tab != 2 &&
                             <button
                                 className={`px-4 py-2.5 rounded-lg font-medium cursor-pointer flex items-center gap-2 bg-[#f8fafc] text-[#0f172a] border border-[#e2e8f0]`}

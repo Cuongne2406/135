@@ -73,10 +73,22 @@ const postCourseSchema = new Schema({
     TeacherHR: {
         type: Schema.Types.ObjectId, ref: 'user'
     },
+    template: {
+        type: String,
+        default: 'robot-mecha'
+    },
     Version: {
         type: Number
+    },
+    aiPortfolioDraft: {
+        type: Schema.Types.Mixed,
+        default: null
     }
 }, { versionKey: false });
+
+if (models.course && !models.course.schema.path('aiPortfolioDraft')) {
+    delete models.course;
+}
 
 const PostCourse = models.course || model('course', postCourseSchema);
 

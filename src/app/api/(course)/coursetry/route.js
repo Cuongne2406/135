@@ -50,38 +50,51 @@ export async function GET() {
     try {
         await dbConnect()
 
-        const course = await TrialCourse.findById(TRIAL_ID)
+        let course = await TrialCourse.findById(TRIAL_ID)
             .populate('sessions.teacher', 'name phone')
             .populate('sessions.teachingAs', 'name phone')
             .populate('sessions.book', 'Name Topics')
             .lean()
 
+        if (!course) {
+            course = await TrialCourse.findOne()
+                .populate('sessions.teacher', 'name phone')
+                .populate('sessions.teachingAs', 'name phone')
+                .populate('sessions.book', 'Name Topics')
+                .lean()
+        }
+
         if (!course) return jsonRes(404, { status: false, mes: 'Trial course không tồn tại', data: null })
 
+        const sessions = course.sessions || []
         const roomIds = new Set()
         const stuIds = new Set()
-        course.sessions.forEach(s => {
+        sessions.forEach(s => {
             if (s.room) roomIds.add(String(s.room))
-            s.students.forEach(st => stuIds.add(st.studentId))
+            if (s.students) s.students.forEach(st => stuIds.add(String(st.studentId)))
         })
 
         const roomMap = new Map()
-        await Area.find(
-            { 'rooms._id': { $in: [...roomIds].map(id => new Types.ObjectId(id)) } },
-            { 'rooms.$': 1 }
-        ).lean().then(res =>
-            res.forEach(a => a.rooms.forEach(r => roomMap.set(String(r._id), { _id: r._id, name: r.name })))
-        )
+        const validRoomIds = [...roomIds].filter(id => Types.ObjectId.isValid(id)).map(id => new Types.ObjectId(id))
+        if (validRoomIds.length > 0) {
+            const areas = await Area.find(
+                { 'rooms._id': { $in: validRoomIds } },
+                { 'rooms.$': 1 }
+            ).lean()
+            areas.forEach(a => a.rooms?.forEach(r => roomMap.set(String(r._id), { _id: r._id, name: r.name })))
+        }
 
         const stuMap = new Map()
-        await PostStudent.find(
-            { _id: { $in: [...stuIds] } },
-            { Name: 1, Trial: 1, Phone: 1, ID: 1 }
-        ).lean().then(res =>
-            res.forEach(st => {
+        const validStuIds = [...stuIds].filter(id => Types.ObjectId.isValid(id)).map(id => new Types.ObjectId(id))
+        if (validStuIds.length > 0) {
+            const studentDocs = await PostStudent.find(
+                { _id: { $in: validStuIds } },
+                { Name: 1, Trial: 1, Phone: 1, ID: 1 }
+            ).lean()
+            studentDocs.forEach(st => {
                 stuMap.set(String(st._id), { _id: st._id, name: st.Name, statuses: st.Trial, phone: st.Phone || '', id: st.ID })
             })
-        )
+        }
 
         const uniqStu = new Set()
         course.sessions = course.sessions.map(s => {

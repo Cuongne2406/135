@@ -6,6 +6,7 @@ import Book from '@/models/book'
 import Area from '@/models/area'
 import User from '@/models/users'
 import mongoose from 'mongoose'
+import bcrypt from 'bcryptjs'
 
 export async function GET() {
     try {
@@ -40,15 +41,40 @@ export async function GET() {
             })
         }
 
-        let teacher = await User.findOne({ name: 'GV Test' })
+        const hashPass = await bcrypt.hash('123456', 10)
+
+        let teacher = await User.findOne({ email: 'gvtest@test.com' })
         if (!teacher) {
             teacher = await User.create({
                 name: 'GV Test',
                 phone: '0900000000',
                 email: 'gvtest@test.com',
-                password: '$2b$10$test',
-                role: 'teacher',
+                uid: hashPass,
+                role: ['Teacher'],
+                status: true,
             })
+        } else {
+            teacher.uid = hashPass
+            teacher.role = ['Teacher']
+            teacher.status = true
+            await teacher.save()
+        }
+
+        let admin = await User.findOne({ email: 'admin@test.com' })
+        if (!admin) {
+            admin = await User.create({
+                name: 'Admin Sys',
+                phone: '0999999999',
+                email: 'admin@test.com',
+                uid: hashPass,
+                role: ['Admin'],
+                status: true,
+            })
+        } else {
+            admin.uid = hashPass
+            admin.role = ['Admin']
+            admin.status = true
+            await admin.save()
         }
 
         const topicId = book.Topics[0]._id

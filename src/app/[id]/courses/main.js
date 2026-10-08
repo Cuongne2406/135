@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import FlexiblePopup from '@/components/(features)/(popup)/popup_right';
 import { driveImage } from '@/function';
+import { getTemplateConfig } from '@/lib/templates';
 
 const buildUrl = (id) => id ? `https://lh3.googleusercontent.com/d/${id}` : '';
 
@@ -22,11 +23,11 @@ const getStatusInfo = (status, type) => {
         enrollment: { 2: 'Đã hoàn thành', 1: 'Bảo lưu', 0: 'Đang học' },
         checkin: { 1: 'Có mặt', 2: 'Vắng', 3: 'Có phép', 0: 'Chưa điểm danh' }
     };
-    return { text: textMap[type][status] || '', className: classMap[type][status] || '' };
+    return { text: textMap[type]?.[status] || '', className: classMap[type]?.[status] || '' };
 };
 
-export default function CourseListDisplay({ courses }) {
-    const [expandedCourseId, setExpandedCourseId] = useState(courses[0]?._id || null);
+export default function CourseListDisplay({ courses = [] }) {
+    const [expandedCourseId, setExpandedCourseId] = useState(courses?.[0]?._id || null);
     const [selectedLesson, setSelectedLesson] = useState(null);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
@@ -80,46 +81,117 @@ export default function CourseListDisplay({ courses }) {
     return (
         <>
             <div className="flex flex-col gap-4">
-                {courses.map(course => {
+                {(courses || []).map(course => {
                     const isExpanded = expandedCourseId === course._id;
                     const statusInfo = getStatusInfo(course.enrollmentStatus, 'enrollment');
-                    const totalLessons = course.Detail.length;
-                    const completedLessons = course.Detail.filter(d => d.Checkin === 1 || d.Checkin === 3).length;
+                    const totalLessons = course.Detail?.length || 0;
+                    const completedLessons = (course.Detail || []).filter(d => d.Checkin === 1 || d.Checkin === 3).length;
                     const progress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-                    const lessonsWithTopicNames = course.Detail.map(detail => ({ ...detail, TopicName: course.Book?.Topics.find(t => t._id === detail.Topic)?.Name }));
+                    const lessonsWithTopicNames = (course.Detail || []).map(detail => ({ ...detail, TopicName: course.Book?.Topics?.find(t => t._id === detail.Topic)?.Name }));
+
+                    const tmpl = getTemplateConfig(course.template);
+                    const { tokens } = tmpl;
 
                     return (
-                        <div key={course._id} className="bg-white rounded-lg border border-[var(--border-color)] overflow-hidden transition-shadow duration-300">
-                            <button className="grid grid-cols-[3fr_2fr_auto] items-center gap-4 w-full px-5 py-4 bg-none border-none cursor-pointer text-left max-md:grid-cols-[1fr_auto]" onClick={() => setExpandedCourseId(isExpanded ? null : course._id)}>
+                        <div
+                            key={course._id}
+                            className="rounded-xl overflow-hidden transition-all duration-300 shadow-xs"
+                            style={{
+                                backgroundColor: tokens.cardBg,
+                                border: `1.5px solid ${tokens.cardBorder}`
+                            }}
+                        >
+                            <button
+                                className="grid grid-cols-[3fr_2fr_auto] items-center gap-4 w-full px-5 py-4 border-none cursor-pointer text-left max-md:grid-cols-[1fr_auto] transition-colors"
+                                style={{ background: tokens.headerBg }}
+                                onClick={() => setExpandedCourseId(isExpanded ? null : course._id)}
+                            >
                                 <div className="flex items-center gap-4">
-                                    <Image src={driveImage(course.Book?.Image)} width={60} height={60} alt={course.Book?.Name} className="rounded-lg object-cover" />
-                                    <div style={{ display: 'flex', gap: 1, flexDirection: 'column' }}>
-                                        <p className='text-sm font-semibold text-[var(--text-primary)]'>{course.Book?.Name}</p>
-                                        <p className='text-sm font-semibold text-[var(--text-primary)]'>Khóa: <span style={{ fontWeight: 400 }}>{course.ID}</span></p>
-                                        <p className='text-sm font-semibold text-[var(--text-primary)]'>Trạng thái: <span style={{ fontWeight: 400 }}>{statusInfo.text}</span></p>
+                                    {course.Book?.Image ? (
+                                        <Image src={driveImage(course.Book.Image)} width={60} height={60} alt={course.Book?.Name || 'Khoá học'} className="rounded-lg object-cover shadow-xs" />
+                                    ) : (
+                                        <div className="w-[60px] h-[60px] rounded-lg bg-gray-200/80 flex items-center justify-center text-xl shadow-xs" style={{ border: `1px solid ${tokens.cardBorder}` }}>
+                                            {tmpl.icon || '📚'}
+                                        </div>
+                                    )}
+                                    <div style={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <p className='text-base font-bold' style={{ color: tokens.textPrimary }}>{course.Book?.Name}</p>
+                                            <span
+                                                className="text-[11px] px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 shadow-xs"
+                                                style={{
+                                                    backgroundColor: tokens.badgeBg,
+                                                    color: tokens.badgeText,
+                                                    border: `1px solid ${tokens.accentBorder}`
+                                                }}
+                                            >
+                                                {tmpl.icon} {tmpl.name}
+                                            </span>
+                                        </div>
+                                        <p className='text-xs font-medium' style={{ color: tokens.textSecondary }}>
+                                            Khóa: <span style={{ fontWeight: 600 }}>{course.ID}</span>
+                                        </p>
+                                        <p className='text-xs font-medium' style={{ color: tokens.textSecondary }}>
+                                            Trạng thái: <span style={{ fontWeight: 600 }}>{statusInfo.text}</span>
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="text-sm text-[#6c757d] max-md:hidden">
-                                    <span>{completedLessons}/{totalLessons} buổi</span>
-                                    <div className="w-full h-1.5 bg-[#e9ecef] rounded overflow-hidden mt-1">
-                                        <div className="h-full bg-[#007bff] rounded transition-all duration-500 ease-in-out" style={{ width: `${progress}%` }}></div>
+                                <div className="text-sm max-md:hidden" style={{ color: tokens.textSecondary }}>
+                                    <span className="font-medium">{completedLessons}/{totalLessons} buổi học</span>
+                                    <div className="w-full h-2 rounded-full overflow-hidden mt-1.5 bg-black/10">
+                                        <div
+                                            className="h-full rounded-full transition-all duration-500 ease-in-out"
+                                            style={{ width: `${progress}%`, background: tokens.progressBar }}
+                                        />
                                     </div>
                                 </div>
                                 <ArrowIcon isOpen={isExpanded} />
                             </button>
-                            <div className={`max-h-0 overflow-hidden transition-[max-height] duration-[0.4s] ease-out bg-[#fdfdfd] ${isExpanded ? 'max-h-[2000px] transition-[max-height] duration-[0.5s] ease-in border-t border-[var(--border-color)]' : ''}`}>
-                                <div className="flex flex-col">
+                            <div
+                                className={`max-h-0 overflow-hidden transition-[max-height] duration-[0.4s] ease-out ${isExpanded ? 'max-h-[2000px] transition-[max-height] duration-[0.5s] ease-in border-t' : ''
+                                    }`}
+                                style={{
+                                    backgroundColor: tokens.cardBg,
+                                    borderColor: tokens.cardBorder
+                                }}
+                            >
+                                <div className="flex flex-col p-2 gap-1.5">
                                     {lessonsWithTopicNames.map((lesson, index) => {
                                         const lessonStatus = getStatusInfo(lesson.Checkin, 'checkin');
                                         return (
-                                            <button key={lesson._id} className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 w-full px-4 py-3 rounded-md border-none bg-white cursor-pointer text-left transition-[background-color,box-shadow] duration-200 border-t border-[var(--border-color)] hover:bg-[#f8f9fa] hover:shadow-[0_1px_4px_rgba(0,0,0,0.05)] max-md:grid-cols-[auto_1fr_auto] max-md:gap-3" onClick={() => handleLessonClick(lesson)}>
-                                                <p className="font-bold text-[#007bff] text-sm">Buổi {index + 1}</p>
+                                            <button
+                                                key={lesson._id}
+                                                className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 w-full px-4 py-3 rounded-lg border cursor-pointer text-left transition-all duration-150 hover:-translate-y-0.5 max-md:grid-cols-[auto_1fr_auto] max-md:gap-3 shadow-2xs"
+                                                style={{
+                                                    backgroundColor: tokens.lessonBg,
+                                                    borderColor: tokens.cardBorder
+                                                }}
+                                                onClick={() => handleLessonClick(lesson)}
+                                            >
+                                                <p
+                                                    className="font-bold text-sm tracking-wide"
+                                                    style={{ color: tokens.primary }}
+                                                >
+                                                    Buổi {index + 1}
+                                                </p>
                                                 <div className="flex flex-col gap-0.5">
-                                                    <p className="font-medium text-[#495057]">{lesson.TopicName || `Chủ đề buổi ${index + 1}`}</p>
-                                                    <p className="text-xs text-[#adb5bd]">Thời gian học: {lesson.Time} {new Date(lesson.Day).toLocaleDateString('vi-VN')}</p>
+                                                    <p
+                                                        className="font-semibold text-sm"
+                                                        style={{ color: tokens.textPrimary }}
+                                                    >
+                                                        {lesson.TopicName || `Chủ đề buổi ${index + 1}`}
+                                                    </p>
+                                                    <p
+                                                        className="text-xs"
+                                                        style={{ color: tokens.textSecondary }}
+                                                    >
+                                                        Thời gian: {lesson.Time} • {new Date(lesson.Day).toLocaleDateString('vi-VN')}
+                                                    </p>
                                                 </div>
-                                                <div className={`text-sm font-medium px-2.5 py-1 rounded max-md:hidden ${lessonStatus.className}`}>{lessonStatus.text}</div>
-                                                <p className="text-[#6c757d]">›</p>
+                                                <div className={`text-xs font-semibold px-2.5 py-1 rounded-md max-md:hidden ${lessonStatus.className}`}>
+                                                    {lessonStatus.text}
+                                                </div>
+                                                <p style={{ color: tokens.textSecondary }} className="font-bold text-base">›</p>
                                             </button>
                                         );
                                     })}

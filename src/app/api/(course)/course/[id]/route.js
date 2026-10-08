@@ -64,6 +64,14 @@ export async function PATCH(request, { params }) {
 
         if (body.Status === true) {
             const studentIDsInCourse = updatedCourse.Student.map(s => s.ID);
+            const portfolioMap = new Map();
+            if (Array.isArray(body.portfolioReviews)) {
+                body.portfolioReviews.forEach(r => {
+                    if (r.studentId) portfolioMap.set(String(r.studentId), r);
+                    if (r.ID) portfolioMap.set(String(r.ID), r);
+                });
+            }
+
             if (studentIDsInCourse.length > 0) {
                 const students = await PostStudent.find({ ID: { $in: studentIDsInCourse } }).select('_id ID Course Profile');
                 const bulkOperations = [];
@@ -74,34 +82,63 @@ export async function PATCH(request, { params }) {
                         student.Profile = { Present: [] };
                     }
 
-                    const studentInCourseData = updatedCourse.Student.find(s => s.ID === student.ID);
-                    const allComments = studentInCourseData?.Learn.flatMap(l => l.Cmt || []).filter(cmt => cmt && cmt.trim() !== '');
-                    const summaryComment = await generateSummaryComment(allComments);
+                    const reviewData = portfolioMap.get(String(student._id)) || portfolioMap.get(String(student.ID));
+
+                    let finalComment = reviewData?.comment;
+                    if (!finalComment) {
+                        const studentInCourseData = updatedCourse.Student.find(s => s.ID === student.ID);
+                        const allComments = studentInCourseData?.Learn.flatMap(l => l.Cmt || []).filter(cmt => cmt && cmt.trim() !== '');
+                        finalComment = await generateSummaryComment(allComments);
+                    }
+
+                    const coverImg = reviewData?.coverImg || '';
+                    const projectImgs = [reviewData?.projectImg1, reviewData?.projectImg2].filter(Boolean);
 
                     const newPresentation = {
                         course: updatedCourse._id,
-                        bookId: updatedCourse.Book.ID,
-                        bookName: updatedCourse.Book.Name,
-                        Comment: summaryComment,
-                        Video: '',
-                        Img: ''
+                        bookId: updatedCourse.Book?.ID || updatedCourse.Book?._id?.toString() || 'DEFAULT_BOOK',
+                        bookName: updatedCourse.Book?.Name || 'Khóa học',
+                        Comment: finalComment,
+                        Video: reviewData?.video || '',
+                        Img: coverImg
                     };
-                    console.log(newPresentation,1);
-                    
+
                     const currentPresentations = student.Profile?.Present || [];
-                    const otherPresentations = currentPresentations.filter(p => p.bookId !== updatedCourse.Book.ID);
+                    const otherPresentations = currentPresentations.filter(p => p.bookId !== (updatedCourse.Book?.ID || updatedCourse.Book?._id?.toString()));
                     const newPresentArray = [...otherPresentations, newPresentation];
+
+                    // Tích hợp danh sách ảnh dự án vào ImgPJ của học sinh
+                    const currentImgPJ = Array.isArray(student.Profile?.ImgPJ) ? student.Profile.ImgPJ : [];
+                    const allNewImgs = [coverImg, ...projectImgs].filter(Boolean);
+                    const mergedImgPJ = Array.from(new Set([...currentImgPJ, ...allNewImgs]));
+
+                    // Cập nhật điểm Radar kỹ năng
+                    let mergedSkills = {};
+                    if (student.Profile?.Skill) {
+                        mergedSkills = student.Profile.Skill instanceof Map
+                            ? Object.fromEntries(student.Profile.Skill)
+                            : (typeof student.Profile.Skill === 'object' ? { ...student.Profile.Skill } : {});
+                    }
+                    if (reviewData?.skills && typeof reviewData.skills === 'object') {
+                        mergedSkills = { ...mergedSkills, ...reviewData.skills };
+                    }
+
                     const newProfileObject = {
-                        ...student.Profile, 
-                        Present: newPresentArray 
+                        ...student.Profile,
+                        Present: newPresentArray,
+                        ImgPJ: mergedImgPJ,
+                        Skill: mergedSkills
                     };
+                    if (coverImg && (!student.Profile.ImgSkill || student.Profile.ImgSkill === '')) {
+                        newProfileObject.ImgSkill = coverImg;
+                    }
 
                     const hasOtherActiveCourses = student.Course.some(c => c.course.toString() !== updatedCourse._id.toString() && c.status === 0);
                     const newStatusForStudent = {
                         status: hasOtherActiveCourses ? 2 : 1, act: hasOtherActiveCourses ? 'học' : 'chờ',
                         date: new Date(), note: `Hoàn thành khóa học ${updatedCourse.ID}`
                     };
-                    
+
                     bulkOperations.push({
                         updateOne: {
                             filter: { _id: student._id },

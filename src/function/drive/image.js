@@ -52,3 +52,21 @@ export async function deleteImageFromDrive(fileId) {
         return false;
     }
 }
+
+export async function getFilesInDriveFolder(folderId) {
+    if (!folderId) return [];
+    try {
+        const drive = await getDriveClient();
+        const response = await drive.files.list({
+            q: `'${folderId}' in parents and trashed = false and (mimeType contains 'image/')`,
+            fields: 'files(id, name, mimeType, thumbnailLink, createdTime)',
+            pageSize: 100,
+            supportsAllDrives: true,
+            includeItemsFromAllDrives: true,
+        });
+        return response.data.files || [];
+    } catch (error) {
+        console.error(`Lỗi khi lấy danh sách file từ Drive folder ${folderId}:`, error?.message);
+        return [];
+    }
+}
