@@ -20,18 +20,22 @@
     "exceljs": "^3.4.0",
     "googleapis": "^173.0.0",
     "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^1.60.0",
     "mongoose": "^8.16.4",
     "next": "^16.2.7",
+    "qrcode": "^1.5.4",
     "react": "^19.2.7",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.2.7",
     "react-markdown": "^10.1.0",
     "rehype-highlight": "^7.0.2",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.2",
     "autoprefixer": "^10.5.2",
+    "playwright": "^1.64.1",
     "postcss": "^8.5.16",
     "tailwindcss": "^4.3.2"
   }

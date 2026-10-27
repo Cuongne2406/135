@@ -13,7 +13,7 @@ if (!mongoose.models.user) {
 
 export async function GET(request, { params }) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         if (!id || id.length !== 48) {
             return NextResponse.json(

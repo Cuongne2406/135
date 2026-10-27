@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { calculatePastLessons, formatDate } from '@/function';
+import CourseHealthBar from '@/components/(features)/courseHealthBar';
 
 export default function CourseItem({ data = {} }) {
     const { ID = '', Area = {}, Detail = [], Student = [], Book = { Name: 'Trống' } } = data || {};
@@ -133,6 +134,9 @@ export default function CourseItem({ data = {} }) {
                         style={{ width: `${Number(pastLessonsCount) / data.Detail.length * 100}%` }}
                         aria-label="progress"
                     />
+                </div>
+                <div className="mt-3 pt-2.5 border-t border-gray-100">
+                    <CourseHealthBar course={data} mode="compact" />
                 </div>
             </div>
         </Link>

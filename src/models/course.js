@@ -10,7 +10,7 @@ const DetailSchema = new Schema({
     Image: { type: String },
     DetailImage: {
         type: [{
-            id: { type: String, required: true, unique: true },
+            id: { type: String, required: true },
             type: { type: String },
             create: { type: Date, default: Date.now }
         }],
@@ -28,7 +28,7 @@ const LearnDetailSchema = new Schema({
     Lesson: { type: Schema.Types.ObjectId, required: true },
     Image: {
         type: [{
-            id: { type: String, required: true, unique: true },
+            id: { type: String, required: true },
             type: { type: String },
             create: { type: Date, default: Date.now }
         }],
@@ -83,13 +83,34 @@ const postCourseSchema = new Schema({
     aiPortfolioDraft: {
         type: Schema.Types.Mixed,
         default: null
+    },
+    isPublished: {
+        type: Boolean,
+        default: false
+    },
+    publishedAt: {
+        type: Date,
+        default: null
     }
 }, { versionKey: false });
+
+postCourseSchema.index({ Type: 1, Status: 1 });
+postCourseSchema.index({ 'Detail.Image': 1 });
+postCourseSchema.index({ 'Detail.Day': 1 });
+postCourseSchema.index({ 'Detail.Teacher': 1 });
+postCourseSchema.index({ 'Student.ID': 1 });
+postCourseSchema.index({ Area: 1 });
 
 if (models.course && !models.course.schema.path('aiPortfolioDraft')) {
     delete models.course;
 }
+if (models.Course && !models.Course.schema.path('aiPortfolioDraft')) {
+    delete models.Course;
+}
 
-const PostCourse = models.course || model('course', postCourseSchema);
+const PostCourse = models.Course || models.course || model('course', postCourseSchema);
+if (!models.Course) {
+    try { model('Course', postCourseSchema); } catch (_) {}
+}
 
 export default PostCourse;

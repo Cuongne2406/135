@@ -87,7 +87,9 @@ export async function CheckRole() {
     const decodedToken = jwt.verify(token, getJwtSecret());
     return decodedToken;
   } catch (error) {
-    console.error("Lỗi xác thực JWT:", error.message);
+    if (error.name !== 'TokenExpiredError') {
+      console.error("Lỗi xác thực JWT:", error.message);
+    }
     return null;
   }
 }

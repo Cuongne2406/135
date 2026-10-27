@@ -14,6 +14,9 @@ function extractFolderId(input) {
 }
 
 export async function POST(req) {
+    if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ status: 1, mes: 'Endpoint test Update Drive Folder bị vô hiệu hóa trên môi trường Production' }, { status: 403 });
+    }
     try {
         await connectDB();
         const body = await req.json();

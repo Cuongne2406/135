@@ -14,5 +14,8 @@ const AreaSchema = new Schema(
   { timestamps: true }
 )
 
-const Area = models.area || model('area', AreaSchema)
-export default Area
+const Area = models.Area || models.area || model('area', AreaSchema);
+if (!models.Area) {
+  try { model('Area', AreaSchema); } catch (_) {}
+}
+export default Area;

@@ -3,6 +3,7 @@ import connectDB from '@/config/connectDB'
 import MakeupSession from '@/models/makeupSession'
 import PostCourse from '@/models/course'
 import authenticate from '@/utils/authenticate'
+import { checkScheduleConflict } from '@/utils/scheduleConflict'
 import mongoose from 'mongoose'
 
 export async function PATCH(req, { params }) {
@@ -10,13 +11,38 @@ export async function PATCH(req, { params }) {
         const auth = await authenticate(req)
         if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-        const { id } = params
+        const { id } = await params
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return NextResponse.json({ error: 'ID không hợp lệ' }, { status: 400 })
         }
 
         const body = await req.json()
         await connectDB()
+
+        const existingSession = await MakeupSession.findById(id).lean()
+        if (!existingSession) {
+            return NextResponse.json({ error: 'Không tìm thấy phiên học bù' }, { status: 404 })
+        }
+
+        const targetDate = body.makeupDate || existingSession.makeupDate
+        const targetTime = body.makeupTime || existingSession.makeupTime
+        const targetRoom = body.makeupRoom !== undefined ? body.makeupRoom : existingSession.makeupRoom
+        const targetTeacher = body.makeupTeacher !== undefined ? body.makeupTeacher : existingSession.makeupTeacher
+
+        if (targetDate && targetTime && (targetRoom || targetTeacher)) {
+            const conflict = await checkScheduleConflict({
+                date: targetDate,
+                timeStr: targetTime,
+                roomId: targetRoom,
+                teacherId: targetTeacher,
+                excludeCourseId: existingSession.course,
+                excludeLessonId: existingSession.lesson,
+                excludeMakeupId: id
+            })
+            if (conflict.hasConflict) {
+                return NextResponse.json({ error: conflict.message }, { status: 409 })
+            }
+        }
 
         const updateData = { ...body, updatedBy: auth.user._id }
         if (body.makeupStatus === 'MAKEUP_COMPLETED') {
@@ -52,7 +78,7 @@ export async function DELETE(req, { params }) {
         const auth = await authenticate(req)
         if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-        const { id } = params
+        const { id } = await params
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return NextResponse.json({ error: 'ID không hợp lệ' }, { status: 400 })
         }

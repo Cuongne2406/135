@@ -8,6 +8,9 @@ import { Svg_Reload } from '@/components/(icon)/svg';
 import { reloadStudent } from '@/data/actions/reload';
 import Create from '../../ui/create';
 
+import EmptyState from '@/components/ui/EmptyState';
+import SkeletonTable from '@/components/ui/SkeletonTable';
+
 const STATUS_MAP = { "Đang học": 2, "Chờ lên khóa": 1, "Đã nghỉ": 0 };
 
 export default function Main({ data_student, data_area }) {
@@ -37,17 +40,17 @@ export default function Main({ data_student, data_area }) {
 
   return (
     <div className="flex gap-4 h-[calc(100%-16px)] w-full p-2 pr-0 pt-2">
-      <div className="flex-1 rounded-lg border border-[var(--border-color)] flex flex-col overflow-hidden">
-        <div className="border-b-2 border-[var(--border-color)] px-3 py-2 flex items-center justify-between gap-2">
-          <div className="flex gap-2 items-center">
+      <div className="flex-1 rounded-lg border border-slate-200 bg-white flex flex-col overflow-hidden shadow-xs">
+        <div className="border-b border-slate-200 px-3 py-2.5 flex items-center justify-between gap-2 bg-slate-50/50">
+          <div className="flex gap-2 items-center flex-wrap">
             <input
-              className="px-3 py-2 border border-gray-200 rounded bg-white text-sm outline-none text-gray-700 w-[300px]"
-              placeholder="Nhập tên hoặc ID học sinh..."
+              className="h-9 px-3 border border-slate-300 rounded-md bg-white text-sm outline-none text-slate-900 focus:ring-2 focus:ring-[var(--main_d)]/15 focus:border-[var(--main_d)] w-[280px]"
+              placeholder="Tìm theo tên hoặc ID học sinh..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <select
-              className="px-3 py-2 border border-gray-200 rounded bg-white text-sm outline-none text-gray-700 w-[180px]"
+              className="h-9 px-3 border border-slate-300 rounded-md bg-white text-sm outline-none text-slate-800 focus:ring-2 focus:ring-[var(--main_d)]/15 focus:border-[var(--main_d)] w-[170px]"
               value={filterArea}
               onChange={(e) => setFilterArea(e.target.value)}
             >
@@ -57,11 +60,11 @@ export default function Main({ data_student, data_area }) {
               ))}
             </select>
             <select
-              className="px-3 py-2 border border-gray-200 rounded bg-white text-sm outline-none text-gray-700 w-[140px]"
+              className="h-9 px-3 border border-slate-300 rounded-md bg-white text-sm outline-none text-slate-800 focus:ring-2 focus:ring-[var(--main_d)]/15 focus:border-[var(--main_d)] w-[140px]"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
-              <option value="Tất cả">Tất cả</option>
+              <option value="Tất cả">Tất cả trạng thái</option>
               <option value="Đang học">Đang học</option>
               <option value="Chờ lên khóa">Chờ lên khóa</option>
               <option value="Đã nghỉ">Đã nghỉ</option>
@@ -70,24 +73,47 @@ export default function Main({ data_student, data_area }) {
 
           <div className="flex gap-2 items-center">
             <button
-              className="px-3 py-2 bg-[var(--main_d)] text-white text-sm font-medium rounded cursor-pointer border-none flex items-center gap-1.5 whitespace-nowrap transition-colors hover:brightness-110"
+              className="h-9 px-3.5 bg-[var(--main_d)] text-white text-sm font-medium rounded-md cursor-pointer border-none flex items-center gap-1.5 whitespace-nowrap transition-colors hover:bg-[var(--main_b)] shadow-xs"
               onClick={ReLoadData}
             >
-              <Svg_Reload w={16} h={16} c='white' />
-              Tải lại dữ liệu
+              <Svg_Reload w={15} h={15} c='white' />
+              Tải lại
             </button>
             <Create data_area={data_area} />
           </div>
         </div>
 
+        {/* Header danh sách học viên */}
+        <div className="bg-slate-50/90 border-b border-slate-200 px-3 py-2.5 flex items-center text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <div style={{ flex: 5, display: 'flex', alignItems: 'center' }}>
+            <div style={{ flex: 2 }}>Mã & Họ tên học sinh</div>
+            <div style={{ flex: 1 }}>Khu vực</div>
+            <div style={{ flex: 1 }}>Liên hệ</div>
+            <div style={{ flex: 1 }}>Ngày tạo</div>
+            <div style={{ flex: 0.8, textAlign: 'center' }}>Xếp hạng</div>
+          </div>
+          <div style={{ flex: 1, textAlign: 'center' }}>Thao tác</div>
+        </div>
+
         <div className="flex-1 scroll">
-          {filteredStudents.map((t, index) => (
-            <Li_l key={t.ID || index} data={t} dataArea={data_area} />
-          ))}
+          {load ? (
+            <div className="p-4">
+              <SkeletonTable rows={6} columns={6} />
+            </div>
+          ) : filteredStudents.length === 0 ? (
+            <EmptyState
+              title="Không tìm thấy học sinh nào"
+              description="Không có bản ghi nào khớp với điều kiện tìm kiếm hoặc bộ lọc khu vực/trạng thái hiện tại."
+              actionText="Xóa bộ lọc"
+              onAction={() => { setSearchTerm(''); setFilterArea('Tất cả'); setFilterStatus('Tất cả'); }}
+            />
+          ) : (
+            filteredStudents.map((t, index) => (
+              <Li_l key={t.ID || index} data={t} dataArea={data_area} ReLoadData={ReLoadData} />
+            ))
+          )}
         </div>
       </div>
-
-      {load && (<div className="fixed inset-0 bg-black/80 flex justify-center items-center z-[9999]">  <Loading content={<p className='text-sm font-normal text-white'>Đang tải dữ liệu...</p>} /></div>)}
     </div>
   );
 }

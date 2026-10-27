@@ -12,6 +12,7 @@ import Loading from '@/components/(ui)/(loading)/loading';
 import Image from 'next/image';
 import { Svg_Send, Svg_Pen, Svg_Check, Svg_Out, Svg_History, Svg_Chat_1 } from '@/components/(icon)/svg';
 import { history_data } from '@/data/actions/get';
+import ConvertToStudentModal from '@/components/(features)/(student)/convertToStudentModal';
 
 function HistoryLogItem({ log }) {
     const getActionTypeName = (type) => {
@@ -138,6 +139,7 @@ export default function CustomerRow({ customer, index, isSelected, onSelect, vis
     const [noteState, addNoteAction, isNotePending] = useActionState(addCareNoteAction, null);
     const [statusState, updateStatusAction, isStatusPending] = useActionState(updateCustomerStatusAction, null);
     const [conversionState, convertToStudentActionFn, isConversionPending] = useActionState(convertToStudentAction, null);
+    const [isConvertModalOpen, setIsConvertModalOpen] = useState(false);
     const [comment, setComment] = useState('');
     const [totudent, setToStudent] = useState(false);
     const noteFormRef = useRef(null);
@@ -333,16 +335,15 @@ export default function CustomerRow({ customer, index, isSelected, onSelect, vis
                                                 <h6 className='font-normal'>Kết thúc chăm sóc</h6>
                                             </button>
                                         </form>
-                                        <form action={convertToStudentActionFn} className='flex flex-col p-3 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors'>
-                                            <input type="hidden" name="customerId" value={customer._id} />
-                                            <button type="submit" disabled={isAnyActionPending} className='w-full text-left bg-transparent border-none cursor-pointer flex flex-col gap-1 p-0'>
+                                        <div className='flex flex-col p-3 rounded-lg border border-blue-200 bg-blue-50/60 hover:bg-blue-100/80 cursor-pointer transition-colors' onClick={() => setIsConvertModalOpen(true)}>
+                                            <button type="button" disabled={isAnyActionPending} className='w-full text-left bg-transparent border-none cursor-pointer flex flex-col gap-1 p-0'>
                                                 <div className='flex gap-2 items-center'>
-                                                    <Svg_Check w={'var(--font-size-sm)'} h={'var(--font-size-sm)'} c={'var(--text-primary)'} />
-                                                    <h5 className='font-medium'>Chuyển thành học sinh</h5>
+                                                    <Svg_Check w={'var(--font-size-sm)'} h={'var(--font-size-sm)'} c={'var(--main_d)'} />
+                                                    <h5 className='font-semibold text-[var(--main_d)]'>Chuyển thành học sinh</h5>
                                                 </div>
-                                                <h6 className='font-normal'>Xác nhận chăm sóc thành công</h6>
+                                                <h6 className='font-normal text-slate-600'>Gán lớp chính quy & cơ sở</h6>
                                             </button>
-                                        </form>
+                                        </div>
                                         <form action={updateStatusAction} className='flex flex-col p-3 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors'>
                                             <input type="hidden" name="customerId" value={customer._id} />
                                             <input type="hidden" name="status" value="3" />
@@ -458,6 +459,23 @@ export default function CustomerRow({ customer, index, isSelected, onSelect, vis
                 </div>
             </CenterPopup >
             <Noti open={notification.open} onClose={handleCloseNoti} status={notification.status} mes={notification.mes} />
+            <ConvertToStudentModal
+                open={isConvertModalOpen}
+                onClose={() => setIsConvertModalOpen(false)}
+                leadData={{
+                    _id: customer._id,
+                    name: customer.name,
+                    phone: customer.phone,
+                    parentName: customer.nameparent,
+                    email: customer.email,
+                    leadType: 'customer'
+                }}
+                onSuccess={() => {
+                    setIsConvertModalOpen(false);
+                    handleClosePopup();
+                    router.refresh();
+                }}
+            />
         </>
     );
 }

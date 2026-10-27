@@ -1,6 +1,7 @@
 import connectDB from '@/config/connectDB';
 import { reloadUser } from '@/data/actions/reload';
 import PostUser from '@/models/users';
+import authenticate from '@/utils/authenticate';
 import jsonRes from '@/utils/response';
 
 export async function PATCH(request, { params }) {
@@ -10,21 +11,31 @@ export async function PATCH(request, { params }) {
             return jsonRes(400, { error: 'Thiếu ID người dùng.' });
         }
 
+        const { user: currentUser } = await authenticate(request);
+        if (!currentUser || !currentUser.role?.includes('Admin')) {
+            return jsonRes(403, { error: 'Chỉ Quản trị viên (Admin) mới có quyền khóa hoặc mở khóa tài khoản.' });
+        }
+
+        if (currentUser._id.toString() === id.toString()) {
+            return jsonRes(400, { error: 'Bạn không thể tự vô hiệu hóa tài khoản của chính mình.' });
+        }
+
         await connectDB();
 
-        const user = await PostUser.findById(id);
-        if (!user) {
+        const targetUser = await PostUser.findById(id);
+        if (!targetUser) {
             return jsonRes(404, { error: 'Không tìm thấy người dùng.' });
         }
 
-        user.status = !user.status;
-        await user.save();
+        targetUser.status = !targetUser.status;
+        await targetUser.save();
 
-        await reloadUser()
-        return jsonRes(200, { message: 'Cập nhật trạng thái thành công.', status: user.status });
+        await reloadUser(id);
+        return jsonRes(200, { message: 'Cập nhật trạng thái thành công.', status: targetUser.status });
 
     } catch (err) {
         console.error(err);
-        return jsonRes(500, { error: 'Lỗi máy chủ' });
+        const statusCode = err.message === 'Authentication failed' ? 401 : err.message.includes('quyền') ? 403 : 500;
+        return jsonRes(statusCode, { error: err.message || 'Lỗi máy chủ' });
     }
 }

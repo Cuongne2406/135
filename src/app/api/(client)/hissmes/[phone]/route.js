@@ -4,7 +4,7 @@ import SendHistory from '@/models/historyClient';
 
 export async function GET(req, { params }) {
     try {
-        const { phone } = params;
+        const { phone } = await params;
         
         if (typeof phone !== 'string') {
             return NextResponse.json(

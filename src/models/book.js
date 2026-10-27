@@ -60,6 +60,9 @@ const BookSchema = new Schema({
     },
 }, { timestamps: true, });
 
-const Book = models.book || model('book', BookSchema);
+const Book = models.Book || models.book || model('book', BookSchema);
+if (!models.Book) {
+    try { model('Book', BookSchema); } catch (_) {}
+}
 
 export default Book;

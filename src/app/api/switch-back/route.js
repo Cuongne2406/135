@@ -5,18 +5,28 @@ import { getJwtSecret, getCookieName } from '@/utils/env'
 
 export async function POST(request) {
   try {
-    const { backupToken } = await request.json()
+    let backupToken;
+    try {
+      const body = await request.json()
+      backupToken = body?.backupToken
+    } catch (e) {}
+
+    const cookieStore = await cookies()
+    if (!backupToken) {
+      backupToken = cookieStore.get('backup_token')?.value
+    }
+
     if (!backupToken) {
       return NextResponse.json({ success: false, error: 'Thiếu backup token' }, { status: 400 })
     }
 
     const decoded = jwt.verify(backupToken, getJwtSecret())
-    const cookieStore = await cookies()
     cookieStore.set(getCookieName(), backupToken, {
       httpOnly: true,
       sameSite: 'lax',
       path: '/',
     })
+    cookieStore.delete('backup_token')
 
     return NextResponse.json({
       success: true,

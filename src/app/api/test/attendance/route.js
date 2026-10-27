@@ -68,7 +68,10 @@ function generateSampleData() {
     })
 }
 
-export async function GET() {
+export async function GET(request) {
+    if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ error: 'Chức năng Test Attendance bị vô hiệu hóa trên môi trường Production' }, { status: 403 });
+    }
     const data = generateSampleData()
     return NextResponse.json({ success: true, data })
 }

@@ -4,6 +4,7 @@ import TrialCourse from '@/models/coursetry'
 import connectDB from '@/config/connectDB'
 import mongoose from 'mongoose'
 import jsonRes, { corsHeaders } from '@/utils/response'
+import { Re_coursetry } from '@/data/course'
 
 const CORS_HEADERS = corsHeaders
 

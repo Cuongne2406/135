@@ -4,6 +4,8 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Svg_Delete, Svg_Eye, Svg_Setting } from '@/components/(icon)/svg';
 import CustomerRow from './row';
 const Svg_View = ({ w, h, c }) => (<svg width={w} height={h} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill={c} /></svg>);
+import EmptyState from '@/components/ui/EmptyState';
+
 const ALL_COLUMNS = [
     { key: 'nameparent', header: 'Tên phụ huynh' },
     { key: 'phone', header: 'SĐT' },
@@ -19,18 +21,18 @@ const ALL_COLUMNS = [
 const INITIAL_VISIBLE_COLUMNS = ['nameparent', 'name', 'phone', 'status', 'source', 'statusaction'];
 function CustomerTableHeader({ onSelectPage, areAllSelected, visibleColumns, viewMode }) {
     return (
-        <div className="flex shrink-0 min-w-full">
+        <div className="flex shrink-0 min-w-full bg-slate-50/90 border-b border-slate-200">
             {viewMode === 'manage' && (
-                <div className="p-3 text-left font-semibold text-[var(--text-primary)] border-b-2 border-[var(--border-color)] whitespace-nowrap w-15 shrink-0 text-center">
+                <div className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap w-15 shrink-0 text-center">
                     <label className='flex items-center justify-center cursor-pointer w-5 h-5'>
-                        <input type="checkbox" className='w-4 h-4 accent-[var(--main_d)]' onChange={() => onSelectPage(areAllSelected)} checked={areAllSelected} />
+                        <input type="checkbox" className='w-4 h-4 accent-slate-900 rounded cursor-pointer' onChange={() => onSelectPage(areAllSelected)} checked={areAllSelected} />
                     </label>
                 </div>
             )}
-            <div className="p-3 text-left font-semibold text-[var(--text-primary)] border-b-2 border-[var(--border-color)] whitespace-nowrap shrink-0 w-15 text-center"><h5>STT</h5></div>
+            <div className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap shrink-0 w-15 text-center">STT</div>
             {visibleColumns.map(colKey => {
                 const column = ALL_COLUMNS.find(c => c.key === colKey);
-                return <div key={colKey} className="flex-1 p-3 text-left font-semibold text-[var(--text-primary)] border-b-2 border-[var(--border-color)] truncate"><h5 className="truncate">{column?.header}</h5></div>;
+                return <div key={colKey} className="flex-1 p-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 truncate">{column?.header}</div>;
             })}
         </div>
     );
@@ -159,22 +161,31 @@ export default function CustomerTable({ zalo, data = [], total = 0, user, select
     const phonesOnPage = data.map(c => c.phone);
     const areAllSelectedOnPage = phonesOnPage.length > 0 && phonesOnPage.every(phone => selectedCustomers.has(phone));
     return (
-        <div className={'flex flex-col bg-[var(--bg-primary)] border border-[var(--border-color)] rounded relative flex-1'}>
+        <div className={'flex flex-col bg-white border border-slate-200 rounded-lg shadow-xs relative flex-1 overflow-hidden'}>
             <div className={'flex-1 overflow-x-auto h-[calc(100%-50px)]'}>
                 <div className='flex flex-col min-w-fit'>
                     <CustomerTableHeader onSelectPage={handleSelectPage} areAllSelected={areAllSelectedOnPage} visibleColumns={visibleColumns} viewMode={viewMode} />
-                    <div className='overflow-y-auto'>{data.map((customer, index) => (
+                    <div className='overflow-y-auto'>
+                        {data.map((customer, index) => (
                             <CustomerRow zalo={zalo} viewMode={viewMode} user={user} key={customer._id} customer={customer} index={(page - 1) * limit + index + 1} isSelected={selectedCustomers.has(customer.phone)} onSelect={handleSelect} visibleColumns={visibleColumns} />
                         ))}
                         {data.length === 0 && (
-                            <div style={{ height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <h5 style={{ fontStyle: 'italic' }}>Không có dữ liệu khách hàng phù hợp!</h5>
-                            </div>
+                            <EmptyState
+                                title="Không tìm thấy khách hàng nào"
+                                description="Không có bản ghi khách hàng nào phù hợp với điều kiện tìm kiếm hoặc bộ lọc hiện tại."
+                            />
                         )}
                     </div>
                 </div>
             </div>
-            {isPending && <div className={'absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-[2px] z-10'}><h5>Đang tải...</h5></div>}
+            {isPending && (
+                <div className={'absolute inset-0 bg-white/70 flex items-center justify-center backdrop-blur-xs z-10'}>
+                    <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-slate-200 shadow-sm text-sm font-medium text-slate-700">
+                        <div className="w-4 h-4 border-2 border-slate-800 border-t-transparent rounded-full animate-spin" />
+                        <span>Đang cập nhật danh sách...</span>
+                    </div>
+                </div>
+            )}
             <TableControls total={total} limit={limit} page={page} onDeselectAll={handleDeselectAll} createURL={createURL} selectedCount={selectedCustomers.size} visibleColumns={visibleColumns} onVisibleColumnsChange={setVisibleColumns} viewMode={viewMode} onToggleViewMode={onToggleViewMode} />
         </div>
     );

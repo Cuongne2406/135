@@ -21,9 +21,8 @@ export async function POST(request) {
             return jsonRes(403, { status: false, mes: 'Bạn không có quyền truy cập chức năng này.' });
         }
         const formData = await request.formData();
-        const avtFile = formData.get('Avt');
-        let avt;
-        if (avtFile?.size > 0) { avt = await uploadImageToDrive(avtFile, '1h8n0ueMwKumXlYkCDKffgNCyKYRIUJQy'); }
+        const avtFolderId = process.env.GOOGLE_DRIVE_STUDENT_AVT_FOLDER_ID || '1h8n0ueMwKumXlYkCDKffgNCyKYRIUJQy';
+        if (avtFile?.size > 0) { avt = await uploadImageToDrive(avtFile, avtFolderId); }
         const lastStudent = await PostStudent.findOne({ ID: /^AI\d{4}$/ }).sort({ ID: -1 }).select('ID').lean();
         const nextIdNumber = lastStudent ? parseInt(lastStudent.ID.slice(2), 10) + 1 : 1;
         const newStudent = new PostStudent({

@@ -38,6 +38,11 @@ export async function POST(request, { params }) {
       sameSite: 'lax',
       path: '/',
     })
+    cookieStore.set('backup_token', backupToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      path: '/',
+    })
 
     return NextResponse.json({
       success: true,

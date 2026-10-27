@@ -4,6 +4,7 @@ import MakeupSession from '@/models/makeupSession'
 import PostCourse from '@/models/course'
 import PostStudent from '@/models/student'
 import authenticate from '@/utils/authenticate'
+import { checkScheduleConflict } from '@/utils/scheduleConflict'
 import mongoose from 'mongoose'
 
 export async function GET(req) {
@@ -58,6 +59,21 @@ export async function POST(req) {
         }
 
         await connectDB()
+
+        // Check conflict if scheduling room/teacher/date/time
+        if (rest.makeupDate && rest.makeupTime && (rest.makeupRoom || rest.makeupTeacher)) {
+            const conflict = await checkScheduleConflict({
+                date: rest.makeupDate,
+                timeStr: rest.makeupTime,
+                roomId: rest.makeupRoom,
+                teacherId: rest.makeupTeacher,
+                excludeCourseId: courseId,
+                excludeLessonId: lessonId
+            })
+            if (conflict.hasConflict) {
+                return NextResponse.json({ error: conflict.message }, { status: 409 })
+            }
+        }
 
         const session = await MakeupSession.create({
             course: new mongoose.Types.ObjectId(courseId),

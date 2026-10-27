@@ -13,17 +13,26 @@ const RoomSchema = new Schema(
 
 const logs = new Schema(
     {
-        status: { type: RoomSchema },
-        type: { type: String, required: true, enum: ["sendMessage", "addFriend", "findUid", "checkFriend"] },
+        status: { type: RoomSchema, default: () => ({ status: true, message: 'Thành công', data: {} }) },
+        type: { type: String, required: true },
+        action: { type: String },
+        note: { type: String },
+        details: { type: Schema.Types.Mixed, default: {} },
         createdAt: { type: Date, default: Date.now },
-        createBy: { type: Schema.Types.ObjectId, ref: 'user', required: true },
+        createBy: { type: Schema.Types.ObjectId, ref: 'user' },
         customer: { type: Schema.Types.ObjectId, ref: 'customer' },
         student: { type: Schema.Types.ObjectId, ref: 'student' },
-        zalo: { type: Schema.Types.ObjectId, ref: 'zaloaccount', required: true },
+        zalo: { type: Schema.Types.ObjectId, ref: 'zaloaccount', required: false },
         schedule: { type: Schema.Types.ObjectId, ref: 'scheduledjob', default: null },
     },
-    { timestamps: false, versionKey: false }
+    { timestamps: true, versionKey: false }
 )
 
-const Logs = models.logmes || model('logmes', logs)
-export default Logs
+const Logs = models.Log || models.log || models.logmes || model('logmes', logs);
+if (!models.Log) {
+    try { model('Log', logs); } catch (_) {}
+}
+if (!models.log) {
+    try { model('log', logs); } catch (_) {}
+}
+export default Logs;

@@ -14,6 +14,7 @@ import ListArea from '../../ui/area-item'
 import CreateArea from '../../ui/createarea';
 import CourseTryItem from '../../ui/coursetry-item';
 import { reloadBook, reloadCourse } from '@/data/actions/reload';
+import EmptyState from '@/components/ui/EmptyState';
 
 function BookIcon({ active }) {
     return (
@@ -181,11 +182,11 @@ export default function Navbar({ data = [], book = [], user, areas = [], trys, t
     return (
         <>
             <div className={'flex flex-col h-full'}>
-                <div className={'flex bg-[var(--bg-primary)] p-4 rounded-lg border border-[var(--border-color)]'}>
+                <div className={'flex bg-white p-1.5 rounded-lg border border-slate-200 shadow-xs'}>
                     {TABS.map((t, i) => (
                         <div
                             key={t.label}
-                            className={`flex-1 flex items-center justify-center cursor-pointer transition-[background-color] duration-200 ${i === tab ? 'bg-[var(--main_d)] text-white rounded' : ''}`}
+                            className={`flex-1 flex items-center justify-center cursor-pointer transition-all duration-150 py-1.5 rounded-md ${i === tab ? 'bg-slate-900 text-white font-medium shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
                             onClick={() => setTab(i)}
                         >
                             <Nav
@@ -198,34 +199,33 @@ export default function Navbar({ data = [], book = [], user, areas = [], trys, t
                     ))}
                 </div>
 
-                <div className={'flex items-center gap-3 p-4 mt-4 bg-[var(--bg-primary)] rounded-lg border border-[var(--border-color)]'}>
-                    <div className='flex items-center gap-4 flex-1'>
+                <div className={'flex items-center gap-3 p-3.5 mt-3 bg-white rounded-lg border border-slate-200 shadow-xs flex-wrap'}>
+                    <div className='flex items-center gap-3 flex-1 flex-wrap'>
                         {tab !== 3 && tab !== 2 ? (
                             <>
                                 <input
-                                    className={`px-3 py-2.5 border border-gray-200 rounded bg-white text-sm outline-none resize-none text-[var(--text-primary)] w-[300px]`}
-                                    placeholder="Nhập ID khóa học hoặc tên GVCN"
+                                    className="h-9 px-3 border border-slate-300 rounded-md bg-white text-sm outline-none text-slate-900 focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 w-[260px]"
+                                    placeholder="Tìm theo ID khóa học hoặc tên GVCN"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
 
                                 <select
-                                    className='px-3 py-2.5 border border-gray-200 rounded bg-white text-sm outline-none text-gray-700 resize-none text-[var(--text-primary)]'
+                                    className="h-9 px-3 border border-slate-300 rounded-md bg-white text-sm outline-none text-slate-800 focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900"
                                     value={area}
                                     onChange={(e) => setArea(e.target.value)}
                                 >
-                                    <option value="" className='text-sm font-normal text-[var(--text-primary)]'>Tất cả khu vực</option>
+                                    <option value="">Tất cả khu vực</option>
                                     {areaOptions.map((a, index) =>
                                         a && (
-                                            <option key={index} value={a._id} className='text-sm font-normal text-[var(--text-primary)]'>
+                                            <option key={index} value={a._id}>
                                                 {a.name}
                                             </option>
                                         )
                                     )}
                                 </select>
-                                {/* BỘ LỌC THỜI GIAN MỚI */}
                                 <select
-                                    className='px-3 py-2.5 border border-gray-200 rounded bg-white text-sm outline-none text-gray-700 resize-none'
+                                    className="h-9 px-3 border border-slate-300 rounded-md bg-white text-sm outline-none text-slate-800 focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900"
                                     value={timeRange}
                                     onChange={(e) => setTimeRange(e.target.value)}
                                 >
@@ -240,7 +240,7 @@ export default function Navbar({ data = [], book = [], user, areas = [], trys, t
 
                                 <input
                                     type="date"
-                                    className='px-3 py-2.5 border border-gray-200 rounded bg-white text-sm outline-none text-gray-700 resize-none'
+                                    className="h-9 px-2.5 border border-slate-300 rounded-md bg-white text-sm outline-none text-slate-800 focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900"
                                     value={startDate}
                                     onChange={(e) => {
                                         setStartDate(e.target.value);
@@ -250,21 +250,20 @@ export default function Navbar({ data = [], book = [], user, areas = [], trys, t
 
                                 <input
                                     type="date"
-                                    className='px-3 py-2.5 border border-gray-200 rounded bg-white text-sm outline-none text-gray-700 resize-none'
+                                    className="h-9 px-2.5 border border-slate-300 rounded-md bg-white text-sm outline-none text-slate-800 focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900"
                                     value={endDate}
                                     onChange={(e) => {
                                         setEndDate(e.target.value);
-                                        setTimeRange(''); // Reset bộ chọn nếu chọn ngày tùy chỉnh
+                                        setTimeRange('');
                                     }}
                                 />
-
                             </>
                         ) : null}
                     </div>
                     <div className='flex gap-2 items-center flex-wrap'>
                         <Link
                             href="/preview-templates"
-                            className="px-3.5 py-2.5 rounded-lg font-semibold text-xs cursor-pointer flex items-center gap-1.5 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors no-underline"
+                            className="h-9 px-3 rounded-md font-medium text-xs cursor-pointer flex items-center gap-1.5 bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 transition-colors no-underline"
                             title="Xem và so sánh 15 mẫu Template ePortfolio"
                         >
                             <span>🎨</span>
@@ -272,7 +271,7 @@ export default function Navbar({ data = [], book = [], user, areas = [], trys, t
                         </Link>
                         <Link
                             href="/portfolio-lookbook"
-                            className="px-3.5 py-2.5 rounded-lg font-semibold text-xs cursor-pointer flex items-center gap-1.5 bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition-colors no-underline"
+                            className="h-9 px-3 rounded-md font-medium text-xs cursor-pointer flex items-center gap-1.5 bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 transition-colors no-underline"
                             title="Xem ấn phẩm Kỷ yếu Tạp chí A4"
                         >
                             <span>📖</span>
@@ -280,11 +279,11 @@ export default function Navbar({ data = [], book = [], user, areas = [], trys, t
                         </Link>
                         {tab != 2 &&
                             <button
-                                className={`px-4 py-2.5 rounded-lg font-medium cursor-pointer flex items-center gap-2 bg-[#f8fafc] text-[#0f172a] border border-[#e2e8f0]`}
+                                className="h-9 px-3.5 rounded-md font-medium text-xs cursor-pointer flex items-center gap-2 bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition-colors shadow-xs"
                                 onClick={tab !== 3 ? reloadData : reloadDatabook}
                                 disabled={isReloading}
                             >
-                                {isReloading ? 'Đang tải...' : 'Làm mới dữ liệu'}
+                                {isReloading ? 'Đang tải...' : 'Làm mới'}
                             </button>}
                         {user.role.includes('Admin') || user.role.includes('Acadamic') ? <>
                             {tab !== 3 && tab !== 2 ? <Create teachers={teacher} books={book} areas={areas} /> : tab === 3 ? <CourseManagementPage /> : <CreateArea />}
@@ -305,7 +304,12 @@ export default function Navbar({ data = [], book = [], user, areas = [], trys, t
                                     )}
                                 </div>
                             ) : (
-                                <p className={'mt-6 text-[var(--text-secondary)] italic text-center'}>Không tìm thấy khóa học phù hợp.</p>
+                                <EmptyState
+                                    title="Không tìm thấy khóa học nào phù hợp"
+                                    description="Vui lòng thử thay đổi từ khóa tìm kiếm, bộ lọc khu vực hoặc khoảng thời gian."
+                                    actionText="Xóa bộ lọc"
+                                    onAction={() => { setSearch(''); setArea(''); setTimeRange(''); setStartDate(''); setEndDate(''); }}
+                                />
                             )}
                         </>
                     )}

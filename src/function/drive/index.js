@@ -1,6 +1,9 @@
 import { google } from 'googleapis';
 
+let cachedDrive = null;
+
 export async function getDriveClient() {
+  if (cachedDrive) return cachedDrive;
   const auth = new google.auth.GoogleAuth({
     projectId: process.env.GOOGLE_PROJECT_ID,
     credentials: {
@@ -9,5 +12,6 @@ export async function getDriveClient() {
     },
     scopes: ['https://www.googleapis.com/auth/drive'],
   });
-  return google.drive({ version: 'v3', auth });
+  cachedDrive = google.drive({ version: 'v3', auth });
+  return cachedDrive;
 }

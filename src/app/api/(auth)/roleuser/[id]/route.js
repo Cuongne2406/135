@@ -1,6 +1,7 @@
 import connectDB from '@/config/connectDB';
 import { reloadUser } from '@/data/actions/reload';
 import PostUser from '@/models/users';
+import authenticate from '@/utils/authenticate';
 import jsonRes from '@/utils/response';
 
 export async function PATCH(request, { params }) {
@@ -8,6 +9,11 @@ export async function PATCH(request, { params }) {
         const { id } = await params;
         if (!id) {
             return jsonRes(400, { error: 'Thiếu ID người dùng.' });
+        }
+
+        const { user } = await authenticate(request);
+        if (!user || !user.role?.includes('Admin')) {
+            return jsonRes(403, { error: 'Chỉ Quản trị viên (Admin) mới có quyền thay đổi thông tin phân quyền.' });
         }
 
         await connectDB();
@@ -21,6 +27,8 @@ export async function PATCH(request, { params }) {
         if (phone) updateData.phone = phone;
         if (role && typeof role === 'string') {
             updateData.role = [role];
+        } else if (Array.isArray(role)) {
+            updateData.role = role;
         }
 
         const updatedUser = await PostUser.findByIdAndUpdate(id, { $set: updateData }, { new: true });
@@ -28,11 +36,12 @@ export async function PATCH(request, { params }) {
         if (!updatedUser) {
             return jsonRes(404, { error: 'Không tìm thấy người dùng để cập nhật.' });
         }
-        reloadUser()
+        await reloadUser(id);
         return jsonRes(200, { message: 'Cập nhật thông tin thành công.', user: updatedUser });
 
     } catch (err) {
         console.error(err);
-        return jsonRes(500, { error: 'Lỗi máy chủ' });
+        const statusCode = err.message === 'Authentication failed' ? 401 : err.message.includes('quyền') ? 403 : 500;
+        return jsonRes(statusCode, { error: err.message || 'Lỗi máy chủ' });
     }
 }

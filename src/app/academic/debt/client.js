@@ -5,6 +5,7 @@ import React from 'react'
 import Link from 'next/link'
 import Pay from '@/app/student/list/ui/pay'
 import BankManager from '@/components/bank-manager'
+import EmptyState from '@/components/ui/EmptyState'
 
 function fmtPrice(price) {
     const n = Number(price)
@@ -12,42 +13,65 @@ function fmtPrice(price) {
     return n.toLocaleString('vi-VN') + ' VNĐ'
 }
 
-export default function DebtClient({ students, courseMap, attendanceMap }) {
+export default function DebtClient({ students, courseMap, attendanceMap, invoiceMap = {} }) {
     const [search, setSearch] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
     const [viewMode, setViewMode] = useState('flat')
     const [expanded, setExpanded] = useState({})
     const [tab, setTab] = useState('tuition')
 
-const rows = useMemo(() => {
-    const result = []
-    const seen = new Set()
-    students.forEach(s => {
-        ;(s.Course || []).forEach(c => {
-            const cid = String(c.course)
-            const key = s._id + '-' + cid
-            if (seen.has(key)) return
-            seen.add(key)
-            result.push({
-                _id: s._id,
-                ID: s.ID,
-                Name: s.Name,
-                Phone: s.Phone,
-                AreaName: s.Area?.name || '-',
-                courseId: cid,
-                courseName: (courseMap[cid]?.name) || cid.slice(-6),
-                price: courseMap[cid]?.price,
-                startDate: courseMap[cid]?.startDate,
-                endDate: courseMap[cid]?.endDate,
-                status: c.status,
-                paid: c.tuition != null,
-                attended: attendanceMap?.[cid]?.[s.ID] || 0,
-            })
+    const rows = useMemo(() => {
+        const result = []
+        const seen = new Set()
+        students.forEach(s => {
+            ;(s.Course || []).forEach(c => {
+                const cid = String(c.course)
+                const key = s._id + '-' + cid
+                if (seen.has(key)) return
+                seen.add(key)
+
+                const tuitionId = c.tuition ? String(c.tuition) : null
+                const inv = tuitionId ? invoiceMap[tuitionId] : null
+                const coursePrice = courseMap[cid]?.price || 0
+                const amountInitial = inv?.amountInitial ?? coursePrice
+                const amountPaid = inv?.amountPaid ?? 0
+                const discount = inv?.discount ?? 0
+                const remaining = inv ? inv.remaining : (c.tuition ? 0 : coursePrice)
+
+                let paymentStatus = 'unpaid'
+                if (!c.tuition) {
+                    paymentStatus = 'unpaid'
+                } else if (remaining > 0) {
+                    paymentStatus = 'partial'
+                } else {
+                    paymentStatus = 'paid'
+                }
+
+                result.push({
+                    _id: s._id,
+                    ID: s.ID,
+                    Name: s.Name,
+                    Phone: s.Phone,
+                    AreaName: s.Area?.name || '-',
+                    courseId: cid,
+                    courseName: (courseMap[cid]?.name) || cid.slice(-6),
+                    price: amountInitial,
+                    amountInitial,
+                    amountPaid,
+                    discount,
+                    remaining,
+                    paymentStatus,
+                    paid: paymentStatus === 'paid',
+                    startDate: courseMap[cid]?.startDate,
+                    endDate: courseMap[cid]?.endDate,
+                    status: c.status,
+                    attended: attendanceMap?.[cid]?.[s.ID] || 0,
+                })
             })
         })
         result.sort((a, b) => (a.courseName || '').localeCompare(b.courseName || ''))
         return result
-    }, [students, courseMap, attendanceMap])
+    }, [students, courseMap, attendanceMap, invoiceMap])
 
     const filtered = useMemo(() => {
         let result = rows
@@ -55,8 +79,9 @@ const rows = useMemo(() => {
             const q = search.toLowerCase()
             result = result.filter(r => r.ID?.toLowerCase().includes(q) || r.Name?.toLowerCase().includes(q))
         }
-        if (statusFilter === 'paid') result = result.filter(r => r.paid)
-        else if (statusFilter === 'unpaid') result = result.filter(r => !r.paid)
+        if (statusFilter === 'paid') result = result.filter(r => r.paymentStatus === 'paid')
+        else if (statusFilter === 'partial') result = result.filter(r => r.paymentStatus === 'partial')
+        else if (statusFilter === 'unpaid') result = result.filter(r => r.paymentStatus === 'unpaid')
         return result
     }, [rows, search, statusFilter])
 
@@ -73,45 +98,50 @@ const rows = useMemo(() => {
 
     function renderFlat() {
         return (
-            <div className="overflow-x-auto bg-[var(--bg-primary)] rounded border border-[var(--border-color)] flex-1">
-                <table className="w-full text-sm">
+            <div className="overflow-x-auto bg-white rounded-lg border border-slate-200 shadow-xs flex-1">
+                <table className="w-full text-sm border-collapse">
                     <thead>
-                        <tr className="text-left bg-[var(--main_d)] text-white">
-                            <th className="p-2.5 font-medium">Lớp</th>
-                            <th className="p-2.5 font-medium">Ngày BĐ</th>
-                            <th className="p-2.5 font-medium">Ngày KT</th>
-                            <th className="p-2.5 font-medium">ID</th>
-                            <th className="p-2.5 font-medium">Tên</th>
-                            <th className="p-2.5 font-medium">Điện thoại</th>
-                            <th className="p-2.5 font-medium">Đã học</th>
-                            <th className="p-2.5 font-medium">Số tiền</th>
-                            <th className="p-2.5 font-medium">Đóng tiền</th>
-                            <th className="p-2.5 font-medium">Thao tác</th>
+                        <tr className="text-left bg-slate-50/90 border-b border-slate-200">
+                            <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Lớp</th>
+                            <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Ngày BĐ</th>
+                            <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Ngày KT</th>
+                            <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Mã HV</th>
+                            <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Họ và tên</th>
+                            <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Điện thoại</th>
+                            <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500 text-center">Đã học</th>
+                            <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Học phí</th>
+                            <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500 text-center">Trạng thái</th>
+                            <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500 text-center">Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-slate-100">
                         {filtered.map(r => (
-                            <tr key={r._id + '-' + r.courseId} className="border-t border-[var(--border-color)] hover:bg-[var(--hover)]">
-                                <td className="p-2.5">
-                                    <Link href={`/course/${r.courseId}`} className="inline-block px-2 py-1 rounded-md text-sm font-medium text-[var(--main_d)] bg-[var(--main_d)]/10 hover:bg-[var(--main_d)]/20 transition-colors">{r.courseName}</Link>
+                            <tr key={r._id + '-' + r.courseId} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="p-3">
+                                    <Link href={`/course/${r.courseId}`} className="inline-block px-2 py-0.5 rounded text-xs font-medium text-slate-800 bg-slate-100 hover:bg-slate-200 transition-colors">{r.courseName}</Link>
                                 </td>
-                                <td className="p-2.5 text-[var(--text-primary)] text-xs">{r.startDate ? new Date(r.startDate).toLocaleDateString('vi-VN') : '—'}</td>
-                                <td className="p-2.5 text-[var(--text-primary)] text-xs">{r.endDate ? new Date(r.endDate).toLocaleDateString('vi-VN') : '—'}</td>
-                                <td className="p-2.5 text-[var(--text-primary)]">{r.ID}</td>
-                                <td className="p-2.5">
-                                    <Link href={`/${r._id}`} className="text-[var(--main_d)] hover:underline">{r.Name}</Link>
+                                <td className="p-3 text-slate-600 text-xs font-mono">{r.startDate ? new Date(r.startDate).toLocaleDateString('vi-VN') : '—'}</td>
+                                <td className="p-3 text-slate-600 text-xs font-mono">{r.endDate ? new Date(r.endDate).toLocaleDateString('vi-VN') : '—'}</td>
+                                <td className="p-3 font-mono text-xs text-slate-500">{r.ID}</td>
+                                <td className="p-3">
+                                    <Link href={`/${r._id}`} className="font-medium text-slate-900 hover:underline">{r.Name}</Link>
                                 </td>
-                                <td className="p-2.5 text-[var(--text-secondary)]">{r.Phone || '—'}</td>
-                                <td className="p-2.5 text-[var(--text-primary)]">{r.attended}</td>
-                                <td className="p-2.5">{fmtPrice(r.price)}</td>
-                                <td className="p-2.5">
-                                    {r.paid ? (
-                                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">Đã đóng</span>
+                                <td className="p-3 text-slate-600 font-mono text-xs">{r.Phone || '—'}</td>
+                                <td className="p-3 text-slate-800 text-center font-medium">{r.attended}</td>
+                                <td className="p-3 font-medium text-slate-900">{fmtPrice(r.price)}</td>
+                                <td className="p-3 text-center">
+                                    {r.paymentStatus === 'paid' ? (
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-[#f0fdf4] text-[#15803d] border border-[#bbf7d0]">Đã hoàn tất</span>
+                                    ) : r.paymentStatus === 'partial' ? (
+                                        <span className="inline-flex flex-col items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-[#fffbeb] text-[#b45309] border border-[#fde68a]">
+                                            <span>Còn nợ</span>
+                                            <span className="text-[10px] font-normal text-amber-700">Thiếu: {fmtPrice(r.remaining)}</span>
+                                        </span>
                                     ) : (
-                                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">Chưa đóng</span>
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-[#fef2f2] text-[#b91c1c] border border-[#fecaca]">Chưa nộp</span>
                                     )}
                                 </td>
-                                <td className="p-2.5">
+                                <td className="p-3 text-center">
                                     <Pay _id={r._id} />
                                 </td>
                             </tr>
@@ -183,10 +213,14 @@ const rows = useMemo(() => {
                                         <td className="p-2.5 text-[var(--text-primary)]">{r.attended}</td>
                                         <td className="p-2.5">{fmtPrice(r.price)}</td>
                                         <td className="p-2.5">
-                                                {r.paid ? (
-                                                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">Đã đóng</span>
+                                                {r.paymentStatus === 'paid' ? (
+                                                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">Đã hoàn tất</span>
+                                                ) : r.paymentStatus === 'partial' ? (
+                                                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800" title={`Còn nợ: ${fmtPrice(r.remaining)}`}>
+                                                        Nợ {fmtPrice(r.remaining)}
+                                                    </span>
                                                 ) : (
-                                                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">Chưa đóng</span>
+                                                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">Chưa nộp</span>
                                                 )}
                                             </td>
                                             <td className="p-2.5">
@@ -229,34 +263,38 @@ const rows = useMemo(() => {
 
             {tab === 'tuition' ? (
                 <>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
                 <input
-                    className="px-3 py-2 border border-gray-200 rounded bg-white text-sm outline-none text-gray-700 flex-1"
-                    placeholder="Tìm theo tên hoặc ID..."
+                    className="h-9 px-3 border border-slate-300 rounded-md bg-white text-sm outline-none text-slate-900 focus:ring-2 focus:ring-[var(--main_d)]/15 focus:border-[var(--main_d)] flex-1"
+                    placeholder="Tìm theo tên học viên hoặc mã ID..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                 />
                 <select
-                    className="px-3 py-2 border border-gray-200 rounded bg-white text-sm outline-none text-gray-700"
+                    className="h-9 px-3 border border-slate-300 rounded-md bg-white text-sm outline-none text-slate-800 focus:ring-2 focus:ring-[var(--main_d)]/15 focus:border-[var(--main_d)]"
                     value={statusFilter}
                     onChange={e => setStatusFilter(e.target.value)}
                 >
-                    <option value="all">Tất cả</option>
-                    <option value="unpaid">Chưa đóng</option>
-                    <option value="paid">Đã đóng</option>
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="unpaid">Chưa nộp</option>
+                    <option value="partial">Còn nợ / Nộp một phần</option>
+                    <option value="paid">Đã hoàn tất</option>
                 </select>
                 <button
                     onClick={() => setViewMode(v => v === 'flat' ? 'grouped' : 'flat')}
-                    className="px-3 py-2 text-xs rounded-lg border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--main_d)] transition-colors whitespace-nowrap"
+                    className="h-9 px-3 text-xs font-medium rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-colors whitespace-nowrap shadow-xs cursor-pointer"
                 >
-                    {viewMode === 'flat' ? 'Theo lớp' : 'Danh sách'}
+                    {viewMode === 'flat' ? 'Xem theo lớp' : 'Xem danh sách'}
                 </button>
             </div>
 
             {filtered.length === 0 ? (
-                <div className="flex-1 flex items-center justify-center text-sm text-[var(--text-secondary)]">
-                    Không có học sinh nợ học phí
-                </div>
+                <EmptyState
+                    title="Không có dữ liệu học phí"
+                    description="Không tìm thấy học viên nào phù hợp với điều kiện tìm kiếm hoặc trạng thái học phí hiện tại."
+                    actionText="Xóa bộ lọc"
+                    onAction={() => { setSearch(''); setStatusFilter('all'); }}
+                />
             ) : viewMode === 'flat' ? renderFlat() : renderGrouped()}
                 </>
             ) : (

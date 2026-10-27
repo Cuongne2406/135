@@ -1,4 +1,3 @@
-import Zalo from '@/app/client/ui/zalo'
 import { Schema, model, models } from 'mongoose'
 
 const postUser = new Schema({
@@ -32,6 +31,14 @@ const postUser = new Schema({
   },
 }, { timestamps: true })
 
-const users = models.user || model('user', postUser)
+postUser.index({ phone: 1 });
+postUser.index({ status: 1 });
+
+const users = models.User || models.user || model('User', postUser);
+if (!models.user) {
+  try {
+    model('user', postUser);
+  } catch (e) {}
+}
 
 export default users

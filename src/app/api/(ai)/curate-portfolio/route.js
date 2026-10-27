@@ -2,13 +2,35 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/config/connectDB';
 import PostCourse from '@/models/course';
 import PostStudent from '@/models/student';
+import PostBook from '@/models/book';
 import { getFilesInDriveFolder } from '@/function/drive/image';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-
+import { handleApiError } from '@/utils/apiError';
 import mongoose from 'mongoose';
+import fs from 'fs';
+import path from 'path';
 
 // Helper tải thumbnail ảnh w512 dưới dạng base64 cho Gemini
 async function fetchImageBase64(fileId, timeoutMs = 3000) {
+    if (!fileId || typeof fileId !== 'string') return null;
+    // Hỗ trợ đọc ảnh trực tiếp từ thư mục public/ nếu là đường dẫn nội bộ
+    if (fileId.startsWith('/')) {
+        try {
+            const localPath = path.join(process.cwd(), 'public', fileId);
+            if (fs.existsSync(localPath)) {
+                const buffer = fs.readFileSync(localPath);
+                return {
+                    inlineData: {
+                        data: buffer.toString('base64'),
+                        mimeType: 'image/jpeg'
+                    }
+                };
+            }
+        } catch (e) {
+            console.warn('[AI-Curate] Lỗi đọc ảnh local:', e.message);
+        }
+    }
+
     try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -58,6 +80,25 @@ function calculateRadarSkills(stuDataInCourse, totalLessons, sIdx) {
     };
 }
 
+// Helper định dạng radar skills từ AI với Fallback an toàn
+function formatRadarSkills(aiSkills, fallbackSkills) {
+    if (!aiSkills || typeof aiSkills !== 'object') return fallbackSkills;
+    const formatVal = (v, fb) => {
+        if (v === undefined || v === null) return fb;
+        if (typeof v === 'string' && v.includes('%')) return v;
+        const num = Number(v);
+        if (!isNaN(num) && num > 0) return `${Math.min(100, Math.max(50, Math.round(num)))} %`;
+        return fb;
+    };
+    return {
+        'Tư duy Thuật toán & Logic': formatVal(aiSkills.algorithm || aiSkills['Tư duy Thuật toán & Logic'], fallbackSkills['Tư duy Thuật toán & Logic']),
+        'Kỹ năng Thao tác & Lắp ráp': formatVal(aiSkills.manipulation || aiSkills['Kỹ năng Thao tác & Lắp ráp'], fallbackSkills['Kỹ năng Thao tác & Lắp ráp']),
+        'Thuyết trình & Báo cáo': formatVal(aiSkills.presentation || aiSkills['Thuyết trình & Báo cáo'], fallbackSkills['Thuyết trình & Báo cáo']),
+        'Tinh thần Đồng đội': formatVal(aiSkills.teamwork || aiSkills['Tinh thần Đồng đội'], fallbackSkills['Tinh thần Đồng đội']),
+        'Sáng tạo & Cải tiến': formatVal(aiSkills.creativity || aiSkills['Sáng tạo & Cải tiến'], fallbackSkills['Sáng tạo & Cải tiến'])
+    };
+}
+
 export async function POST(req) {
     try {
         await connectDB();
@@ -83,9 +124,9 @@ export async function POST(req) {
             });
         }
 
-        // 2. Lấy thông tin học sinh trong lớp
+        // 2. Lấy thông tin học sinh trong lớp (bao gồm điểm số Scores)
         const studentIds = (course.Student || []).map(s => s.ID);
-        const studentDocs = await PostStudent.find({ ID: { $in: studentIds } }).select('_id ID Name Avt avatar Profile').lean();
+        const studentDocs = await PostStudent.find({ ID: { $in: studentIds } }).select('_id ID Name Avt avatar Profile Scores').lean();
 
         // 3. Thu thập toàn bộ ảnh của khóa học (từ DetailImage + Google Drive Folder)
         const allCourseImages = [];
@@ -108,28 +149,35 @@ export async function POST(req) {
                 }
             });
 
-            // Từ các Google Drive folder của từng buổi học
-            for (let idx = 0; idx < course.Detail.length; idx++) {
-                const folderId = course.Detail[idx].Image;
-                if (folderId && typeof folderId === 'string' && folderId.length > 15) {
-                    try {
-                        const driveFiles = await getFilesInDriveFolder(folderId);
-                        for (const file of driveFiles) {
-                            if (file.id && !seenIds.has(file.id)) {
-                                seenIds.add(file.id);
-                                allCourseImages.push({
-                                    id: file.id,
-                                    source: `Buổi ${idx + 1} (Drive)`,
-                                    name: file.name,
-                                    lessonIdx: idx
-                                });
-                            }
-                        }
-                    } catch (err) {
-                        console.warn(`[AI-Curate] Quét Drive folder ${folderId} thất bại:`, err.message);
-                    }
+            // Từ các Google Drive folder của từng buổi học (quét đồng thời song song)
+            const folderPromises = course.Detail.map(async (lesson, idx) => {
+                const folderId = lesson.Image;
+                if (!folderId || typeof folderId !== 'string' || folderId.length <= 15) return [];
+                try {
+                    const driveFiles = await getFilesInDriveFolder(folderId);
+                    return driveFiles.map(file => ({
+                        id: file.id,
+                        source: `Buổi ${idx + 1} (Drive)`,
+                        name: file.name,
+                        lessonIdx: idx
+                    }));
+                } catch (err) {
+                    console.warn(`[AI-Curate] Quét Drive folder ${folderId} thất bại:`, err.message);
+                    return [];
                 }
-            }
+            });
+
+            const folderResults = await Promise.allSettled(folderPromises);
+            folderResults.forEach(res => {
+                if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+                    res.value.forEach(file => {
+                        if (file.id && !seenIds.has(file.id)) {
+                            seenIds.add(file.id);
+                            allCourseImages.push(file);
+                        }
+                    });
+                }
+            });
         }
 
         // 4. Thu thập ảnh riêng của từng học sinh (từ Learn[].Image)
@@ -157,7 +205,7 @@ export async function POST(req) {
             studentPersonalMap.set(stu.ID, personal);
         });
 
-        // 5. Sử dụng Gemini Vision để phân tích và tối ưu hóa lựa chọn (nếu có API Key và có ảnh)
+        // 5. Sử dụng Gemini Vision & Pedagogical Reasoning để phân tích đa chiều
         const geminiApiKey = process.env.GEMINI_API_KEY;
         const aiRecommendations = new Map();
 
@@ -165,30 +213,61 @@ export async function POST(req) {
             try {
                 // Giới hạn tối đa 24 ảnh đại diện từ các buổi học để gửi AI trong thời gian tối ưu
                 const sampleImages = allCourseImages.slice(0, 24);
-                const imagePayloads = [];
+                
+                // Tải đồng thời song song 24 ảnh base64
+                const base64Results = await Promise.allSettled(
+                    sampleImages.map(img => fetchImageBase64(img.id, 2500))
+                );
 
-                for (const img of sampleImages) {
-                    const base64Data = await fetchImageBase64(img.id, 2000);
-                    if (base64Data) {
-                        imagePayloads.push({ id: img.id, ...base64Data });
+                const imagePayloads = [];
+                sampleImages.forEach((img, i) => {
+                    const res = base64Results[i];
+                    if (res?.status === 'fulfilled' && res.value) {
+                        imagePayloads.push({ id: img.id, ...res.value });
                     }
-                }
+                });
 
                 if (imagePayloads.length > 0) {
                     const genAI = new GoogleGenerativeAI(geminiApiKey);
                     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-                    const studentListPrompt = studentDocs.map((s, i) => `${i + 1}. ID: ${s.ID}, Tên: ${s.Name || 'Học sinh'}`).join('\n');
+                    // Trích xuất dữ liệu đa chiều cho từng học sinh: Tỷ lệ đi học, ghi chú buổi học, điểm số bài test
+                    const totalLessons = course.Detail?.length || 1;
+                    const studentListPrompt = studentDocs.map((s, i) => {
+                        const stuData = (course.Student || []).find(cs => cs.ID === s.ID);
+                        const totalAtt = (stuData?.Learn || []).filter(l => Number(l.Checkin) === 1).length;
+                        const attRate = Math.round((totalAtt / (totalLessons || 1)) * 100);
+                        const notes = (stuData?.Learn || []).map((l, idx) => {
+                            const c = [l.CmtFn, ...(l.Cmt || [])].filter(Boolean).join('; ');
+                            return c ? `Buổi ${idx + 1}: ${c}` : null;
+                        }).filter(Boolean).join(' | ') || 'Chăm chỉ, tích cực';
+                        const testScores = (s.Scores || []).map(sc => `${sc.testName}: ${sc.score}/${sc.maxScore || 10}`).join(', ') || 'Chưa có điểm bài test';
+                        return `Học sinh ${i + 1}:
+- studentId: "${s.ID}"
+- Họ tên: ${s.Name || 'Học sinh'}
+- Chuyên cần: ${totalAtt}/${totalLessons} buổi (${attRate}%)
+- Ghi chú buổi học: ${notes}
+- Điểm kiểm tra: ${testScores}`;
+                    }).join('\n\n');
+
                     const prompt = `
-Bạn là chuyên gia tuyển chọn ảnh tốt nghiệp E-Portfolio cho trung tâm giáo dục STEM/Robotics.
-Dưới đây là danh sách học sinh:
+Bạn là chuyên gia sư phạm & giám tuyển tốt nghiệp E-Portfolio cho trung tâm giáo dục STEM/Robotics AI Robotic.
+Dưới đây là hồ sơ học tập chi tiết của từng học sinh:
 ${studentListPrompt}
 
-Chúng tôi đã gửi kèm ${imagePayloads.length} bức ảnh hoạt động từ khóa học.
-Hãy chọn ra 3 ảnh đẹp nhất cho mỗi học sinh:
-- coverImg: Ảnh cận cảnh/nửa người rõ mặt học sinh, nét mặt vui vẻ/tự tin/rạng rỡ.
-- projectImg1: Ảnh học sinh đang tập trung thao tác, lắp ráp robot, code hoặc chế tạo.
-- projectImg2: Ảnh chụp cùng sản phẩm hoàn chỉnh hoặc thuyết trình.
+Chúng tôi đã gửi kèm ${imagePayloads.length} bức ảnh hoạt động thực tế từ khóa học.
+Đối với mỗi học sinh, hãy phân tích kỹ hồ sơ và thực hiện:
+1. Tuyển chọn 3 bức ảnh phù hợp nhất:
+   - coverImg: File ID ảnh cận cảnh/nửa người rõ mặt học sinh, nét mặt vui vẻ/tự tin.
+   - projectImg1: File ID ảnh học sinh đang tập trung thao tác, lắp ráp hoặc lập trình.
+   - projectImg2: File ID ảnh chụp cùng sản phẩm hoàn chỉnh hoặc thuyết trình.
+2. Viết nhận xét sư phạm (aiComment): Đoạn nhận xét ấm áp, chuyên nghiệp (khoảng 3-5 câu), mang tính cá nhân hóa sâu sắc dựa trên ghi chú thực tế của giáo viên qua từng buổi học và điểm số của bé. Khen ngợi điểm mạnh nổi trội và khích lệ bé tự tin phát triển đam mê công nghệ.
+3. Đánh giá 5 trục kỹ năng (aiRadarSkills, thang điểm 0 - 100):
+   - algorithm: Tư duy Thuật toán & Logic
+   - manipulation: Kỹ năng Thao tác & Lắp ráp
+   - presentation: Thuyết trình & Báo cáo
+   - teamwork: Tinh thần Đồng đội
+   - creativity: Sáng tạo & Cải tiến
 
 Trả về duy nhất định dạng JSON thuần (không kèm markdown code block thừa thãi) theo cấu trúc:
 {
@@ -197,7 +276,15 @@ Trả về duy nhất định dạng JSON thuần (không kèm markdown code blo
       "studentId": "ID_HOC_SINH",
       "coverImg": "FILE_ID_ANH_1",
       "projectImg1": "FILE_ID_ANH_2",
-      "projectImg2": "FILE_ID_ANH_3"
+      "projectImg2": "FILE_ID_ANH_3",
+      "aiComment": "Nhận xét sư phạm...",
+      "aiRadarSkills": {
+        "algorithm": 92,
+        "manipulation": 95,
+        "presentation": 88,
+        "teamwork": 90,
+        "creativity": 94
+      }
     }
   ]
 }
@@ -206,7 +293,7 @@ Trả về duy nhất định dạng JSON thuần (không kèm markdown code blo
                     const contents = [prompt, ...imagePayloads.map(p => ({ inlineData: p.inlineData }))];
                     const aiResult = await model.generateContent(contents);
                     const rawText = aiResult.response.text().trim();
-                    const jsonCleaned = rawText.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+                    const jsonCleaned = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
                     const parsed = JSON.parse(jsonCleaned);
 
                     if (Array.isArray(parsed?.recommendations)) {
@@ -218,7 +305,7 @@ Trả về duy nhất định dạng JSON thuần (không kèm markdown code blo
                     }
                 }
             } catch (aiErr) {
-                console.warn('[AI-Curate] Lỗi gọi Gemini Vision (sẽ chuyển sang thuật toán Fallback):', aiErr.message);
+                console.warn('[AI-Curate] Lỗi gọi Gemini Vision (chuyển sang Fallback an toàn):', aiErr.message);
             }
         }
 
@@ -250,9 +337,16 @@ Trả về duy nhất định dạng JSON thuần (không kèm markdown code blo
                 ? aiRec.projectImg2
                 : (candidatePool[2] || candidatePool[1] || candidatePool[0] || '');
 
-            const comment = synthesizeComment(stu, stuDataInCourse);
-            const skills = calculateRadarSkills(stuDataInCourse, totalLessons, sIdx);
-            const totalAttended = (stuDataInCourse?.Learn || []).filter(l => l.Checkin === 1).length;
+            // Fallback an toàn cho nhận xét và kỹ năng
+            const fallbackComment = synthesizeComment(stu, stuDataInCourse);
+            const fallbackSkills = calculateRadarSkills(stuDataInCourse, totalLessons, sIdx);
+
+            const comment = (aiRec?.aiComment && typeof aiRec.aiComment === 'string' && aiRec.aiComment.trim().length > 15)
+                ? aiRec.aiComment.trim()
+                : fallbackComment;
+
+            const skills = formatRadarSkills(aiRec?.aiRadarSkills, fallbackSkills);
+            const totalAttended = (stuDataInCourse?.Learn || []).filter(l => Number(l.Checkin) === 1).length;
 
             return {
                 studentId: stu._id?.toString() || stu.ID,
@@ -266,6 +360,8 @@ Trả về duy nhất định dạng JSON thuần (không kèm markdown code blo
                 projectImg2,
                 comment,
                 skills,
+                aiComment: aiRec?.aiComment || null,
+                aiRadarSkills: aiRec?.aiRadarSkills || null,
                 isAiSelected: true
             };
         });
@@ -281,8 +377,7 @@ Trả về duy nhất định dạng JSON thuần (không kèm markdown code blo
         });
 
     } catch (error) {
-        console.error('[AI-Curate] Lỗi server:', error);
-        return NextResponse.json({ status: 1, mes: error.message || 'Lỗi server xử lý ảnh AI.' }, { status: 500 });
+        return handleApiError('GEMINI_CURATE', error, 'Lỗi phân tích và tuyển chọn ảnh AI cho khóa học.');
     }
 }
 
@@ -295,12 +390,59 @@ export async function GET(req) {
 
     try {
         await connectDB();
-        const course = await PostCourse.findById(courseId).select('aiPortfolioDraft').lean();
+        const course = await PostCourse.findById(courseId).select('aiPortfolioDraft isPublished publishedAt ID Type').lean();
         return NextResponse.json({
             status: 2,
-            data: course?.aiPortfolioDraft || null
+            data: course?.aiPortfolioDraft || null,
+            isPublished: !!course?.isPublished,
+            publishedAt: course?.publishedAt || null,
+            courseCode: course?.ID || '',
+            courseType: course?.Type || ''
         });
     } catch (error) {
         return NextResponse.json({ status: 1, mes: error.message }, { status: 500 });
     }
 }
+
+export async function PUT(req) {
+    try {
+        await connectDB();
+        const body = await req.json();
+        const { courseId, isPublished, draft } = body;
+
+        if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+            return NextResponse.json({ status: 1, mes: 'courseId không hợp lệ' }, { status: 400 });
+        }
+
+        const updateFields = {};
+        if (typeof isPublished === 'boolean') {
+            updateFields.isPublished = isPublished;
+            if (isPublished) {
+                updateFields.publishedAt = new Date();
+            }
+        }
+        if (Array.isArray(draft)) {
+            updateFields.aiPortfolioDraft = draft;
+        }
+
+        const updated = await PostCourse.findByIdAndUpdate(
+            courseId,
+            { $set: updateFields },
+            { new: true, select: 'isPublished publishedAt aiPortfolioDraft' }
+        ).lean();
+
+        if (!updated) {
+            return NextResponse.json({ status: 1, mes: 'Không tìm thấy khóa học' }, { status: 404 });
+        }
+
+        return NextResponse.json({
+            status: 2,
+            mes: isPublished ? 'Đã xuất bản ePortfolio thành công' : 'Đã lưu bản nháp ePortfolio',
+            isPublished: !!updated.isPublished,
+            publishedAt: updated.publishedAt
+        });
+    } catch (error) {
+        return NextResponse.json({ status: 1, mes: error.message }, { status: 500 });
+    }
+}
+

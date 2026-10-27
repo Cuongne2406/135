@@ -46,12 +46,12 @@ function ModeToggleSwitch({ mode, onModeChange }) {
     return (
         <div className='flex items-center gap-1 bg-gray-100 p-1 rounded-lg'>
             <button
-                className={`'px-3 py-1.5 rounded-md text-sm transition-colors ${mode === 'current' ? 'bg-white shadow-sm font-medium' : ''}`}
+                className={`px-3 py-1.5 rounded-md text-sm transition-colors ${mode === 'current' ? 'bg-white shadow-sm font-medium' : ''}`}
                 onClick={() => onModeChange('current')}>
                 Zalo hiện tại
             </button>
             <button
-                className={`'px-3 py-1.5 rounded-md text-sm transition-colors ${mode === 'all' ? 'bg-white shadow-sm font-medium' : ''}`}
+                className={`px-3 py-1.5 rounded-md text-sm transition-colors ${mode === 'all' ? 'bg-white shadow-sm font-medium' : ''}`}
                 onClick={() => onModeChange('all')}>
                 Tất cả
             </button>

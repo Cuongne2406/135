@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { driveImage } from '@/function';
 import { reloadCourse } from '@/data/actions/reload';
 import { useRouter } from 'next/navigation';
+import ShareQrModal from '../shareQrModal';
 
 export default function ReviewSheetModal({
     isOpen,
@@ -16,6 +17,7 @@ export default function ReviewSheetModal({
     const router = useRouter();
     const [submitting, setSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [openQrModal, setOpenQrModal] = useState(false);
     const [activePicker, setActivePicker] = useState(null); // { studentId, field: 'coverImg' | 'projectImg1' | 'projectImg2' }
 
     // Thu thập tất cả ảnh của khóa học (Ảnh lớp + Ảnh từng học sinh)
@@ -273,6 +275,17 @@ export default function ReviewSheetModal({
                 throw new Error(data.mes || 'Không thể lưu Portfolio và hoàn thành khóa học.');
             }
 
+            // Đồng bộ trạng thái xuất bản và bản nháp sang API curate-portfolio
+            await fetch('/api/curate-portfolio', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    courseId: course._id,
+                    isPublished: true,
+                    draft: reviews
+                })
+            }).catch(e => console.warn('Lỗi đồng bộ curate-portfolio:', e));
+
             await reloadCourse(course._id);
             router.refresh();
             if (onSuccess) onSuccess();
@@ -280,6 +293,27 @@ export default function ReviewSheetModal({
         } catch (err) {
             console.error('Lỗi khi xuất bản Portfolio:', err);
             setErrorMessage(err.message || 'Đã có lỗi xảy ra.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    // Hành động: Lưu và mở Modal mã QR
+    const handleExportAndShowQr = async () => {
+        setSubmitting(true);
+        try {
+            await fetch('/api/curate-portfolio', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    courseId: course._id,
+                    isPublished: true,
+                    draft: reviews
+                })
+            });
+            setOpenQrModal(true);
+        } catch (err) {
+            console.error('Lỗi lưu trạng thái xuất bản:', err);
         } finally {
             setSubmitting(false);
         }
@@ -408,7 +442,7 @@ export default function ReviewSheetModal({
 
                                     {/* 5-axis Radar tags */}
                                     <div className="flex items-center gap-1.5 flex-wrap max-md:hidden">
-                                        {Object.entries(stu.skills).slice(0, 3).map(([k, v]) => (
+                                        {Object.entries(stu.skills || {}).slice(0, 3).map(([k, v]) => (
                                             <span key={k} className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
                                                 {k.split(' ')[0]}: <b>{v}</b>
                                             </span>
@@ -510,21 +544,19 @@ export default function ReviewSheetModal({
                         </button>
                         <button
                             type="button"
+                            onClick={handleExportAndShowQr}
+                            disabled={submitting || reviews.length === 0}
+                            className="px-4 py-2 rounded-lg text-xs font-semibold text-slate-800 bg-white border border-slate-300 hover:bg-slate-50 cursor-pointer transition-colors shadow-2xs"
+                        >
+                            Xuất & Mã QR
+                        </button>
+                        <button
+                            type="button"
                             onClick={handlePublishAll}
                             disabled={submitting || reviews.length === 0}
-                            className="px-5 py-2 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-none cursor-pointer transition-all shadow-md hover:shadow-lg flex items-center gap-1.5 disabled:opacity-50"
+                            className="px-5 py-2 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 border-none cursor-pointer transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
                         >
-                            {submitting ? (
-                                <>
-                                    <span className="animate-spin">⏳</span>
-                                    <span>Đang xuất bản Portfolio...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span>🚀</span>
-                                    <span>Xác Nhận & Xuất Bản Tất Cả Portfolio</span>
-                                </>
-                            )}
+                            {submitting ? 'Đang lưu...' : 'Lưu & Xuất bản'}
                         </button>
                     </div>
                 </div>
@@ -659,6 +691,13 @@ export default function ReviewSheetModal({
                     </div>
                 </div>
             )}
+
+            <ShareQrModal
+                isOpen={openQrModal}
+                onClose={() => setOpenQrModal(false)}
+                course={course}
+                students={reviews}
+            />
         </div>
     );
 }

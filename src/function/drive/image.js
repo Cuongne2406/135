@@ -34,14 +34,14 @@ export async function uploadImageToDrive(file, folderId) {
 
 export async function deleteImageFromDrive(fileId) {
     if (!fileId) {
-        
+
         return false;
     }
 
     try {
         const drive = await getDriveClient();
         await drive.files.delete({ fileId: fileId, supportsAllDrives: true });
-        
+
         return true;
     } catch (error) {
         if (error.code === 404) {

@@ -19,7 +19,10 @@ export async function POST(request) {
     }
 
     await connectDB()
-    const courses = await PostCourse.find({}).lean()
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const courses = await PostCourse.find({
+      'Detail.Day': { $gte: sevenDaysAgo, $lte: new Date() }
+    }).lean()
     let checked = 0
 
     for (const course of courses) {

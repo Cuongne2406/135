@@ -2,6 +2,7 @@ import { student_data } from '@/data/actions/get'
 import DebtClient from './client'
 import connectDB from '@/config/connectDB'
 import Course from '@/models/course'
+import Invoice from '@/models/invoices'
 import '@/models/book'
 
 export default async function DebtPage() {
@@ -12,6 +13,33 @@ export default async function DebtPage() {
         .populate({ path: 'Book', select: 'Price Name' })
         .select('ID Book Detail.Day Student.ID Student.Learn.Checkin')
         .lean()
+
+    // Thu thập tất cả tuition IDs từ học sinh để lấy dữ liệu hóa đơn
+    const tuitionIds = []
+    ;(allStudents || []).forEach(s => {
+        ;(s.Course || []).forEach(c => {
+            if (c.tuition) tuitionIds.push(c.tuition)
+        })
+    })
+
+    const invoiceDocs = tuitionIds.length > 0
+        ? await Invoice.find({ _id: { $in: tuitionIds } }).select('amountInitial amountPaid discount paymentMethod').lean()
+        : []
+
+    const invoiceMap = {}
+    invoiceDocs.forEach(inv => {
+        const amountInitial = Number(inv.amountInitial) || 0
+        const amountPaid = Number(inv.amountPaid) || 0
+        const discount = Number(inv.discount) || 0
+        const remaining = Math.max(0, amountInitial - (amountPaid + discount))
+        invoiceMap[String(inv._id)] = {
+            amountInitial,
+            amountPaid,
+            discount,
+            remaining,
+            paymentMethod: inv.paymentMethod
+        }
+    })
 
     const courseMap = {}
     const attendanceMap = {}
@@ -31,5 +59,5 @@ export default async function DebtPage() {
         })
     })
 
-    return <DebtClient students={allStudents || []} courseMap={courseMap} attendanceMap={attendanceMap} />
+    return <DebtClient students={allStudents || []} courseMap={courseMap} attendanceMap={attendanceMap} invoiceMap={invoiceMap} />
 }

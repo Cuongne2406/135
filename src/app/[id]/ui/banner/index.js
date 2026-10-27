@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Update from "@/app/student/list/ui/update";
+import { srcImage } from "@/function";
 
 export default function Banner({ data, area }) {
     const pathname = usePathname();
@@ -14,7 +15,7 @@ export default function Banner({ data, area }) {
         const lastKey = keys[keys.length - 1];
         position[1] = lastKey;
     }
-    const avt = data.Avt ? `https://lh3.googleusercontent.com/d/${data?.Avt}` : "https://lh3.googleusercontent.com/d/1iq7y8VE0OyFIiHmpnV_ueunNsTeHK1bG";
+    const avt = data.Avt ? srcImage(data.Avt) : "https://lh3.googleusercontent.com/d/1iq7y8VE0OyFIiHmpnV_ueunNsTeHK1bG";
 
     return (
         <div className="bg-[var(--bg-primary)] rounded-lg flex flex-col border border-[var(--border-color)] text-[var(--text-primary)]">
@@ -26,6 +27,7 @@ export default function Banner({ data, area }) {
                     style={{ objectFit: "cover", borderRadius: 3 }}
                     alt="avatar"
                     priority
+                    unoptimized
                 />
                 <div style={{ alignContent: "center", flex: 1 }}>
                     <p className="text-sm">ID: {data.ID}</p>

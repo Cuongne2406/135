@@ -30,10 +30,10 @@ const COLLAPSED_W = '60px';
 const EXPANDED_W = '240px';
 
 const academicChildren = [
-  { href: '/academic/makeup', content: 'Học bù' },
-  { href: '/academic/rooms', content: 'Phòng học' },
-  { href: '/academic/debt', content: 'Quản lý học phí' },
-  { href: '/academic/report', content: 'Báo cáo chuyên cần' },
+  { href: '/academic/makeup', content: 'Học bù', allowedRoles: ['admin', 'teacher', 'hr', 'client', 'sale', 'academic'] },
+  { href: '/academic/rooms', content: 'Phòng học', allowedRoles: ['admin', 'hr', 'client', 'sale', 'academic'] },
+  { href: '/academic/debt', content: 'Quản lý học phí', allowedRoles: ['admin', 'hr', 'client', 'sale', 'academic'] },
+  { href: '/academic/report', content: 'Báo cáo chuyên cần', allowedRoles: ['admin', 'teacher', 'academic'] },
 ]
 
 const Svg_Palette = (props) => (
@@ -49,58 +49,97 @@ const Svg_Lookbook = (props) => (
 );
 
 const initialNavItems = [
-  { href: '/student/list', icon: <Svg_Student w={22} h={22} c={'var(--text-secondary)'} />, content: 'Học sinh' },
+  { 
+    href: '/student/list', 
+    icon: <Svg_Student w={22} h={22} c={'var(--text-secondary)'} />, 
+    content: 'Học sinh',
+    allowedRoles: ['admin', 'teacher', 'hr', 'client', 'sale', 'academic']
+  },
   {
-    href: '/teacher', icon: <div>
+    href: '/teacher', 
+    icon: <div>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" height={22} width={22} fill={'var(--text-secondary)'}>
         <path d="M160 64c0-35.3 28.7-64 64-64L576 0c35.3 0 64 28.7 64 64l0 288c0 35.3-28.7 64-64 64l-239.2 0c-11.8-25.5-29.9-47.5-52.4-64l99.6 0 0-32c0-17.7 14.3-32 32-32l64 0c17.7 0 32 14.3 32 32l0 32 64 0 0-288L224 64l0 49.1C205.2 102.2 183.3 96 160 96l0-32zm0 64a96 96 0 1 1 0 192 96 96 0 1 1 0-192zM133.3 352l53.3 0C260.3 352 320 411.7 320 485.3c0 14.7-11.9 26.7-26.7 26.7L26.7 512C11.9 512 0 500.1 0 485.3C0 411.7 59.7 352 133.3 352z" />
       </svg>
-    </div>, content: 'Người dùng'
+    </div>, 
+    content: 'Người dùng',
+    allowedRoles: ['admin']
   },
   {
-    href: '/academic', icon: <div>
+    href: '/academic', 
+    icon: <div>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" height={22} width={22} fill={'var(--text-secondary)'}>
         <path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3zM504 312l0-64.9c0-7.9 6.4-17.1 17.1-17.1c4.7 0 9.2 1.8 12.5 5.1l49 49c6.9 6.9 6.9 18.2 0 25.2l-12.5 12.5c-6.9 6.9-18.2 6.9-25.2 0L504 312zm-79.4 71.7L384 424l0 19.5c0 4.7 3.8 8.5 8.5 8.5l19.5 0 40.3-40.3c3.1-3.1 3.1-8.2 0-11.3l-11.3-11.3c-3.1-3.1-8.2-3.1-11.3 0z" />
       </svg>
-    </div>, content: 'Học vụ', children: academicChildren
+    </div>, 
+    content: 'Học vụ', 
+    children: academicChildren,
+    allowedRoles: ['admin', 'teacher', 'hr', 'client', 'sale', 'academic']
   },
-  { href: '/course', icon: <Svg_Course w={22} h={22} c={'var(--text-secondary)'} />, content: 'Khóa học' },
+  { 
+    href: '/course', 
+    icon: <Svg_Course w={22} h={22} c={'var(--text-secondary)'} />, 
+    content: 'Khóa học',
+    allowedRoles: ['admin', 'teacher', 'hr', 'client', 'sale', 'academic']
+  },
   { 
     href: '/preview-templates', 
     icon: <Svg_Palette height={22} width={22} fill={'var(--text-secondary)'} />, 
     content: 'Kho Template',
-    badge: '15 Mẫu'
+    badge: '15 Mẫu',
+    allowedRoles: ['admin', 'teacher', 'academic']
   },
   { 
     href: '/portfolio-lookbook', 
     icon: <Svg_Lookbook height={22} width={22} fill={'var(--text-secondary)'} />, 
     content: 'Kỷ yếu Lookbook',
-    badge: 'A4'
+    badge: 'A4',
+    allowedRoles: ['admin', 'teacher', 'academic']
   },
-  { href: '/calendar', icon: <Svg_Canlendar w={22} h={22} c={'var(--text-secondary)'} />, content: 'Lịch dạy' },
+  { 
+    href: '/calendar', 
+    icon: <Svg_Canlendar w={22} h={22} c={'var(--text-secondary)'} />, 
+    content: 'Lịch dạy',
+    allowedRoles: ['admin', 'teacher', 'hr', 'client', 'sale', 'academic']
+  },
   {
-    href: '/client', icon: <div>
+    href: '/client', 
+    icon: <div>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" height={22} width={22} fill={'var(--text-secondary)'}>
         <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c10 0 18.8-4.9 24.2-12.5l-99.2-99.2c-14.9-14.9-23.3-35.1-23.3-56.1l0-33c-15.9-4.7-32.8-7.2-50.3-7.2l-91.4 0zM384 224c-17.7 0-32 14.3-32 32l0 82.7c0 17 6.7 33.3 18.7 45.3L478.1 491.3c18.7 18.7 49.1 18.7 67.9 0l73.4-73.4c18.7-18.7 18.7-49.1 0-67.9L512 242.7c-12-12-28.3-18.7-45.3-18.7L384 224zm24 80a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z" />
       </svg>
-    </div>, content: 'Chăm sóc'
+    </div>, 
+    content: 'Chăm sóc',
+    allowedRoles: ['admin', 'hr', 'client', 'sale']
   },
-  { href: '/search', icon: <Svg_Search height={22} width={22} fill={'var(--text-secondary)'} />, content: 'Tìm kiếm' },
+  { 
+    href: '/search', 
+    icon: <Svg_Search height={22} width={22} fill={'var(--text-secondary)'} />, 
+    content: 'Tìm kiếm',
+    allowedRoles: ['admin', 'teacher', 'hr', 'client', 'sale', 'academic']
+  },
   {
-    href: '/guide', icon: <div>
+    href: '/guide', 
+    icon: <div>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height={22} width={22} fill={'var(--text-secondary)'}>
         <path d="M96 0C43 0 0 43 0 96L0 416c0 53 43 96 96 96l288 0 32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l0-64c17.7 0 32-14.3 32-32l0-320c0-17.7-14.3-32-32-32L384 0 96 0zm0 384l256 0 0 64L96 448c-17.7 0-32-14.3-32-32s14.3-32 32-32zm32-240c0-8.8 7.2-16 16-16l192 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-192 0c-8.8 0-16-7.2-16-16zm16 48l192 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-192 0c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/>
       </svg>
-    </div>, content: 'Hướng dẫn'
+    </div>, 
+    content: 'Hướng dẫn',
+    allowedRoles: ['admin', 'teacher', 'hr', 'client', 'sale', 'academic']
   },
-  { href: '/', icon: <Svg_Chart h={22} w={22} c={'var(--text-secondary)'} />, content: 'Thống kê' }
+  { 
+    href: '/', 
+    icon: <Svg_Chart h={22} w={22} c={'var(--text-secondary)'} />, 
+    content: 'Thống kê',
+    allowedRoles: ['admin']
+  }
 ];
 
-export default function Nav() {
+export default function Nav({ data }) {
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
-  const [orderedItems, setOrderedItems] = useState(initialNavItems);
   const navContainerRef = useRef(null);
   const [hasBackup, setHasBackup] = useState(false);
   const [backupUser, setBackupUser] = useState({});
@@ -112,6 +151,34 @@ export default function Nav() {
       setBackupUser(u)
     } catch {}
   }, [])
+
+  const userRoles = useMemo(() => {
+    const rawRoles = data?.role || [];
+    const arr = Array.isArray(rawRoles) ? rawRoles : [rawRoles];
+    return arr.map(r => String(r).toLowerCase().trim()).filter(Boolean);
+  }, [data]);
+
+  const isRoleAllowed = (allowedRoles) => {
+    if (!allowedRoles || allowedRoles.length === 0) return true;
+    if (userRoles.length === 0 || userRoles.some(r => ['admin', 'boss'].includes(r))) return true;
+    return allowedRoles.some(r => userRoles.includes(r.toLowerCase()));
+  };
+
+  const allowedNavItems = useMemo(() => {
+    return initialNavItems
+      .filter(item => isRoleAllowed(item.allowedRoles))
+      .map(item => {
+        if (item.children) {
+          return {
+            ...item,
+            children: item.children.filter(child => isRoleAllowed(child.allowedRoles))
+          };
+        }
+        return item;
+      });
+  }, [userRoles]);
+
+  const [orderedItems, setOrderedItems] = useState(allowedNavItems);
 
   const handleSwitchBack = async () => {
     const token = localStorage.getItem('backupToken')
@@ -160,9 +227,9 @@ export default function Nav() {
       try {
         const orderedHrefs = JSON.parse(savedOrder);
         const newOrderedItems = orderedHrefs
-          .map(href => initialNavItems.find(item => item.href === href))
+          .map(href => allowedNavItems.find(item => item.href === href))
           .filter(Boolean);
-        initialNavItems.forEach(item => {
+        allowedNavItems.forEach(item => {
           if (!newOrderedItems.find(i => i.href === item.href)) {
             newOrderedItems.push(item);
           }
@@ -170,12 +237,12 @@ export default function Nav() {
         setOrderedItems(newOrderedItems);
       } catch (e) {
         console.error("Failed to parse nav item order from localStorage", e);
-        setOrderedItems(initialNavItems);
+        setOrderedItems(allowedNavItems);
       }
     } else {
-      setOrderedItems(initialNavItems);
+      setOrderedItems(allowedNavItems);
     }
-  }, []);
+  }, [allowedNavItems]);
 
   const [activeMenu, setActiveMenu] = useState(1);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -336,15 +403,15 @@ export default function Nav() {
                   <div
                     className={`flex items-center rounded-lg cursor-pointer transition-all duration-200 hover:bg-[var(--hover)]
                       ${collapsed ? 'h-11 justify-center' : 'h-10 gap-3 px-3'}
-                      ${anyActive ? 'bg-[var(--border-color)]' : ''}`}
+                      ${anyActive ? 'bg-[var(--bg-active)] text-[var(--main_d)] font-semibold' : ''}`}
                     onClick={() => handleNavItemClick(href)}
                   >
                     <div className="shrink-0">{icon}</div>
                     {!collapsed && (
-                      <span className="text-sm font-medium text-[var(--text-primary)] truncate flex-1">{content}</span>
+                      <span className={`text-sm ${anyActive ? 'font-semibold text-[var(--main_d)]' : 'font-medium text-[var(--text-primary)]'} truncate flex-1`}>{content}</span>
                     )}
                     {!collapsed && badge && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200 shrink-0">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[var(--bg-active)] text-[var(--main_d)] border border-blue-200 shrink-0">
                         {badge}
                       </span>
                     )}
@@ -353,7 +420,7 @@ export default function Nav() {
                         onClick={(e) => { e.stopPropagation(); toggleParent(href); }}
                         className="shrink-0 p-1 rounded hover:bg-[var(--hover)] transition-colors"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" height={10} width={10} fill={'var(--text-secondary)'} style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform .2s' }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" height={10} width={10} fill={anyActive ? 'var(--main_d)' : 'var(--text-secondary)'} style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform .2s' }}>
                           <path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/>
                         </svg>
                       </button>
@@ -367,7 +434,7 @@ export default function Nav() {
                           <Link
                             key={child.href}
                             href={child.href}
-                            className={`block px-3 py-2 text-sm rounded-lg transition-colors ${active ? 'bg-[var(--border-color)] font-medium' : 'text-[var(--text-primary)] hover:bg-[var(--hover)]'}`}
+                            className={`block px-3 py-2 text-sm rounded-lg transition-colors ${active ? 'bg-[var(--bg-active)] text-[var(--main_d)] font-semibold' : 'text-[var(--text-primary)] hover:bg-[var(--hover)]'}`}
                           >
                             {child.content}
                           </Link>

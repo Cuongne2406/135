@@ -38,5 +38,8 @@ const FormSchema = new Schema(
     { timestamps: false, versionKey: false }
 )
 
-const Customer = models.customer || model('customer', FormSchema)
-export default Customer
+const Customer = models.Customer || models.customer || model('customer', FormSchema);
+if (!models.Customer) {
+  try { model('Customer', FormSchema); } catch (_) {}
+}
+export default Customer;

@@ -2,6 +2,7 @@ import connectDB from '@/config/connectDB'
 import NotificationRecipient from '@/models/notificationRecipient'
 import jwt from 'jsonwebtoken'
 import { getJwtSecret, getCookieName } from '@/utils/env'
+import { scanAllSlaLessons } from '@/function/notificationEngine'
 
 const clients = new Map()
 
@@ -39,6 +40,14 @@ export async function GET(request) {
     const userId = decoded._id || decoded.id
     if (!userId) {
       return new Response('Unauthorized', { status: 401 })
+    }
+
+    // Auto-Trigger SLA scan: Kiểm tra chu kỳ 15 phút một lần để chủ động đẩy cảnh báo
+    const now = Date.now()
+    if (!global.lastSlaCheckTime || now - global.lastSlaCheckTime > 15 * 60 * 1000) {
+      global.lastSlaCheckTime = now
+      // Chạy ngầm non-blocking không làm trễ quá trình mở kết nối SSE
+      scanAllSlaLessons().catch(err => console.warn('[Auto-SLA] Non-blocking scan error:', err.message))
     }
 
     const stream = new ReadableStream({

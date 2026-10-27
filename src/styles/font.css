@@ -1,98 +1,78 @@
 :root {
-    --font-size-xxs: 0.625rem;
-    --font-size-xs: 0.75rem;
-    --font-size-sm: 0.875rem;
-    --font-size-base: 1rem;
-    --font-size-md: 1.25rem;
-    --font-size-lg: 1.625rem;
-    --font-size-xl: 2rem;
-    --popup-50: 100%;
-    --popup-30: 100%;
+    --font-size-xxs: 0.6875rem; /* 11px */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 0.875rem; /* 14px */
+    --font-size-md: 1rem;       /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --popup-50: 50%;
+    --popup-30: 480px;
 }
 
-@media (min-width: 768px) {
-    :root {
-        --font-size-xs: 0.875rem;
-        --font-size-sm: 1rem;
-        --font-size-base: 1.0625rem;
-        --font-size-md: 1.375rem;
-        --font-size-lg: 1.875rem;
-        --font-size-xl: 2.5rem;
-    }
-}
-
-@media (min-width: 1024px) {
-    :root {
-        --font-size-xxs: 0.8rem;
-        --font-size-base: 1.125rem;
-        --font-size-md: 1.5rem;
-        --font-size-lg: 2.25rem;
-        --font-size-xl: 3rem;
-        --popup-50: 50%;
-        --popup-30: 600px;
-    }
-}
-
-@media (min-width: 1441px) {
-    :root {
-        --font-size-md: 1.625rem;
-        --font-size-lg: 2.75rem;
-        --font-size-xl: 3.75rem;
-    }
-}
-
-@media (min-width: 1920px) {
-    :root {
-        --font-size-md: 1.75rem;
-        --font-size-lg: 3.25rem;
-        --font-size-xl: 4.5rem;
-    }
-}
-
+/* Typography Hierarchy - Enterprise Minimalist (Linear / Vercel) */
 h1 {
-    font-size: var(--font-size-xl);
+    font-size: 1.25rem; /* 20px - text-xl */
+    font-weight: 600;
+    line-height: 1.4;
+    color: #0f172a; /* Slate 900 */
+    letter-spacing: -0.025em;
     margin: 0;
-    color: var(--text-primary);
 }
 
 h2 {
-    font-size: var(--font-size-lg);
+    font-size: 1.125rem; /* 18px - text-lg */
+    font-weight: 600;
+    line-height: 1.4;
+    color: #0f172a; /* Slate 900 */
+    letter-spacing: -0.02em;
     margin: 0;
-    color: var(--text-primary);
 }
 
 h3 {
-    font-size: var(--font-size-md);
+    font-size: 1rem; /* 16px - text-base */
+    font-weight: 600;
+    line-height: 1.4;
+    color: #0f172a; /* Slate 900 */
     margin: 0;
-    color: var(--text-primary);
 }
 
 h4 {
-    font-size: var(--font-size-sm);
+    font-size: 0.875rem; /* 14px - text-sm */
+    font-weight: 600;
+    line-height: 1.4;
+    color: #1e293b; /* Slate 800 */
     margin: 0;
-    color: var(--text-primary);
 }
 
-h5,
+h5 {
+    font-size: 0.8125rem; /* 13px */
+    font-weight: 500;
+    line-height: 1.4;
+    color: #475569; /* Slate 600 */
+    margin: 0;
+}
+
+h6 {
+    font-size: 0.75rem; /* 12px - text-xs */
+    font-weight: 500;
+    line-height: 1.4;
+    color: #64748b; /* Slate 500 */
+    margin: 0;
+}
+
 label {
-    font-size: var(--font-size-xs);
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    color: #334155; /* Slate 700 */
     margin: 0;
-    color: var(--text-primary);
-    font-weight: 400;
-}
-
-h6,
-blockquote {
-    font-size: var(--font-size-xxs);
-    margin: 0;
-    color: var(--text-secondary);
-    font-weight: 400;
 }
 
 p {
-    font-size: var(--font-size-base);
+    font-size: 0.875rem; /* 14px */
+    color: #334155; /* Slate 700 */
+    line-height: 1.5;
     margin: 0;
-    color: var(--text-primary);
 }
 
 .text_w_400 {

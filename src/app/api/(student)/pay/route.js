@@ -7,9 +7,18 @@ import '@/models/users';
 import { NextResponse } from 'next/server';
 import authenticate from '@/utils/authenticate';
 import { revalidateTag } from 'next/cache';
+import { writeSystemLog } from '@/utils/auditLog';
 
-export async function GET(request, { params }) {
+export async function GET(request) {
     try {
+        const { user } = await authenticate(request);
+        if (!user) {
+            return NextResponse.json(
+                { status: 1, mes: 'Xác thực không thành công.', data: [] },
+                { status: 401 }
+            );
+        }
+
         const { searchParams } = new URL(request.url);
         const _id = searchParams.get('_id');
 
@@ -77,7 +86,11 @@ export async function POST(request) {
             );
         }
 
-        if (!user.role.includes('Admin')) {
+        const isAdmin = Array.isArray(user.role)
+            ? user.role.some(r => /^admin$/i.test(r))
+            : /^admin$/i.test(user.role);
+
+        if (!isAdmin) {
             return NextResponse.json(
                 { status: 1, mes: 'Không có quyền truy cập chức năng này.', data: [] },
                 { status: 403 }
@@ -111,6 +124,23 @@ export async function POST(request) {
                 { status: 200 }
             );
         }
+
+        // Ghi nhận nhật ký kiểm toán (Audit Trail)
+        await writeSystemLog({
+            type: 'PAYMENT',
+            status: true,
+            createBy: user._id,
+            student: studentId,
+            note: `Thu học phí: ${amountPaid} VNĐ (Học phí gốc: ${amountInitial}, Giảm giá: ${discount || 0})`,
+            details: {
+                invoiceId: savedInvoice._id,
+                courseId,
+                amountInitial,
+                amountPaid,
+                discount: discount || 0,
+                paymentMethod: paymentMethod === 1 ? 'Chuyển khoản' : 'Tiền mặt'
+            }
+        });
 
         revalidateTag(`student:${studentId}`);
         revalidateTag('students');

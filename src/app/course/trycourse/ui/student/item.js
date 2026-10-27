@@ -7,6 +7,7 @@ import { formatDate } from '@/function';
 import Loading from '@/components/(ui)/(loading)/loading';
 import Noti from '@/components/(features)/(noti)/noti';
 import { IconSuccess, IconFailure } from '@/components/(features)/(noti)/noti';
+import ConvertToStudentModal from '@/components/(features)/(student)/convertToStudentModal';
 
 const CARE_STATUS_OPTIONS = [
     { value: 1, label: 'Chưa chăm sóc' },
@@ -39,6 +40,8 @@ export default function CareSessionPopup({ open, onClose, session }) {
     const [note, setNote] = useState(careInfo?.note || '');
     const [loading, setLoading] = useState(false);
     const [noti, setNoti] = useState({ open: false, ok: false, msg: '' });
+
+    const [isConvertOpen, setIsConvertOpen] = useState(false);
 
     // Đồng bộ state khi props `session` thay đổi
     useEffect(() => {
@@ -142,6 +145,15 @@ export default function CareSessionPopup({ open, onClose, session }) {
                             </button>
                         ))}
                     </div>
+                    <div className="mt-2 pt-2 border-t border-slate-100 flex justify-end">
+                        <button
+                            type="button"
+                            className="px-3 py-1.5 text-xs font-semibold rounded bg-[var(--main_d)] text-white hover:opacity-90 transition-opacity"
+                            onClick={() => setIsConvertOpen(true)}
+                        >
+                            🎓 Chuyển thành Học viên Chính thức
+                        </button>
+                    </div>
                 </section>
 
                 <section className={'flex flex-col gap-2 bg-[var(--bg-primary)] p-4 rounded-md border border-[var(--border-color)]'}>
@@ -183,6 +195,21 @@ export default function CareSessionPopup({ open, onClose, session }) {
                 renderItemList={renderForm}
                 width={520}
                 globalZIndex={1200}
+            />
+            <ConvertToStudentModal
+                open={isConvertOpen}
+                onClose={() => setIsConvertOpen(false)}
+                leadData={{
+                    id: session.studentId,
+                    name: session.name,
+                    phone: session.phone,
+                    leadType: 'coursetry'
+                }}
+                onSuccess={() => {
+                    setIsConvertOpen(false);
+                    if (onClose) onClose();
+                    router.refresh();
+                }}
             />
         </>
     )

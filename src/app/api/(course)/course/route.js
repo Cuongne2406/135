@@ -8,10 +8,10 @@ import { NextResponse } from 'next/server';
 import authenticate from '@/utils/authenticate';
 import { reloadCourse } from '@/data/actions/reload';
 
-const APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxhq2HUS3Jhhh0XF9PPr_ldJ1redmb1JAN5hZjaeYzvb_AyJiVifEXsW-MdKqpBfEeZww/exec';
+const APPSCRIPT_URL = process.env.GOOGLE_APPSCRIPT_CALENDAR_URL || process.env.GOOGLE_APPSCRIPT_URL || 'https://script.google.com/macros/s/AKfycbxhq2HUS3Jhhh0XF9PPr_ldJ1redmb1JAN5hZjaeYzvb_AyJiVifEXsW-MdKqpBfEeZww/exec';
 
 export async function POST(request) {
-    try { 
+    try {
         const { user, body } = await authenticate(request);
         if (!user) {
             return NextResponse.json({ status: 0, mes: 'Xác thực không thành công.' }, { status: 401 });
@@ -31,11 +31,11 @@ export async function POST(request) {
             const pipeline = [{ $unwind: '$rooms' }, { $match: { 'rooms.name': { $in: roomNames } } }, { $project: { _id: 0, name: '$rooms.name', roomId: '$rooms._id' } }];
             const foundRooms = await PostArea.aggregate(pipeline);
             console.log(foundRooms);
-            
+
             foundRooms.forEach(room => roomNameToIdMap.set(room.name, room.roomId));
         }
         console.log(roomNameToIdMap);
-        
+
         const yearPrefix = new Date().getFullYear().toString().slice(-2);
         const coursePrefix = `${yearPrefix}${code.trim().toUpperCase()}`;
         const lastCourse = await PostCourse.findOne({ ID: { $regex: `^${coursePrefix}` } }).sort({ ID: -1 }).select('ID').lean();
@@ -67,7 +67,7 @@ export async function POST(request) {
             }
             const roomId = d.Room ? roomNameToIdMap.get(d.Room.trim()) : null;
             console.log(roomId);
-            
+
             return { Topic: d.Topic, Day: new Date(d.Day), Room: roomId || null, Time: d.Time || '', Teacher: mongoose.Types.ObjectId.isValid(d.Teacher) ? d.Teacher : null, TeachingAs: mongoose.Types.ObjectId.isValid(d.TeachingAs) ? d.TeachingAs : null, Image: imageUrls[i] || '' };
         });
         const newCourseData = { ID: newCourseID, Detail: normalizedDetail, Student: [], Version: 1 };

@@ -8,6 +8,7 @@ import { Re_lesson } from '@/data/course';
 import Noti from '@/components/(features)/(noti)/noti';
 import { Svg_Pen } from '@/components/(icon)/svg';
 import Link from 'next/link';
+import { compressImage } from '@/utils/imageCompressor';
 
 function Lightbox({ mediaItem, onClose, onUpdateSuccess }) {
     const [isLoading, setIsLoading] = useState(false);
@@ -54,9 +55,15 @@ function Lightbox({ mediaItem, onClose, onUpdateSuccess }) {
 
         setIsLoading(true);
 
+        let fileToUpload = file;
+        if (mediaItem.type === 'image') {
+            const comp = await compressImage(file, { maxDimension: 1920, quality: 0.8 });
+            fileToUpload = comp.file;
+        }
+
         const formData = new FormData();
         formData.append('id', mediaItem.id);
-        formData.append('newImage', file);
+        formData.append('newImage', fileToUpload);
 
         try {
             const response = await fetch('/api/updateimage', {
@@ -323,9 +330,20 @@ const UploadManager = forwardRef(({
 
             try {
                 const fileType = file.type.startsWith('video') ? 'video' : 'image';
+                let fileToUpload = file;
+                if (fileType === 'image') {
+                    const comp = await compressImage(file, { maxDimension: 1920, quality: 0.8 });
+                    fileToUpload = comp.file;
+                    if (comp.isCompressed) {
+                        onProgressUpdate({
+                            currentFile: `(${fileIndex}/${selectedFiles.length}) ${file.name} (Đã nén -${comp.savedPercent}%)`
+                        });
+                    }
+                }
+
                 const formData = new FormData();
                 formData.append('folderId', session.Image);
-                formData.append('images', file);
+                formData.append('images', fileToUpload);
                 formData.append('fileType', fileType);
 
                 const response = await fetch('/api/updateimage', { method: 'POST', body: formData });

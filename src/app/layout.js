@@ -2,12 +2,12 @@ export const dynamic = 'force-dynamic';
 
 import { Inter, Oswald } from 'next/font/google';
 import { cookies } from 'next/headers';
-import Layout_Login from '@/app/(auth)/login';
+import jwt from 'jsonwebtoken';
 import Nav from '@/components/(layout)/nav';
 import NavMobile from '@/components/(layout)/navMobile';
-import '@/styles/all.css'
+import '@/styles/all.css';
 import '@/styles/font.css';
-import { getAppUrl, getCookieName } from '@/utils/env';
+import { getCookieName, getJwtSecret } from '@/utils/env';
 
 const inter = Inter({
   subsets: ['vietnamese', 'latin'],
@@ -32,42 +32,43 @@ export const viewport = {
 };
 
 export default async function RootLayout({ children }) {
-  let data = null;
+  let user = null;
 
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get(getCookieName())?.value;
+    const token = cookieStore.get(getCookieName())?.value || cookieStore.get('token')?.value;
     if (token) {
-      const response = await fetch(`${getAppUrl()}/api/check`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ source: 1 }),
-        cache: 'no-store'
-      });
-      const result = await response.json();
-      if (result?.status === 2) { data = result.data }
+      try {
+        const decoded = jwt.verify(token, getJwtSecret());
+        if (decoded && (decoded.id || decoded._id)) {
+          user = decoded;
+        }
+      } catch (jwtErr) {
+        // Token không hợp lệ hoặc đã hết hạn
+      }
     }
   } catch (error) {
-    console.error('RootLayout check failed:', error);
+    console.error('RootLayout auth check error:', error);
   }
-  
+
   return (
     <html lang="en">
       <body className={`${inter.variable} ${oswald.variable}`}>
-        {data ?
+        {user ? (
           <div className="w-full h-full overflow-hidden flex">
             <div className="fixed top-0 left-0 h-full w-[var(--sidebar-w,240px)] border-r border-[var(--border-color)] bg-[var(--bg-primary)] z-[99] max-md:hidden transition-all duration-300">
-              <Nav data={data} />
+              <Nav data={user} />
             </div>
-            <NavMobile data={data} />
+            <NavMobile data={user} />
             <div className="ml-[var(--sidebar-w,240px)] w-[calc(100%-var(--sidebar-w,240px)-32px)] h-[calc(100%-32px)] bg-[var(--bg-secondary)] p-4 overflow-hidden overflow-y-auto max-md:ml-0 max-md:w-full max-md:h-[calc(100%-76px)] max-md:p-2 max-md:pb-[68px] transition-all duration-300">
               {children}
             </div>
-          </div> :
-          <Layout_Login />}
+          </div>
+        ) : (
+          <main className="w-full h-full overflow-hidden">
+            {children}
+          </main>
+        )}
       </body>
     </html>
   );

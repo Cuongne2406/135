@@ -9,6 +9,7 @@ import AlertPopup from '@/components/(features)/(noti)/alert';
 import Menu from '@/components/(ui)/(button)/menu';
 import Loading from '@/components/(ui)/(loading)/loading';
 import { useRouter } from 'next/navigation';
+import { srcImage } from '@/function';
 
 const formatDateForInput = (dateString) => {
     if (!dateString) return '';
@@ -69,7 +70,7 @@ const UpdateStudentForm = React.memo(forwardRef(({
                 address: data.Address || ''
             });
             // SỬA LỖI TẠI ĐÂY: Sử dụng trực tiếp data.Avt
-            setAvatarPreview(`https://lh3.googleusercontent.com/d/${data.Avt || null}`);
+            setAvatarPreview(data.Avt ? srcImage(data.Avt) : null);
             setIsDirty(false);
         }
     }, [data]);

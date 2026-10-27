@@ -1,12 +1,15 @@
 import Timeline from "./ui/timeline";
 import Detail from "./ui/detailcourse";
-import { course_data, student_data, user_data } from "@/data/actions/get";
+import { course_data, students_by_ids, user_data } from "@/data/actions/get";
 
 export default async function OverviewTab({ params }) {
     const { id } = await params;
     const data = await course_data(id[0]);
     if (!data) return <div className="flex items-center justify-center h-full text-sm text-[var(--text-secondary)]">Không tìm thấy khóa học</div>
-    let students = await student_data();
+    
+    // Tối ưu over-fetching: Chỉ truy vấn danh sách học sinh có trong khóa học này thay vì toàn bộ DB
+    const studentIds = (data.Student || []).map(s => s.ID).filter(Boolean);
+    const students = await students_by_ids(studentIds);
     const users = await user_data({ activeOnly: true })
     const tienDo = tinhTienDoHocTap(data);
     data.Progress = tienDo; 

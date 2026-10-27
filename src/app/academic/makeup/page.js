@@ -2,16 +2,18 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import SkeletonTable from '@/components/ui/SkeletonTable'
+import EmptyState from '@/components/ui/EmptyState'
 
 const statusMap = {
-    MAKEUP_PENDING: { label: 'Chờ xếp lịch bù', color: 'bg-[#fff3e0] text-[#e65100]' },
-    MAKEUP_REQUIRED: { label: 'Cần học bù', color: 'bg-[#fef3cd] text-[#856404]' },
-    MAKEUP_SCHEDULED: { label: 'Đã xếp lịch bù', color: 'bg-[#e3f2fd] text-[#1565c0]' },
-    MAKEUP_COMPLETED: { label: 'Đã học bù', color: 'bg-[#e8f5e9] text-[#2e7d32]' },
-    MAKEUP_ABSENT: { label: 'Vắng buổi bù', color: 'bg-[#ffebee] text-[#c62828]' },
-    MAKEUP_EXPIRED: { label: 'Quá hạn học bù', color: 'bg-[#f3e5f5] text-[#6a1b9a]' },
-    MAKEUP_CANCELLED: { label: 'Hủy học bù', color: 'bg-[#eceff1] text-[#607d8b]' },
-    NOT_REQUIRED: { label: 'Không cần học bù', color: 'bg-[#f1f3f5] text-[#6c757d]' },
+    MAKEUP_PENDING: { label: 'Chờ xếp lịch bù', color: 'bg-[#fffbeb] text-[#b45309] border border-[#fde68a]' },
+    MAKEUP_REQUIRED: { label: 'Cần học bù', color: 'bg-[#fffbeb] text-[#b45309] border border-[#fde68a]' },
+    MAKEUP_SCHEDULED: { label: 'Đã xếp lịch bù', color: 'bg-[#f0fdf4] text-[#15803d] border border-[#bbf7d0]' },
+    MAKEUP_COMPLETED: { label: 'Đã học bù', color: 'bg-[#f0fdf4] text-[#15803d] border border-[#bbf7d0]' },
+    MAKEUP_ABSENT: { label: 'Vắng buổi bù', color: 'bg-[#fef2f2] text-[#b91c1c] border border-[#fecaca]' },
+    MAKEUP_EXPIRED: { label: 'Quá hạn học bù', color: 'bg-[#fef2f2] text-[#b91c1c] border border-[#fecaca]' },
+    MAKEUP_CANCELLED: { label: 'Hủy học bù', color: 'bg-[#f8fafc] text-[#475569] border border-[#e2e8f0]' },
+    NOT_REQUIRED: { label: 'Không cần học bù', color: 'bg-[#f8fafc] text-[#475569] border border-[#e2e8f0]' },
 }
 
 export default function MakeupPage() {
@@ -139,63 +141,66 @@ export default function MakeupPage() {
             <div className="flex gap-2 flex-wrap">
                 {filters.map(f => (
                     <button key={f} onClick={() => setStatusFilter(f)}
-                        className={`text-xs px-3 py-1 rounded border ${statusFilter === f ? 'bg-[#1565c0] text-white border-[#1565c0]' : 'bg-[var(--bg-primary)] text-[var(--text-primary)] border-[var(--border-color)]'}`}>
+                        className={`text-xs px-3 py-1.5 rounded-md font-medium border transition-colors cursor-pointer ${statusFilter === f ? 'bg-[var(--main_d)] text-white border-[var(--main_d)] shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}>
                         {statusMap[f]?.label || 'Tất cả'}
                     </button>
                 ))}
             </div>
 
             {loading ? (
-                <div className="flex items-center justify-center p-8"><p>Đang tải...</p></div>
+                <SkeletonTable rows={5} columns={6} headers={['Học sinh', 'Khóa học', 'Nội dung cần bù', 'Lịch bù', 'Trạng thái', 'Hành động']} />
             ) : sessions.length === 0 ? (
-                <div className="flex items-center justify-center p-8 bg-[var(--bg-primary)] rounded border border-[var(--border-color)]">
-                    <p className="text-[var(--text-secondary)]">Không có phiên học bù nào</p>
-                </div>
+                <EmptyState
+                    title="Không có phiên học bù nào"
+                    description="Hiện tại không có yêu cầu hoặc lịch học bù nào phù hợp với bộ lọc."
+                    actionText={statusFilter ? 'Xem tất cả' : undefined}
+                    onAction={statusFilter ? () => setStatusFilter('') : undefined}
+                />
             ) : (
-                <div className="overflow-x-auto bg-[var(--bg-primary)] rounded border border-[var(--border-color)]">
-                    <table className="w-full text-sm">
+                <div className="overflow-x-auto bg-white rounded-lg border border-slate-200 shadow-xs">
+                    <table className="w-full text-sm border-collapse">
                         <thead>
-                            <tr className="border-b border-[var(--border-color)] text-left">
-                                <th className="p-3 font-medium text-[var(--text-primary)]">Học sinh</th>
-                                <th className="p-3 font-medium text-[var(--text-primary)]">Khóa học</th>
-                                <th className="p-3 font-medium text-[var(--text-primary)]">Nội dung cần bù</th>
-                                <th className="p-3 font-medium text-[var(--text-primary)]">Lịch bù</th>
-                                <th className="p-3 font-medium text-[var(--text-primary)]">Trạng thái</th>
-                                <th className="p-3 font-medium text-[var(--text-primary)]">Hành động</th>
+                            <tr className="bg-slate-50/90 border-b border-slate-200 text-left">
+                                <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Học sinh</th>
+                                <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Khóa học</th>
+                                <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Nội dung cần bù</th>
+                                <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Lịch bù</th>
+                                <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Trạng thái</th>
+                                <th className="p-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Hành động</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-slate-100">
                             {sessions.map(s => {
-                                const st = statusMap[s.makeupStatus] || { label: s.makeupStatus, color: '' }
+                                const st = statusMap[s.makeupStatus] || { label: s.makeupStatus, color: 'bg-slate-50 text-slate-600 border border-slate-200' }
                                 return (
-                                    <tr key={s._id} className="border-b border-[var(--border-color)] hover:bg-[var(--bg-hover)]">
-                                        <td className="p-3 text-[var(--text-primary)]">{s.studentName}</td>
-                                        <td className="p-3 text-[var(--text-primary)]">{s.course?.Name || s.course?.ID || 'N/A'}</td>
-                                        <td className="p-3 text-[var(--text-primary)]">{s.contentToMakeup || '—'}</td>
-                                        <td className="p-3 text-[var(--text-primary)]">
+                                    <tr key={s._id} className="hover:bg-slate-50/80 transition-colors">
+                                        <td className="p-3 font-medium text-slate-900">{s.studentName}</td>
+                                        <td className="p-3 text-slate-700">{s.course?.Name || s.course?.ID || '—'}</td>
+                                        <td className="p-3 text-slate-600">{s.contentToMakeup || '—'}</td>
+                                        <td className="p-3 text-slate-600 font-mono text-xs">
                                             {s.makeupDate ? new Date(s.makeupDate).toLocaleDateString('vi-VN') : '—'}
                                             {s.makeupTime ? ` ${s.makeupTime}` : ''}
                                         </td>
                                         <td className="p-3">
-                                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${st.color}`}>{st.label}</span>
+                                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold ${st.color}`}>{st.label}</span>
                                         </td>
-                                        <td className="p-3 flex gap-1">
+                                        <td className="p-3 flex gap-1.5 items-center">
                                             {s.makeupStatus === 'MAKEUP_PENDING' && (
                                                 <button onClick={() => handleStatusChange(s._id, 'MAKEUP_SCHEDULED')}
-                                                    className="text-xs px-2 py-1 rounded bg-[#e3f2fd] text-[#1565c0]">Xếp lịch</button>
+                                                    className="text-xs px-2.5 py-1 rounded-md font-medium bg-[var(--main_d)] text-white hover:bg-[var(--main_b)] transition-colors">Xếp lịch</button>
                                             )}
                                             {s.makeupStatus === 'MAKEUP_SCHEDULED' && (
                                                 <button onClick={() => handleStatusChange(s._id, 'MAKEUP_COMPLETED')}
-                                                    className="text-xs px-2 py-1 rounded bg-[#e8f5e9] text-[#2e7d32]">Xác nhận đã học</button>
+                                                    className="text-xs px-2.5 py-1 rounded-md font-medium bg-emerald-700 text-white hover:bg-emerald-800 transition-colors">Xác nhận học</button>
                                             )}
                                             {['MAKEUP_PENDING', 'MAKEUP_SCHEDULED'].includes(s.makeupStatus) && (
                                                 <button onClick={() => handleStatusChange(s._id, 'MAKEUP_CANCELLED')}
-                                                    className="text-xs px-2 py-1 rounded bg-[#ffebee] text-[#c62828]">Hủy</button>
+                                                    className="text-xs px-2 py-1 rounded-md font-medium bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition-colors">Hủy</button>
                                             )}
                                             <button onClick={() => handleDelete(s._id)}
-                                                className="text-xs px-2 py-1 rounded bg-[#eceff1] text-[#607d8b]">Xóa</button>
+                                                className="text-xs px-2 py-1 rounded-md font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Xóa</button>
                                             {s.course?._id && (
-                                                <Link href={`/course/${s.course._id}`} className="text-xs px-2 py-1 rounded bg-[#f1f3f5] text-[#6c757d]">
+                                                <Link href={`/course/${s.course._id}`} className="text-xs px-2 py-1 rounded-md font-medium bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 transition-colors">
                                                     Khóa học
                                                 </Link>
                                             )}

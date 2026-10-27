@@ -20,14 +20,14 @@ export default async function CourseTryPage() {
     return (
         <div style={{ display: 'flex', height: '100%', width: '100%', gap: 16 }}>
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', height: '100%', flex: 1.6 }}>
-                <div style={{
-                    borderRadius: '8px', padding: 16, background: 'linear-gradient(90deg, var(--yellow) 0%, rgb(249, 174, 0) 100%)',
-                    boxShadow: 'var(--boxshaw)', overflow: 'hidden',
-                }}>
-                    <Link href={`/course/trycourse`}>
-                        <div className="text-base font-medium text-[var(--text-primary)]" style={{ color: 'white', fontWeight: '500' }}>AI Robotic</div>
-                        <div className="text-xl font-semibold text-[var(--text-primary)]" style={{ margin: '4px 0', color: 'white' }}>Lớp: HỌC THỬ</div>
-                        <div className="text-base font-medium text-[var(--text-primary)]" style={{ color: 'white' }}>Học thử miễn phí AI Robotic</div>
+                <div className="rounded-lg p-4 bg-white border border-slate-200 shadow-xs mb-3">
+                    <Link href={`/course/trycourse`} className="block">
+                        <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Chương trình trải nghiệm</span>
+                            <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#fffbeb] text-[#b45309] border border-[#fde68a]">Học thử</span>
+                        </div>
+                        <div className="text-lg font-semibold text-slate-900 tracking-tight">AI Robotic — Lớp Học Thử</div>
+                        <div className="text-xs text-slate-500 mt-1">Lớp học trải nghiệm công nghệ & robotics miễn phí</div>
                     </Link>
                 </div>
                 <CourseTryFilter data={data} book={book} student={student} teacher={teacher} area={area} />

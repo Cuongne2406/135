@@ -1,8 +1,8 @@
 import { google } from 'googleapis';
 
 // --- CONFIGURATION ---
-const SPREADSHEET_ID = '1Q6SXlW-UMI6xivsADF8X0cWG6IHUNYLx5xU_Jo5xHhk';
-const TARGET_SHEET = 'data';
+const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_CALENDAR_RE_ID || '1Q6SXlW-UMI6xivsADF8X0cWG6IHUNYLx5xU_Jo5xHhk';
+const TARGET_SHEET = process.env.GOOGLE_SHEETS_CALENDAR_RE_SHEET || 'data';
 
 // --- CORS HEADERS ---
 const corsHeaders = {

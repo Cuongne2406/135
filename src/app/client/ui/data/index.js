@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import { createAreaAction, updateAreaAction, deleteAreaAction, syncCustomersFromSheetAction } from '@/app/actions/data.actions';
+import { createFormAction, updateFormAction, deleteFormAction, syncCustomersFromSheetAction } from '@/app/actions/data.actions';
 import AlertPopup from '@/components/(features)/(noti)/alert';
 import FlexiblePopup from '@/components/(features)/(popup)/popup_right';
 import CenterPopup from '@/components/(features)/(popup)/popup_center';
@@ -141,9 +141,9 @@ export default function SettingData({ data }) {
     const [copyStatus, setCopyStatus] = useState('idle');
     const [notification, setNotification] = useState({ open: false, status: true, mes: '' });
 
-    const [createState, createAction, isCreatePending] = useActionState(createAreaAction, { message: null, status: null });
-    const [updateState, updateAction, isUpdatePending] = useActionState(updateAreaAction, { message: null, status: null });
-    const [deleteState, deleteAction, isDeletePending] = useActionState(deleteAreaAction, { message: null, status: null });
+    const [createState, createAction, isCreatePending] = useActionState(createFormAction, { message: null, status: null });
+    const [updateState, updateAction, isUpdatePending] = useActionState(updateFormAction, { message: null, status: null });
+    const [deleteState, deleteAction, isDeletePending] = useActionState(deleteFormAction, { message: null, status: null });
     const [syncState, syncAction, isSyncPending] = useActionState(syncCustomersFromSheetAction, { message: null, status: null });
 
     const handleActionComplete = (state, closePopupCallback) => {

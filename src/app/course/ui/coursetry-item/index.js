@@ -8,28 +8,28 @@ export default function CourseTryItem({ data }) {
     const totalStudents = data.totalStudents ?? 0;
 
     return (
-        <Link href={`/course/trycourse`} className='bg-[#fffce6] rounded-lg p-4 w-[calc(25%-12px-32px)] shadow-[var(--boxshaw2)] transition-shadow duration-300 flex flex-col justify-between no-underline border-b-3 border-[var(--yellow)] relative hover:cursor-pointer hover:shadow-[0_3px_8px_rgba(0,0,0,0.24)] before:content-[""] before:absolute before:bottom-0 before:right-0 before:w-1/2 before:h-auto before:aspect-[16/9] before:bg-[url(https://www.voca.vn/assets/images/project-mission-2.svg)] before:bg-cover before:transition-opacity before:duration-300'>
+        <Link href={`/course/trycourse`} className='bg-[#fffdf0] rounded-xl p-4.5 w-[calc(25%-12px-32px)] border border-amber-200 border-b-4 border-b-[var(--yellow)] shadow-xs hover:shadow-md transition-all flex flex-col justify-between no-underline'>
             <div>
                 <div className='flex items-center mb-4'>
-                    <div className='w-11 h-11 rounded-md bg-[var(--main_d)] text-white flex items-center justify-center font-medium mr-3' style={{ background: 'var(--yellow)' }}>
+                    <div className='w-11 h-11 rounded-lg bg-[var(--yellow)] text-slate-900 border border-amber-300 flex items-center justify-center font-bold text-sm mr-3'>
                         HT
                     </div>
                     <div className='flex-1'>
-                        <div className='font-bold text-[#656565] flex justify-between items-center text-xl'>
+                        <div className='font-bold text-[var(--text-primary)] flex justify-between items-center text-sm'>
                             HỌC THỬ AI ROBOTIC
                         </div>
-                        <p className='text-[#656565] text-sm font-medium mt-1'>Khóa học thử miễn phí</p>
+                        <p className='text-amber-800/80 text-xs font-medium mt-0.5'>Khóa học thử miễn phí</p>
                     </div>
                 </div>
-                <div className='flex gap-1 mb-1 text-sm'>
-                    <span className='text-[#656565]'>Số buổi chưa diễn ra:</span>
-                    <span className='text-[#656565]'>
+                <div className='flex justify-between items-center mb-1.5 text-xs'>
+                    <span className='text-[var(--text-secondary)]'>Số buổi chưa diễn ra:</span>
+                    <span className='font-semibold text-slate-900 bg-amber-100/70 px-2 py-0.5 rounded'>
                         {totalSessions}
                     </span>
                 </div>
-                <div className='flex gap-1 mb-1 text-sm'>
-                    <span className='text-[#656565]'>Học sinh chưa học thử:</span>
-                    <span className='text-[#656565]'>
+                <div className='flex justify-between items-center text-xs'>
+                    <span className='text-[var(--text-secondary)]'>Học sinh chưa học thử:</span>
+                    <span className='font-semibold text-slate-900 bg-amber-100/70 px-2 py-0.5 rounded'>
                         {totalStudents}
                     </span>
                 </div>

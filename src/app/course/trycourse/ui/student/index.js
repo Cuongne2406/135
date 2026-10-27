@@ -5,6 +5,9 @@ import SessionPopup from '../detaillesson';
 import CareSessionPopup from './item';
 import { formatDate } from '@/function';
 import Menu from '@/components/(ui)/(button)/menu'; // Import Menu component
+import EmptyState from '@/components/ui/EmptyState';
+import ConvertToStudentModal from '@/components/(features)/(student)/convertToStudentModal';
+import { useRouter } from 'next/navigation';
 
 /* helpers */
 const toDate = (day, hm) => {
@@ -34,10 +37,13 @@ const CARE_FILTER_OPTIONS = {
 
 
 export default function Student({ data, student, teacher = [], area = [], book = [] }) {
+    const router = useRouter();
     const [q, setQ] = useState('');
     const [detailId, setDetailId] = useState(null);
     const [careOpen, setCareOpen] = useState(false);
     const [careSession, setCareSession] = useState(null);
+    const [isConvertOpen, setIsConvertOpen] = useState(false);
+    const [convertLeadData, setConvertLeadData] = useState(null);
 
     // 1. Thêm state cho bộ lọc trạng thái chăm sóc
     const [careFilter, setCareFilter] = useState('all');
@@ -140,11 +146,19 @@ export default function Student({ data, student, teacher = [], area = [], book =
                 </div>
 
                 <div className={'flex flex-col gap-2 mt-[6px] max-h-[calc(100vh-280px)] overflow-auto'}>
-                    {rows.map(r => (
+                    {rows.length === 0 ? (
+                        <EmptyState
+                            title="Chưa có học sinh học thử nào"
+                            description="Không tìm thấy học sinh phù hợp với điều kiện tìm kiếm hoặc bộ lọc chăm sóc hiện tại."
+                            actionText={q || careFilter !== 'all' ? "Xóa bộ lọc" : undefined}
+                            onAction={q || careFilter !== 'all' ? () => { setQ(''); setCareFilter('all'); } : undefined}
+                        />
+                    ) : (
+                        rows.map(r => (
                         <div key={r.id} className={'flex gap-1.5'}>
                             <div
-                                className={`${'flex-1 grid grid-cols-3 gap-3 p-[10px] rounded-md relative bg-[#f5f5f5] cursor-pointer'} ${r.attend.cls}`}
-                                style={r.careStatus === 2 ? { opacity: .55, background: '#fefefe' } : undefined}
+                                className={`${'flex-1 grid grid-cols-4 gap-3 p-[10px] rounded-md relative bg-[#f5f5f5] cursor-pointer'} ${r.attend.cls}`}
+                                style={r.careStatus === 2 ? { opacity: .75, background: '#fefefe' } : undefined}
                                 onClick={() => {
                                     setCareSession({
                                         ...r.session,
@@ -157,12 +171,36 @@ export default function Student({ data, student, teacher = [], area = [], book =
                                     setCareOpen(true);
                                 }}
                             >
-                                {r.careStatus === 2 && <div className={'absolute inset-0 bg-black/35 text-white text-sm font-semibold flex items-center justify-center rounded-sm pointer-events-none'} style={{ justifyContent: 'center' }}>
-                                    <p className='text-xs font-semibold text-[var(--text-primary)]' style={{ background: 'var(--green)', padding: 8, borderRadius: 5, color: 'white' }}>{careTxt(r.careStatus)}</p>
+                                {r.careStatus === 2 && <div className={'absolute inset-0 bg-black/20 text-white text-sm font-semibold flex items-center justify-center rounded-sm pointer-events-none'} style={{ justifyContent: 'center' }}>
+                                    <p className='text-xs font-semibold text-[var(--text-primary)]' style={{ background: 'var(--green)', padding: 6, borderRadius: 5, color: 'white' }}>{careTxt(r.careStatus)}</p>
                                 </div>}
-                                <div className={'flex flex-col gap-0.5'}><p className='text-sm font-normal text-[var(--text-primary)]'>Tên học sinh</p><p className='text-sm font-semibold text-[var(--text-primary)]'>{r.name}</p></div>
-                                <div className={'flex flex-col gap-0.5'}><p className='text-sm font-normal text-[var(--text-primary)]'>Trạng thái học thử</p><p className='text-sm font-semibold text-[var(--text-primary)]'>{r.attend.label}</p></div>
-                                <div className={'flex flex-col gap-0.5'}><p className='text-sm font-normal text-[var(--text-primary)]'>Trạng thái chăm sóc</p><p className='text-sm font-semibold text-[var(--text-primary)]'>{careTxt(r.careStatus)}</p></div>
+                                <div className={'flex flex-col gap-0.5'}><p className='text-xs text-[var(--text-secondary)]'>Tên học sinh</p><p className='text-sm font-semibold text-[var(--text-primary)]'>{r.name}</p></div>
+                                <div className={'flex flex-col gap-0.5'}><p className='text-xs text-[var(--text-secondary)]'>Điểm danh</p><p className='text-sm font-semibold text-[var(--text-primary)]'>{r.attend.label}</p></div>
+                                <div className={'flex flex-col gap-0.5'}><p className='text-xs text-[var(--text-secondary)]'>Chăm sóc</p><p className='text-sm font-semibold text-[var(--text-primary)]'>{careTxt(r.careStatus)}</p></div>
+                                <div className={'flex items-center justify-end'}>
+                                    {r.careStatus !== 2 ? (
+                                        <button
+                                            type="button"
+                                            className="px-2.5 py-1 text-xs font-semibold rounded bg-[var(--main_d)] text-white hover:opacity-90 transition-opacity shadow-xs z-10"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setConvertLeadData({
+                                                    id: r.studentId,
+                                                    name: r.name,
+                                                    phone: r.phone,
+                                                    leadType: 'coursetry'
+                                                });
+                                                setIsConvertOpen(true);
+                                            }}
+                                        >
+                                            + Nhập học
+                                        </button>
+                                    ) : (
+                                        <span className="text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                            ✓ Đã nhập học
+                                        </span>
+                                    )}
+                                </div>
                             </div>
 
                             <div
@@ -173,7 +211,7 @@ export default function Student({ data, student, teacher = [], area = [], book =
                                 <p className='text-sm font-normal text-[var(--text-primary)]'>Thời gian: {r.session.time} – {formatDate(new Date(r.session.day))}</p>
                             </div>
                         </div>
-                    ))}
+                    )))}
                 </div>
             </div>
 
@@ -197,6 +235,16 @@ export default function Student({ data, student, teacher = [], area = [], book =
                     onChangeStatus={changeCareStatus}
                 />
             )}
+
+            <ConvertToStudentModal
+                open={isConvertOpen}
+                onClose={() => setIsConvertOpen(false)}
+                leadData={convertLeadData}
+                onSuccess={() => {
+                    setIsConvertOpen(false);
+                    router.refresh();
+                }}
+            />
         </>
     )
 }

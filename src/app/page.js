@@ -9,9 +9,13 @@ export default async function Home() {
   if (!user) {
     redirect('/login'); 
   }
+  const isAdmin = Array.isArray(user.role)
+    ? user.role.some(r => /^admin$/i.test(r))
+    : user.role === 'Admin';
+
   return (
     <>
-      {user.role == 'Admin' ? <AdminPage /> : <TeacherPage data={await user_data({ _id: user.id })} />}
+      {isAdmin ? <AdminPage /> : <TeacherPage data={await user_data({ _id: user.id })} />}
     </>
-  )
+  );
 }

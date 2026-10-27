@@ -29,6 +29,7 @@ export async function GET(req) {
       : {}
 
     const officialAgg = PostCourse.aggregate([
+      { $match: { 'Detail.Day': { $gte: start, $lt: end } } },
       { $unwind: '$Detail' },
       { $match: { 'Detail.Day': { $gte: start, $lt: end }, ...teacherMatch } },
       {
@@ -119,6 +120,7 @@ export async function GET(req) {
       : {}
 
     const trialAgg = TrialCourse.aggregate([
+      { $match: { 'sessions.day': { $gte: start, $lt: end } } },
       { $unwind: '$sessions' },
       { $match: { 'sessions.day': { $gte: start, $lt: end }, ...trialTeacherMatch } },
       { $lookup: { from: 'books', localField: 'sessions.book', foreignField: '_id', as: 'b' } },

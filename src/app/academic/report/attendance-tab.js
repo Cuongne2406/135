@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
+import SkeletonTable from '@/components/ui/SkeletonTable'
+import EmptyState from '@/components/ui/EmptyState'
+
 function toDateStr(d) {
     const y = d.getFullYear()
     const m = String(d.getMonth() + 1).padStart(2, '0')
@@ -35,19 +38,10 @@ export default function AttendanceTab() {
 
             const res = await fetch(`/api/checkin?month=${month}&year=${year}`)
             const json = await res.json()
-            let dayLessons = (json.data || []).filter(l => {
+            const dayLessons = (json.data || []).filter(l => {
                 const lDate = new Date(l.date)
                 return toDateStr(lDate) === selectedDate
             })
-
-            if (dayLessons.length === 0) {
-                const testRes = await fetch('/api/test/attendance')
-                const testJson = await testRes.json()
-                dayLessons = (testJson.data || []).filter(l => {
-                    const lDate = new Date(l.date)
-                    return toDateStr(lDate) === selectedDate
-                })
-            }
 
             const enriched = dayLessons.map(l => {
                 const students = l.students || []
@@ -120,104 +114,72 @@ export default function AttendanceTab() {
                 ))}
             </div>
 
-            <div className="bg-white border border-[var(--border-color)] rounded-lg" style={{ height: 560 }}>
-                <div className="overflow-auto h-full">
-                <table className="w-full text-sm table-fixed" style={{ minWidth: 800 }}>
-                    <colgroup>
-                        <col style={{ width: 56 }} />
-                        <col style={{ width: 130 }} />
-                        <col style={{ width: 130 }} />
-                        <col style={{ width: 90 }} />
-                        <col style={{ width: 110 }} />
-                        <col style={{ width: 100 }} />
-                        <col style={{ width: 70 }} />
-                        <col style={{ width: 70 }} />
-                        <col style={{ width: 70 }} />
-                    </colgroup>
-                    <thead className="sticky top-0 z-10">
-                        <tr className="bg-[var(--main_d)] text-white">
-                            <th className="p-2 font-medium text-center">STT</th>
-                            <th className="p-2 font-medium text-left">Lớp</th>
-                            <th className="p-2 font-medium text-left">Giáo viên</th>
-                            <th className="p-2 font-medium text-left">Phòng</th>
-                            <th className="p-2 font-medium text-left">Phân loại</th>
-                            <th className="p-2 font-medium text-left">Giờ</th>
-                            <th className="p-2 font-medium text-center">Sĩ số</th>
-                            <th className="p-2 font-medium text-center">Có mặt</th>
-                            <th className="p-2 font-medium text-center">Vắng</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr>
-                                <td colSpan={9} className="p-8 text-center text-sm text-[var(--text-secondary)]">Đang tải...</td>
-                            </tr>
-                        ) : (
-                            (() => {
-                                const rows = []
-                                if (lessons.length === 0) {
-                                    rows.push(
-                                        <tr key="empty-msg">
-                                            <td colSpan={9} className="p-8 text-center text-sm text-[var(--text-secondary)]">Hôm nay không có buổi học nào</td>
-                                        </tr>
-                                    )
-                                    for (let i = 1; i < ITEMS_PER_PAGE; i++) {
-                                        rows.push(
-                                            <tr key={`empty-${i}`} className="bg-white border-b border-[var(--border-color)]" style={{ height: 48 }}>
-                                                <td colSpan={9}></td>
-                                            </tr>
-                                        )
-                                    }
-                                } else {
-                                    for (let i = 0; i < ITEMS_PER_PAGE; i++) {
-                                        const l = pageItems[i]
-                                        if (l) {
-                                            const hasUnchecked = l.unchecked > 0
-                                            rows.push(
-                                                <tr key={l._id} className="bg-white border-b border-[var(--border-color)] hover:bg-blue-50 transition-colors" style={{ height: 48 }}>
-                                                    <td className="p-2 text-center text-[var(--text-secondary)]">{startIdx + i + 1}</td>
-                                                    <td className="p-2 font-medium truncate">
-                                                        <div className="flex items-center gap-1">
-                                                            <Link href={`/course/${l.courseId || l._id}`} className="text-[var(--main_d)] hover:underline font-semibold">
-                                                                {l.courseId || l.courseName}
-                                                            </Link>
-                                                            {hasUnchecked && (
-                                                                <span className="shrink-0 px-1 py-0.5 rounded font-bold bg-orange-500 text-white" style={{ fontSize: 11 }}>
-                                                                    Chưa ĐD
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                    <td className="p-2 text-[var(--text-secondary)] truncate">{l.teacher?.name || '—'}</td>
-                                                    <td className="p-2 text-[var(--text-secondary)]">{l.room?.name || '—'}</td>
-                                                    <td className="p-2">
-                                                        <span className={`px-1.5 py-0.5 rounded font-semibold text-white text-sm ${
-                                                            l.typeLabel === 'Lớp học thử' ? 'bg-purple-600' : 'bg-blue-600'
-                                                        }`}>
-                                                            {l.typeLabel === 'Lớp học thử' ? 'Học thử' : 'Thường'}
+            <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-xs min-h-[400px]">
+                {loading ? (
+                    <SkeletonTable rows={8} columns={9} headers={['STT', 'Lớp', 'Giáo viên', 'Phòng', 'Phân loại', 'Giờ', 'Sĩ số', 'Có mặt', 'Vắng']} />
+                ) : lessons.length === 0 ? (
+                    <EmptyState
+                        title="Không có buổi học nào vào ngày đã chọn"
+                        description="Vui lòng chọn ngày khác trên lịch để xem báo cáo điểm danh chuyên cần."
+                        actionText="Chọn ngày hôm nay"
+                        onAction={() => setSelectedDate(toDateStr(new Date()))}
+                    />
+                ) : (
+                    <div className="overflow-auto max-h-[560px]">
+                        <table className="w-full text-xs border-collapse">
+                            <thead>
+                                <tr className="bg-slate-50/90 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider sticky top-0 z-10">
+                                    <th className="p-3 text-center w-12">STT</th>
+                                    <th className="p-3 text-left">Lớp / Khóa học</th>
+                                    <th className="p-3 text-left">Giáo viên</th>
+                                    <th className="p-3 text-left">Phòng</th>
+                                    <th className="p-3 text-left">Phân loại</th>
+                                    <th className="p-3 text-left">Giờ học</th>
+                                    <th className="p-3 text-center">Sĩ số</th>
+                                    <th className="p-3 text-center">Có mặt</th>
+                                    <th className="p-3 text-center">Vắng</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {pageItems.map((l, i) => {
+                                    const hasUnchecked = l.unchecked > 0;
+                                    return (
+                                        <tr key={l._id} className="hover:bg-slate-50/80 transition-colors">
+                                            <td className="p-3 text-center text-slate-400 font-medium">{startIdx + i + 1}</td>
+                                            <td className="p-3 font-medium text-slate-900">
+                                                <div className="flex items-center gap-1.5">
+                                                    <Link href={`/course/${l.courseId || l._id}`} className="font-semibold text-slate-900 hover:text-indigo-600 transition-colors no-underline">
+                                                        {l.courseId || l.courseName}
+                                                    </Link>
+                                                    {hasUnchecked && (
+                                                        <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                            Chưa ĐD
                                                         </span>
-                                                    </td>
-                                                    <td className="p-2 text-[var(--text-secondary)]">{l.time || '—'}</td>
-                                                    <td className="p-2 text-center text-[var(--text-primary)] font-medium">{l.totalStudents}</td>
-                                                    <td className="p-2 text-center text-green-600 font-bold">{l.present}</td>
-                                                    <td className="p-2 text-center text-red-600 font-bold">{l.absent}</td>
-                                                </tr>
-                                            )
-                                        } else {
-                                            rows.push(
-                                                <tr key={`empty-${i}`} className="bg-white border-b border-[var(--border-color)]" style={{ height: 48 }}>
-                                                    <td colSpan={9}></td>
-                                                </tr>
-                                            )
-                                        }
-                                    }
-                                }
-                                return rows
-                            })()
-                        )}
-                    </tbody>
-                </table>
-                </div>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="p-3 text-slate-600">{l.teacher?.name || '—'}</td>
+                                            <td className="p-3 text-slate-600">{l.room?.name || '—'}</td>
+                                            <td className="p-3">
+                                                <span className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
+                                                    l.typeLabel === 'Lớp học thử'
+                                                        ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                                                        : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                                }`}>
+                                                    {l.typeLabel === 'Lớp học thử' ? 'Học thử' : 'Chính thức'}
+                                                </span>
+                                            </td>
+                                            <td className="p-3 text-slate-600 font-mono text-[11px]">{l.time || '—'}</td>
+                                            <td className="p-3 text-center font-bold text-slate-900">{l.totalStudents}</td>
+                                            <td className="p-3 text-center font-bold text-emerald-600">{l.present}</td>
+                                            <td className="p-3 text-center font-bold text-rose-600">{l.absent}</td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
 
             {!loading && lessons.length > ITEMS_PER_PAGE && (

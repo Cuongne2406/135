@@ -15,10 +15,20 @@ const Trials = new Schema({
 });
 
 const Status = new Schema({
-  status: { type: Number, required: true },
-  date: { type: Date, required: true },
+  status: { type: Schema.Types.Mixed, required: true },
+  act: { type: String, default: '' },
+  date: { type: Date, default: Date.now },
   note: { type: String, default: '' },
 });
+
+const ScoreSchema = new Schema({
+  testName: { type: String, required: true },
+  courseId: { type: Schema.Types.ObjectId, ref: 'course' },
+  score: { type: Number, required: true },
+  maxScore: { type: Number, default: 10 },
+  date: { type: Date, default: Date.now },
+  note: { type: String, default: '' },
+}, { _id: true });
 
 const PresentationSchema = new Schema({
   course: { type: Schema.Types.ObjectId, ref: 'course', required: true },
@@ -98,6 +108,10 @@ const postSchema = new Schema({
     type: ProfileSchema,
     default: () => ({ Present: [] })
   },
+  Scores: {
+    type: [ScoreSchema],
+    default: []
+  },
   Leave: { type: Boolean, default: false },
   Trial: {
     type: [Trials],
@@ -106,6 +120,15 @@ const postSchema = new Schema({
   Note: { type: [LearnDetailSchema], default: [] }
 }, { versionKey: false })
 
-const PostStudent = models.student || model('student', postSchema)
+postSchema.index({ ID: 1 });
+postSchema.index({ Phone: 1 });
+postSchema.index({ Uid: 1 });
+postSchema.index({ 'Course.course': 1 });
+postSchema.index({ Area: 1 });
 
-export default PostStudent
+const PostStudent = models.Student || models.student || model('student', postSchema);
+if (!models.Student) {
+  try { model('Student', postSchema); } catch (_) {}
+}
+
+export default PostStudent;

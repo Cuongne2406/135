@@ -3,11 +3,28 @@ import PostCourse from '@/models/course'
 import User from '@/models/users'
 import NotificationSetting from '@/models/notificationSetting'
 import { createNotification } from '@/data/database/notification'
+import { renderNotificationTemplate } from '@/services/notification.service'
 import dayjs from 'dayjs'
 
+let settingsCache = null;
+let lastSettingsCacheTime = 0;
+
+async function getAllSettings() {
+  const now = Date.now();
+  if (settingsCache && (now - lastSettingsCacheTime < 60000)) {
+    return settingsCache;
+  }
+  const settings = await NotificationSetting.find({}).lean();
+  const map = {};
+  settings.forEach(s => { map[s.key] = s.value; });
+  settingsCache = map;
+  lastSettingsCacheTime = now;
+  return settingsCache;
+}
+
 async function getSetting(key) {
-  const setting = await NotificationSetting.findOne({ key }).lean()
-  return setting ? setting.value : null
+  const map = await getAllSettings();
+  return map[key] ?? null;
 }
 
 export async function checkLessonAfterEnd(courseId, lessonId) {
@@ -19,6 +36,8 @@ export async function checkLessonAfterEnd(courseId, lessonId) {
   if (!lesson) return
 
   const minutesSinceEnd = dayjs().diff(dayjs(lesson.Day), 'minute')
+  if (minutesSinceEnd < 0 || minutesSinceEnd > 7 * 24 * 60) return
+
   const teacher = lesson.Teacher ? await User.findById(lesson.Teacher).lean() : null
   const teacherName = teacher?.name || 'N/A'
 
@@ -30,11 +49,17 @@ export async function checkLessonAfterEnd(courseId, lessonId) {
   const hasCheckin = lesson.Type || lesson.Note
 
   if (minutesSinceEnd >= reminderMin && !hasCheckin) {
+    const rendered = await renderNotificationTemplate('MISSING_ATTENDANCE', {
+      courseName: course.ID,
+      minutes: minutesSinceEnd,
+      teacherName: teacherName
+    });
+
     await createNotification({
-      title: `Thiếu điểm danh - ${course.ID}`,
-      content: `Lớp ${course.ID} đã kết thúc ${minutesSinceEnd} phút nhưng giáo viên ${teacherName} chưa điểm danh.`,
+      title: rendered.title,
+      content: rendered.content,
       type: 'MISSING_ATTENDANCE',
-      level: 'REMINDER',
+      level: rendered.level || 'REMINDER',
       ref_course: course._id,
       ref_lesson: lesson._id,
       ref_teacher: lesson.Teacher,
@@ -105,5 +130,28 @@ export async function checkStudentAbsent(courseId, studentId) {
       ref_student: student._id,
       targetRoles: ['teacher', 'hocvu', 'Academic'],
     })
+  }
+}
+
+/**
+ * Quét toàn bộ buổi học trong 7 ngày gần nhất để phát hiện vi phạm SLA
+ */
+export async function scanAllSlaLessons() {
+  try {
+    await connectDB()
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const courses = await PostCourse.find({
+      'Detail.Day': { $gte: sevenDaysAgo, $lte: new Date() }
+    }).lean()
+
+    for (const course of courses) {
+      for (const lesson of (course.Detail || [])) {
+        if (lesson._id) {
+          await checkLessonAfterEnd(course._id.toString(), lesson._id.toString())
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[Auto-SLA] Quét SLA tự động thất bại:', err.message)
   }
 }

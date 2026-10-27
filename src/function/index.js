@@ -36,7 +36,10 @@ export function calculatePastLessons(courseData) {
 }
 
 export function srcImage(id) {
-    return `https://lh3.googleusercontent.com/d/${id}`
+    if (!id || typeof id !== 'string') return 'https://lh3.googleusercontent.com/d/1iq7y8VE0OyFIiHmpnV_ueunNsTeHK1bG';
+    if (id.startsWith('http://') || id.startsWith('https://') || id.startsWith('/') || id.startsWith('data:')) return id;
+    if (id.startsWith('https://lh3.googleusercontent.com/d/')) return id;
+    return `https://lh3.googleusercontent.com/d/${id}`;
 }
 
 export function formatCurrencyVN(number) {
@@ -49,7 +52,8 @@ export function formatCurrencyVN(number) {
 
 export const truncateString = (str, start, end) => !str ? "" : str.length > start + end ? `${str.slice(0, start)}...${str.slice(-end)}` : str;
 export const driveImage = (id) => {
-    if (!id) return null;
+    if (!id || typeof id !== 'string') return null;
+    if (id.startsWith('http://') || id.startsWith('https://') || id.startsWith('/') || id.startsWith('data:')) return id;
     if (id.startsWith('https://lh3.googleusercontent.com/d/')) return id;
     return `https://lh3.googleusercontent.com/d/${id}`;
 }

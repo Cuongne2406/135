@@ -16,6 +16,7 @@ export async function GET() {
         const { start, end, now } = getTodayRange()
 
         const agg = PostCourse.aggregate([
+            { $match: { 'Detail.Day': { $gte: start, $lt: end } } },
             { $unwind: '$Detail' },
             { $match: { 'Detail.Day': { $gte: start, $lt: end } } },
             {

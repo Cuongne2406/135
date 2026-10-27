@@ -11,10 +11,10 @@ import SettingVariant from './ui/variant';
 import SettingZaloRoles from './ui/zalos';
 import ActionHistory from './ui/hisotry';
 import ZaloConfig from './ui/zalo-config';
-import BotLogs from './ui/bot-logs';
+import SkeletonTable from '@/components/ui/SkeletonTable';
 
 function TableSkeleton() {
-    return <div style={{ height: '500px', background: '#f8f9fa', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Đang tải dữ liệu...</div>;
+    return <SkeletonTable rows={8} columns={7} headers={['Chọn', 'STT', 'Tên phụ huynh', 'Tên học viên', 'Số điện thoại', 'Trạng thái', 'Nguồn']} />;
 }
 export default function CustomerView({ c, running, initialResult, user, sources, labelData, formData, zaloData, users, variant }) {
     const [selectedCustomers, setSelectedCustomers] = useState(new Map());

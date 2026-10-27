@@ -1,20 +1,8 @@
 import { NextResponse } from 'next/server';
-import { google } from 'googleapis';
 import { Readable } from 'stream';
 import connectDB from '@/config/connectDB';
 import PostCourse from '@/models/course';
-
-async function getDriveClient() {
-    const auth = new google.auth.GoogleAuth({
-        projectId: process.env.GOOGLE_PROJECT_ID,
-        credentials: {
-            client_email: process.env.GOOGLE_CLIENT_EMAIL,
-            private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        },
-        scopes: ['https://www.googleapis.com/auth/drive'],
-    });
-    return google.drive({ version: 'v3', auth });
-}
+import { getDriveClient } from '@/function/drive/index';
 
 function getSimplifiedType(mimeType) {
     if (mimeType.startsWith('image/')) {

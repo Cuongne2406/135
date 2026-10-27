@@ -1,12 +1,12 @@
-/* app/api/course/udetail/route.js */
 import connectDB from '@/config/connectDB';
 import PostCourse from '@/models/course';
 import Area from '@/models/area'; // Import model Area để tra cứu
 import { NextResponse } from 'next/server';
 import { Types, isValidObjectId } from 'mongoose';
 import { reloadCourse } from '@/data/actions/reload';
+import { checkScheduleConflict } from '@/utils/scheduleConflict';
 
-const APPSCRIPT = 'https://script.google.com/macros/s/AKfycbxhq2HUS3Jhhh0XF9PPr_ldJ1redmb1JAN5hZjaeYzvb_AyJiVifEXsW-MdKqpBfEeZww/exec';
+const APPSCRIPT = process.env.GOOGLE_APPSCRIPT_CALENDAR_URL || process.env.GOOGLE_APPSCRIPT_URL || 'https://script.google.com/macros/s/AKfycbxhq2HUS3Jhhh0XF9PPr_ldJ1redmb1JAN5hZjaeYzvb_AyJiVifEXsW-MdKqpBfEeZww/exec';
 const CREATE_LESSON_REQUIRED = ['Day', 'Topic', 'Room', 'Time', 'Teacher'];
 
 // Helper: Tìm _id của phòng từ tên phòng
@@ -70,6 +70,18 @@ export async function POST(request) {
                 }
             } catch (err) {
                 console.error('[udetail] APPSCRIPT_ERROR:', err);
+            }
+
+            // Kiểm tra xung đột lịch phòng học và giáo viên
+            const conflictCheck = await checkScheduleConflict({
+                date: lessonDay,
+                timeStr: data.Time,
+                roomId: roomId,
+                teacherId: data.Teacher,
+                excludeCourseId: courseId
+            });
+            if (conflictCheck.hasConflict) {
+                return NextResponse.json({ status: 1, mes: conflictCheck.message }, { status: 409 });
             }
 
             const newLessonObjectId = new Types.ObjectId();
@@ -143,6 +155,28 @@ export async function POST(request) {
                 setObj['Detail.$.TeachingAs'] = new Types.ObjectId(TeachingAs);
             } else {
                 return NextResponse.json({ status: 1, mes: 'ID trợ giảng (TeachingAs) không hợp lệ' }, { status: 400 });
+            }
+        }
+
+        // Kiểm tra xung đột nếu cập nhật phòng hoặc giáo viên
+        const existingCourse = await PostCourse.findOne({ _id: courseId, 'Detail._id': detailId }, { Detail: 1 }).lean();
+        const existingDetail = existingCourse?.Detail?.find(d => String(d._id) === String(detailId));
+        const checkDate = data.Day ? new Date(data.Day) : existingDetail?.Day;
+        const checkTime = data.Time || existingDetail?.Time;
+        const checkRoom = setObj['Detail.$.Room'] !== undefined ? setObj['Detail.$.Room'] : existingDetail?.Room;
+        const checkTeacher = setObj['Detail.$.Teacher'] !== undefined ? setObj['Detail.$.Teacher'] : existingDetail?.Teacher;
+
+        if (checkDate && checkTime && (checkRoom || checkTeacher)) {
+            const conflictCheck = await checkScheduleConflict({
+                date: checkDate,
+                timeStr: checkTime,
+                roomId: checkRoom,
+                teacherId: checkTeacher,
+                excludeCourseId: courseId,
+                excludeLessonId: detailId
+            });
+            if (conflictCheck.hasConflict) {
+                return NextResponse.json({ status: 1, mes: conflictCheck.message }, { status: 409 });
             }
         }
 

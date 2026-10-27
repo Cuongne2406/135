@@ -12,7 +12,10 @@ function todayAt(h, m) {
     return d
 }
 
-export async function GET() {
+export async function GET(request) {
+    if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ error: 'Chức năng Test SLA bị vô hiệu hóa trên môi trường Production' }, { status: 403 });
+    }
     try {
         await connectDB()
 
@@ -156,6 +159,9 @@ export async function GET() {
 }
 
 export async function DELETE() {
+    if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ error: 'Endpoint test SLA bị vô hiệu hóa trên môi trường Production' }, { status: 403 });
+    }
     try {
         await connectDB()
         const r1 = await PostCourse.deleteMany({ ID: /^SLA-TEST-/ })

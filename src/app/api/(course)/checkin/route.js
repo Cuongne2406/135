@@ -3,6 +3,8 @@ import connectDB from '@/config/connectDB'
 import PostCourse from '@/models/course'
 import TrialCourse from '@/models/coursetry'
 import PostStudent from '@/models/student'
+import MakeupSession from '@/models/makeupSession'
+import { writeSystemLog } from '@/utils/auditLog'
 import mongoose from 'mongoose'
 import { revalidateTag } from 'next/cache'
 import { Re_coursetry } from '@/data/course'
@@ -23,6 +25,7 @@ export async function GET(req) {
     const end = new Date(Date.UTC(year, month, 1))
 
     const officialAgg = PostCourse.aggregate([
+      { $match: { 'Detail.Day': { $gte: start, $lt: end } } },
       { $unwind: '$Detail' },
       { $match: { 'Detail.Day': { $gte: start, $lt: end } } },
       { $addFields: { students: { $map: { input: { $filter: { input: '$Student', as: 'st', cond: { $anyElementTrue: [{ $map: { input: '$$st.Learn', as: 'lr', in: { $eq: ['$$lr.Lesson', '$Detail._id'] } } }] } } }, as: 'st', in: { $mergeObjects: ['$$st', { Learn: { $filter: { input: '$$st.Learn', as: 'lr', cond: { $eq: ['$$lr.Lesson', '$Detail._id'] } } } }] } } } } },
@@ -42,6 +45,7 @@ export async function GET(req) {
     ])
 
     const trialAgg = TrialCourse.aggregate([
+      { $match: { 'sessions.day': { $gte: start, $lt: end } } },
       { $unwind: '$sessions' },
       { $match: { 'sessions.day': { $gte: start, $lt: end } } },
       { $lookup: { from: 'books', localField: 'sessions.book', foreignField: '_id', as: 'bk' } },
@@ -84,19 +88,76 @@ export async function POST(req) {
       if (lesson) sessionDate = lesson.Day;
 
       for (const a of attendanceData) {
+        const checkinNum = Number(a.checkin);
+        const isAbsent = checkinNum === 0 || checkinNum === 2 || checkinNum === 3;
+        const isPresent = checkinNum === 1;
+
         const updateFields = {
-          'Student.$[stu].Learn.$[les].Checkin': Number(a.checkin),
+          'Student.$[stu].Learn.$[les].Checkin': checkinNum,
           'Student.$[stu].Learn.$[les].Cmt': a.comment || [],
         };
         if (a.absenceReason !== undefined) {
           updateFields['Student.$[stu].Learn.$[les].absenceReason'] = a.absenceReason;
         }
+
+        const stuDoc = (course.Student || []).find(s => s.ID === a.studentId);
+        const learnItem = (stuDoc?.Learn || []).find(l => String(l.Lesson) === String(sessionIdObj));
+        const currentMakeupStatus = learnItem?.makeupStatus || 'NOT_REQUIRED';
+
+        if (isAbsent) {
+          // 1. Cập nhật MAKEUP_REQUIRED nếu chưa phải là MAKEUP_SCHEDULED hoặc MAKEUP_COMPLETED
+          if (currentMakeupStatus !== 'MAKEUP_SCHEDULED' && currentMakeupStatus !== 'MAKEUP_COMPLETED') {
+            updateFields['Student.$[stu].Learn.$[les].makeupStatus'] = 'MAKEUP_REQUIRED';
+          }
+          // 2. Tự động kiểm tra và upsert bản ghi sang MakeupSession
+          await MakeupSession.findOneAndUpdate(
+            { studentId: a.studentId, course: course._id, lesson: sessionIdObj },
+            {
+              $set: {
+                makeupStatus: (currentMakeupStatus === 'MAKEUP_SCHEDULED' || currentMakeupStatus === 'MAKEUP_COMPLETED')
+                  ? currentMakeupStatus
+                  : 'MAKEUP_REQUIRED',
+                originalDate: sessionDate || new Date(),
+                absenceReason: a.absenceReason || '',
+              },
+              $setOnInsert: {
+                contentToMakeup: '',
+                note: 'Tự động tạo từ điểm danh vắng'
+              }
+            },
+            { upsert: true, new: true }
+          );
+        } else if (isPresent) {
+          // 1. Đặt lại makeupStatus: NOT_REQUIRED
+          updateFields['Student.$[stu].Learn.$[les].makeupStatus'] = 'NOT_REQUIRED';
+          // 2. Tự động xóa bản ghi trong MakeupSession nếu đang ở trạng thái MAKEUP_REQUIRED hoặc MAKEUP_PENDING
+          await MakeupSession.findOneAndDelete({
+            studentId: a.studentId,
+            course: course._id,
+            lesson: sessionIdObj,
+            makeupStatus: { $in: ['MAKEUP_REQUIRED', 'MAKEUP_PENDING'] }
+          });
+        }
+
         await PostCourse.updateOne(
           { _id: course._id },
           { $set: updateFields },
           { arrayFilters: [{ 'stu.ID': a.studentId }, { 'les.Lesson': sessionIdObj }] }
-        )
+        );
       }
+
+      // Ghi nhận nhật ký kiểm toán hệ thống
+      await writeSystemLog({
+        type: 'ATTENDANCE_CHECKIN',
+        status: true,
+        note: `Điểm danh lớp ${course.ID} buổi ${sessionId}`,
+        details: {
+          courseId: course._id,
+          sessionId,
+          totalStudents: attendanceData.length,
+          absentCount: attendanceData.filter(a => Number(a.checkin) !== 1).length
+        }
+      });
     } else {
       // Trường hợp 2: Khóa học thử
       const trialCourse = await TrialCourse.findOne({ 'sessions._id': sessionIdObj }).lean()

@@ -40,6 +40,13 @@ const ScheduledJobSchema = new Schema(
             },
         },
 
+        rateLimitPerHour: { type: Number, default: 30 },
+        rateLimitPerDay: { type: Number, default: 200 },
+        rateLimitHourStart: { type: Date },
+        actionsUsedThisHour: { type: Number, default: 0 },
+        rateLimitDayStart: { type: Date },
+        actionsUsedThisDay: { type: Number, default: 0 },
+
         tasks: [TaskSchema],
 
         statistics: {

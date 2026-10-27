@@ -32,11 +32,11 @@ export default async function CheckToken(request) {
     try {
       decodedToken = jwt.verify(token, getJwtSecret());
     } catch (err) {
-      return { error: 'Token không hợp lệ hoặc đã hết hạn ' + token };
+      return { error: 'Token không hợp lệ hoặc đã hết hạn' };
     }
 
     return { user: decodedToken, body: body };
   } catch (error) {
-    return { error: `Có lỗi xảy ra: ${source}` };
+    return { error: 'Có lỗi xảy ra trong quá trình xác thực người dùng' };
   }
 }

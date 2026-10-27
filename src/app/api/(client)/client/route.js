@@ -1,8 +1,9 @@
 import { google } from 'googleapis'
-import jsonRes, { corsHeaders } from '@/utils/response'
+import jsonRes from '@/utils/response'
+import authenticate from '@/utils/authenticate'
 
-const SPREADSHEET_ID = '1ZQsHUyVD3vmafcm6_egWup9ErXfxIg4U-TfVDgDztb8';
-const RANGE_DATA = 'Data!A:L';
+const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_CUSTOMER_ID || '1ZQsHUyVD3vmafcm6_egWup9ErXfxIg4U-TfVDgDztb8';
+const RANGE_DATA = process.env.GOOGLE_SHEETS_CUSTOMER_DATA_RANGE || 'Data!A:L';
 
 async function getSheets(mode = 'read') {
   const scopes = mode === 'read'
@@ -21,8 +22,17 @@ async function getSheets(mode = 'read') {
   return google.sheets({ version: 'v4', auth })
 }
 
-export async function GET() {
+export async function GET(req) {
   try {
+    const { user } = await authenticate(req);
+    if (!user) {
+      return jsonRes(401, { status: false, mes: 'Yêu cầu đăng nhập', data: null });
+    }
+    const hasAccess = user.role?.some(r => ['Admin', 'Sale', 'Academic', 'Manager'].includes(r));
+    if (!hasAccess) {
+      return jsonRes(403, { status: false, mes: 'Bạn không có quyền xem dữ liệu khách hàng', data: null });
+    }
+
     const sheets = await getSheets('read')
     const { data } = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
@@ -52,13 +62,25 @@ export async function GET() {
 
     return jsonRes(200, { status: true, mes: 'success', data: results.reverse() })
   } catch (err) {
-    return jsonRes(500, { status: false, mes: 'Failed to fetch data from Google Sheets', data: null })
+    console.error('Lỗi khi lấy dữ liệu khách hàng:', err);
+    const code = err.message === 'Authentication failed' ? 401 : 500;
+    return jsonRes(code, { status: false, mes: err.message || 'Failed to fetch data from Google Sheets', data: null })
   }
 }
 
 export async function POST(req) {
   try {
-    const { phone, care, studyTry, study, remove } = await req.json();
+    const { user } = await authenticate(req);
+    if (!user) {
+      return jsonRes(401, { status: false, mes: 'Yêu cầu đăng nhập', data: null });
+    }
+    const hasAccess = user.role?.some(r => ['Admin', 'Sale', 'Manager'].includes(r));
+    if (!hasAccess) {
+      return jsonRes(403, { status: false, mes: 'Bạn không có quyền cập nhật dữ liệu khách hàng', data: null });
+    }
+
+    const body = await req.json();
+    const { phone, care, studyTry, study, remove } = body;
 
     if (!phone) return jsonRes(400, { status: false, mes: 'Thiếu số điện thoại (phone)', data: [] })
 
@@ -102,6 +124,8 @@ export async function POST(req) {
     })
     return jsonRes(200, { status: true, mes: 'Đã cập nhật', data: rowNum })
   } catch (err) {
-    return jsonRes(500, { status: false, mes: 'Failed to update Google Sheet', data: null })
+    console.error('Lỗi khi cập nhật dữ liệu khách hàng:', err);
+    const code = err.message === 'Authentication failed' ? 401 : 500;
+    return jsonRes(code, { status: false, mes: err.message || 'Failed to update Google Sheet', data: null })
   }
 }

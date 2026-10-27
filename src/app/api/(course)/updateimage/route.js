@@ -1,21 +1,10 @@
 import { NextResponse } from 'next/server';
-import { google } from 'googleapis';
 import { Readable } from 'stream';
 import connectDB from '@/config/connectDB';
 import PostCourse from '@/models/course';
 import TrialCourse from '@/models/coursetry';
-
-async function getDriveClient() {
-    const auth = new google.auth.GoogleAuth({
-        projectId: process.env.GOOGLE_PROJECT_ID,
-        credentials: {
-            client_email: process.env.GOOGLE_CLIENT_EMAIL,
-            private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        },
-        scopes: ['https://www.googleapis.com/auth/drive'],
-    });
-    return google.drive({ version: 'v3', auth });
-}
+import { handleApiError } from '@/utils/apiError';
+import { getDriveClient } from '@/function/drive/index';
 
 export async function POST(request) {
     await connectDB();
@@ -87,12 +76,7 @@ export async function POST(request) {
         );
 
     } catch (error) {
-        const errorMessage = error.errors?.[0]?.message || error.message || 'Lỗi server không xác định.';
-        console.error('Lỗi API [POST]:', JSON.stringify(error, null, 2));
-        return NextResponse.json(
-            { status: 1, mes: errorMessage },
-            { status: error.code || 500 }
-        );
+        return handleApiError('DRIVE_UPLOAD', error, 'Lỗi tải lên và cập nhật hình ảnh Google Drive.');
     }
 }
 

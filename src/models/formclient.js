@@ -12,5 +12,8 @@ const AreaSchema = new Schema(
     { timestamps: false, versionKey: false }
 )
 
-const Form = models.form || model('form', AreaSchema)
-export default Form
+const Form = models.Form || models.form || model('form', AreaSchema);
+if (!models.Form) {
+    try { model('Form', AreaSchema); } catch (_) {}
+}
+export default Form;

@@ -8,13 +8,18 @@ import FlexiblePopup from '@/components/(features)/(popup)/popup_right';
 import CourseAndImageSelection from '../pickimage';
 import { useRouter } from 'next/navigation';
 import { reloadStudent } from '@/data/actions/reload';
-import { getEportfolioUrl } from '@/utils/env'
+import { getEportfolioUrl } from '@/utils/env';
+import { Share2 } from 'lucide-react';
 
 const CloseIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
 const ArrowIcon = ({ isOpen }) => (<svg style={{ transform: isOpen ? 'rotate(-90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>);
 
 const extractId = (urlOrId) => { if (!urlOrId || typeof urlOrId !== 'string') return ''; const match = urlOrId.match(/id=([^&]+)/) || urlOrId.match(/\/d\/([^/]+)/); return match ? match[1] : urlOrId; };
-const buildUrl = (id) => id ? `https://lh3.googleusercontent.com/d/${id}` : 'https://lh3.googleusercontent.com/d/1iq7y8VE0OyFIiHmpnV_ueunNsTeHK1bG';
+const buildUrl = (id) => {
+    if (!id) return 'https://lh3.googleusercontent.com/d/1iq7y8VE0OyFIiHmpnV_ueunNsTeHK1bG';
+    if (typeof id === 'string' && (id.startsWith('http://') || id.startsWith('https://') || id.startsWith('/') || id.startsWith('data:'))) return id;
+    return `https://lh3.googleusercontent.com/d/${id}`;
+};
 
 const defaultProfile = { Intro: '', Avatar: '', ImgSkill: '', ImgPJ: [], Skill: { "Sự tiến bộ và Phát triển": "50", "Kỹ năng giao tiếp": "50", "Diễn giải vấn đề": "50", "Tự tin năng động": "50", "Đổi mới sáng tạo": "50", "Giao lưu hợp tác": "50" }, Present: [] };
 
@@ -33,8 +38,8 @@ export default function Profile({ data, onSave }) {
         const syncedPresent = completedCourses.map(course => {
             const existingPresent = presentMap.get(course._id) || {};
             return {
-                bookId: course.Book.ID,
-                bookName: course.Book.Name,
+                bookId: course.Book?.ID || 'N/A',
+                bookName: course.Book?.Name || 'Khóa học',
                 Video: extractId(existingPresent.Video || ''),
                 Img: extractId(existingPresent.Img || ''),
                 Comment: existingPresent.Comment || '',
@@ -98,7 +103,21 @@ export default function Profile({ data, onSave }) {
     return (
         <>
             <div className="flex justify-between w-full items-start pb-2">
-                <div className="flex gap-2 items-center"><p className="text-lg font-semibold text-[var(--text-primary)]">Hồ sơ điện tử</p><Link href={`${getEportfolioUrl()}/e-portfolio/${data._id}`} target="_blank"><Svg_link w={20} h={20} c={'blue'} /></Link></div>
+                <div className="flex gap-3 items-center">
+                    <p className="text-lg font-semibold text-[var(--text-primary)] m-0">Hồ sơ điện tử</p>
+                    <Link href={`${getEportfolioUrl()}/e-portfolio/${data._id}`} target="_blank" title="Xem hồ sơ nội bộ">
+                        <Svg_link w={20} h={20} c={'blue'} />
+                    </Link>
+                    <Link
+                        href={`/share/student/${data.ID || data._id}`}
+                        target="_blank"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold bg-sky-50 text-[var(--main_d)] hover:bg-sky-100 rounded-lg border border-sky-200 no-underline transition"
+                        title="Mở link công khai cho phụ huynh"
+                    >
+                        <Share2 className="w-3.5 h-3.5" />
+                        <span>Link Phụ Huynh (Tổng)</span>
+                    </Link>
+                </div>
                 <button onClick={handleSaveChanges} className="flex items-center gap-2 px-4 py-2 border-none bg-[#007bff] text-white rounded-md cursor-pointer font-medium" disabled={isSaving}><Svg_Save w={18} h={18} c={'white'} /> {isSaving ? 'Đang lưu...' : 'Lưu thay đổi'}</button>
             </div>
             <div className="flex flex-col gap-4 w-full">

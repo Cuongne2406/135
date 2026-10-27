@@ -101,3 +101,34 @@ export async function getStudentOne(_id) {
     }
 }
 
+export async function getStudentsByBusinessIds(businessIds = []) {
+    if (!Array.isArray(businessIds) || businessIds.length === 0) return []
+    try {
+        await connectDB()
+        const students = await Student.find({ ID: { $in: businessIds } })
+            .populate({ path: 'Area' })
+            .lean()
+
+        const processed = students.map((student) => {
+            const hasPaid = student.Course?.some(c => c.tuition != null) ?? false
+            const unpaidCount = student.Course?.filter(c => c.tuition == null).length ?? 0
+            const createdAt = student._id ? new mongoose.Types.ObjectId(student._id).getTimestamp() : null
+            const courseCount = student.Course?.length ?? 0
+            const rank = getStudentRank(createdAt, courseCount)
+            return {
+                ...student,
+                hasPaid,
+                unpaidCount,
+                createdAt,
+                courseCount,
+                rank,
+                statusProfile: CheckProfileDone(student)
+            }
+        })
+        return JSON.parse(JSON.stringify(processed))
+    } catch (error) {
+        console.error('Lỗi trong getStudentsByBusinessIds:', error)
+        return []
+    }
+}
+

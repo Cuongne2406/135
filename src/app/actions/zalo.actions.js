@@ -8,9 +8,9 @@ import checkAuthToken from '@/utils/checktoken';
 import { reloadUser, reloadZalo } from '@/data/actions/reload';
 import User from '@/models/users';
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwcaXcpdsonX5eGRd0T-X_yJejKqD0krSSSV3rYDnpot23nWvXkzO3QnnvIo7UqYss1/exec';
-const SPREADSHEET_ID = '1ZQsHUyVD3vmafcm6_egWup9ErXfxIg4U-TfVDgDztb8';
-const TARGET_SHEET = 'Account';
+const APPS_SCRIPT_URL = process.env.GOOGLE_APPS_SCRIPT_ZALO_URL || 'https://script.google.com/macros/s/AKfycbwcaXcpdsonX5eGRd0T-X_yJejKqD0krSSSV3rYDnpot23nWvXkzO3QnnvIo7UqYss1/exec';
+const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_CUSTOMER_ID || '1ZQsHUyVD3vmafcm6_egWup9ErXfxIg4U-TfVDgDztb8';
+const TARGET_SHEET = process.env.GOOGLE_SHEETS_ZALO_ACCOUNT_SHEET || 'Account';
 
 async function getGoogleSheetsClient() {
     const auth = new google.auth.GoogleAuth({

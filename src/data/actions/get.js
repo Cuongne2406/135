@@ -1,6 +1,6 @@
 'use server'
 
-import { getStudentOne, getStudentAll } from '@/data/database/student'
+import { getStudentOne, getStudentAll, getStudentsByBusinessIds } from '@/data/database/student'
 import { getInvoiceOne, getInvoiceAll } from '@/data/database/invoices'
 import { getAreaOne, getAreaAll } from '@/data/database/area'
 import { getCourseOne, getCourseAll } from '@/data/database/course'
@@ -16,8 +16,15 @@ import '@/models/student'
 import connectDB from '@/config/connectDB'
 
 export async function student_data(_id) {
+    if (Array.isArray(_id)) {
+        return await getStudentsByBusinessIds(_id);
+    }
     let data = _id ? await getStudentOne(_id) : await getStudentAll()
     return _id && data ? data[0] || null : data || null
+}
+
+export async function students_by_ids(ids) {
+    return await getStudentsByBusinessIds(ids)
 }
 
 export async function invoices_data(_id) {

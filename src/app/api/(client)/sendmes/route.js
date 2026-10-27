@@ -69,7 +69,8 @@ export async function POST(req) {
 
     const result = { phone, status: 'failed' };
     try {
-        const url = new URL('https://script.google.com/macros/s/AKfycbx17JMuK_X-OhUAjin3IlDTAvhBgOOocoWMrTqT7q7_lWNq0eES-GHLwD4MKMIQ43p9eg/exec');
+        const scriptUrl = process.env.GOOGLE_APPSCRIPT_SENDMES_URL || 'https://script.google.com/macros/s/AKfycbx17JMuK_X-OhUAjin3IlDTAvhBgOOocoWMrTqT7q7_lWNq0eES-GHLwD4MKMIQ43p9eg/exec';
+        const url = new URL(scriptUrl);
         if (rawUid) url.searchParams.set('uid', rawUid);
         else url.searchParams.set('phone', phone);
         console.log(rawUid);

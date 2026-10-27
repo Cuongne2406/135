@@ -12,7 +12,7 @@ const AreaCard = ({ area, onClick }) => (
         <div className='p-3 flex flex-col gap-2' style={{ borderLeft: `5px solid ${area.color || '#ccc'}` }}>
             <p className='text-base font-semibold'>Tên khu vực: {area.name}</p>
             <p className='text-sm font-semibold'>
-                Số phòng học: <span style={{ fontWeight: 400 }}>{area.rooms.length}</span>
+                Số phòng học: <span style={{ fontWeight: 400 }}>{area.rooms?.length || 0}</span>
             </p>
         </div>
     </div>

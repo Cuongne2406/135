@@ -66,7 +66,7 @@ function HistoryTaskItem({ task }) {
                 {errorMessage && <h6 className={'text-[var(--red)] italic'}>Lý do: {errorMessage}</h6>}
             </div>
             <div className={'flex items-center gap-2 text-right whitespace-nowrap'}>
-                <div className={`${'w-2 h-2 rounded-full'} ${styles[statusKey]}`}></div>
+                <div className={`w-2 h-2 rounded-full ${didSucceed ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
                 <h6>{statusText}</h6>
                 <h6>{new Date(task.scheduledFor).toLocaleTimeString('vi-VN')}</h6>
             </div>

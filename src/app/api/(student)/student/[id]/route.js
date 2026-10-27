@@ -47,7 +47,8 @@ export async function PUT(request, { params }) {
 
         const avtFile = formData.get('Avt');
         if (avtFile && typeof avtFile !== 'string' && avtFile.size > 0) {
-            newUploadedFileId = await uploadImageToDrive(avtFile, '1h8n0ueMwKumXlYkCDKffgNCyKYRIUJQy');
+            const avtFolderId = process.env.GOOGLE_DRIVE_STUDENT_AVT_FOLDER_ID || '1h8n0ueMwKumXlYkCDKffgNCyKYRIUJQy';
+            newUploadedFileId = await uploadImageToDrive(avtFile, avtFolderId);
             if (newUploadedFileId) {
                 updateData.Avt = newUploadedFileId;
             } else {
@@ -87,7 +88,7 @@ export async function PUT(request, { params }) {
 
 // Báo nghỉ học sinh - bảo lưu tất cả kết quả học tập hiện tại
 export async function DELETE(request, { params }) {
-    const { id } = params;
+    const { id } = await params;
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
         return jsonRes(400, { status: false, mes: 'ID học sinh không hợp lệ' });
     }
@@ -117,7 +118,7 @@ export async function DELETE(request, { params }) {
         }
         await PostStudent.findByIdAndUpdate(id, {
             $set: { Leave: true },
-            $push: { Status: { status: 'leave', date: new Date(), note: mes } }
+            $push: { Status: { status: 0, act: 'leave', date: new Date(), note: mes } }
         });
         reloadStudent(id);
         return jsonRes(200, { status: true, mes: 'Đã cập nhật trạng thái nghỉ học cho học sinh thành công', data: null });
