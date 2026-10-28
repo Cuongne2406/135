@@ -12,7 +12,8 @@ import {
     ChevronRight, 
     BookOpen,
     Sparkles,
-    Check
+    Check,
+    MessageSquare
 } from 'lucide-react';
 
 import { useParent } from '../context';
@@ -184,9 +185,14 @@ export default function ParentTimelinePage() {
                                 )}
 
                                 {lesson.CmtFn && (
-                                    <div className="mt-2.5 text-xs text-slate-700 italic bg-slate-50 p-3 rounded-xl border border-slate-200/80 leading-relaxed break-words shadow-2xs">
-                                        <span className="text-blue-600 font-semibold not-italic mr-1.5">💬 Nhận xét:</span>
-                                        "{lesson.CmtFn}"
+                                    <div className="mt-2.5 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 leading-relaxed shadow-2xs">
+                                        <div className="flex items-center gap-1.5 text-blue-700 font-semibold mb-1 text-[11px]">
+                                            <MessageSquare className="w-3.5 h-3.5" />
+                                            <span>Nhận xét của giáo viên:</span>
+                                        </div>
+                                        <p className="italic text-slate-700 whitespace-pre-line leading-relaxed">
+                                            "{lesson.CmtFn}"
+                                        </p>
                                     </div>
                                 )}
 

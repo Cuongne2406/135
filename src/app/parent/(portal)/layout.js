@@ -79,7 +79,7 @@ function ParentLayoutInner({ children }) {
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-2.5 min-w-0">
-                                                    <div className="w-7 h-7 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center relative shrink-0 border border-slate-200 text-blue-700 font-bold select-none">
+                                                    <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center relative shrink-0 border border-slate-200 text-white font-bold select-none text-[11px] shadow-2xs">
                                                         {child.Avt ? (
                                                             <img
                                                                 src={child.Avt}
@@ -90,7 +90,7 @@ function ParentLayoutInner({ children }) {
                                                                 }}
                                                             />
                                                         ) : null}
-                                                        <span className="text-[11px] font-bold text-blue-700">
+                                                        <span className="absolute inset-0 flex items-center justify-center -z-0">
                                                             {child.Name ? child.Name.trim().split(' ').pop().charAt(0) : 'B'}
                                                         </span>
                                                     </div>
@@ -127,9 +127,9 @@ function ParentLayoutInner({ children }) {
                     {children}
                 </main>
 
-                {/* Bottom Navigation Bar - Cố định 100% ở đáy màn hình, không bao giờ dịch chuyển khi cuộn */}
-                <nav className="fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-lg">
-                    <div className="max-w-md mx-auto flex items-center justify-around py-2 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+                {/* Bottom Navigation Bar - Cố định 100% ở đáy màn hình, không dịch chuyển khi cuộn */}
+                <nav className="fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+                    <div className="max-w-md mx-auto flex items-center justify-around py-2 px-2 pb-[max(0.6rem,env(safe-area-inset-bottom))]">
                         {navItems.map((item) => {
                             const Icon = item.icon;
                             const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
