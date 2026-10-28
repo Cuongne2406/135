@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { Inter, Oswald } from 'next/font/google';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import Nav from '@/components/(layout)/nav';
 import NavMobile from '@/components/(layout)/navMobile';
@@ -33,9 +33,19 @@ export const viewport = {
 
 export default async function RootLayout({ children }) {
   let user = null;
+  let isPortalRoute = false;
 
   try {
-    const cookieStore = await cookies();
+    const [cookieStore, headerList] = await Promise.all([
+      cookies(),
+      headers()
+    ]);
+
+    const currentPath = headerList.get('x-pathname') || '';
+    isPortalRoute = currentPath.startsWith('/parent') || 
+                    currentPath.startsWith('/share') || 
+                    currentPath.startsWith('/portfolio-lookbook');
+
     const token = cookieStore.get(getCookieName())?.value || cookieStore.get('token')?.value;
     if (token) {
       try {
@@ -51,10 +61,12 @@ export default async function RootLayout({ children }) {
     console.error('RootLayout auth check error:', error);
   }
 
+  const showAdminLayout = user && !isPortalRoute;
+
   return (
     <html lang="en">
       <body className={`${inter.variable} ${oswald.variable}`}>
-        {user ? (
+        {showAdminLayout ? (
           <div className="w-full h-full overflow-hidden flex">
             <div className="fixed top-0 left-0 h-full w-[var(--sidebar-w,240px)] border-r border-[var(--border-color)] bg-[var(--bg-primary)] z-[99] max-md:hidden transition-all duration-300">
               <Nav data={user} />
@@ -65,7 +77,7 @@ export default async function RootLayout({ children }) {
             </div>
           </div>
         ) : (
-          <main className="w-full h-full overflow-hidden">
+          <main className="w-full h-full overflow-y-auto">
             {children}
           </main>
         )}

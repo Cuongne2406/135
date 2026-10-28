@@ -11,6 +11,7 @@ import ScheduledJob from "@/models/schedule";
 import { reloadStudent } from '@/data/actions/reload';
 import { ProfileDefault, statusStudent } from '@/data/default';
 import { getZaloUid } from '@/function/drive/appscript';
+import { getNextStudentId } from '@/utils/studentIdGenerator';
 
 export async function getCombinedData(params) {
     const cachedData = nextCache(
@@ -291,9 +292,13 @@ export async function convertToStudentAction(previousState, formData) {
         }
         const customer = await Customer.findById(customerId).lean();
         if (!customer) { return { success: false, error: 'Không tìm thấy khách hàng.' }; }
-        const lastStudent = await Student.findOne({ ID: /^AI\d{4}$/ }).sort({ ID: -1 }).select('ID').lean();
-        const nextIdNumber = lastStudent ? parseInt(lastStudent.ID.slice(2), 10) + 1 : 1;
-        const newStudentId = 'AI' + String(nextIdNumber).padStart(4, '0');
+        if (customer.phone) {
+            const existingStudent = await Student.findOne({ Phone: customer.phone.trim() }).select('ID Name').lean();
+            if (existingStudent) {
+                return { success: false, error: `Số điện thoại ${customer.phone} đã thuộc về học sinh ${existingStudent.Name} (Mã: ${existingStudent.ID}).` };
+            }
+        }
+        const newStudentId = await getNextStudentId();
         const newStudent = new Student({
             ID: newStudentId,
             Name: customer.name,

@@ -28,55 +28,80 @@ export async function GET(request) {
         // Biến đổi thành danh sách showcase chuẩn
         let showcases = [];
 
+        // Ảnh mẫu tiêu chuẩn theo từng chuyên môn nếu học sinh chưa có ảnh
+        const DEFAULT_SUBJECT_IMAGES = {
+            'Robotics & STEM': 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80',
+            'AI & Data Science': 'https://images.unsplash.com/photo-1555255707-c07966088b7b?auto=format&fit=crop&w=800&q=80',
+            'Lập trình Python': 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
+            'Thiết kế Game': 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
+            'default': 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80'
+        };
+
+        const getFallbackImage = (subj) => {
+            if (!subj) return DEFAULT_SUBJECT_IMAGES.default;
+            if (subj.includes('Robot') || subj.includes('STEM')) return DEFAULT_SUBJECT_IMAGES['Robotics & STEM'];
+            if (subj.includes('AI') || subj.includes('Data')) return DEFAULT_SUBJECT_IMAGES['AI & Data Science'];
+            if (subj.includes('Python')) return DEFAULT_SUBJECT_IMAGES['Lập trình Python'];
+            if (subj.includes('Game')) return DEFAULT_SUBJECT_IMAGES['Thiết kế Game'];
+            return DEFAULT_SUBJECT_IMAGES.default;
+        };
+
         students.forEach((stu, sIdx) => {
             const presents = stu.Profile?.Present || [];
+            const subject = stu.Course?.[0]?.course?.Type || 'Robotics & STEM';
+            const courseCode = stu.Course?.[0]?.course?.ID || 'SYS-AIR';
+
             if (presents.length > 0) {
                 presents.forEach((p, pIdx) => {
+                    const hasValidImg = p.Img && typeof p.Img === 'string' && p.Img.trim().length > 5 && !p.Img.includes('Tiếng Anh');
+                    const mainImg = hasValidImg ? p.Img : getFallbackImage(subject);
+
                     showcases.push({
                         id: `${stu._id}-${pIdx}`,
                         studentId: stu._id,
                         studentCode: stu.ID,
                         name: stu.Name,
                         school: stu.School || 'Trung tâm SYS-AIR',
-                        subject: stu.Course?.[0]?.course?.Type || 'Robotics & STEM',
+                        subject: subject,
                         avatar: stu.Avt || '',
-                        title: p.bookName || `Dự án sáng tạo #${pIdx + 1}`,
-                        desc: p.Comment || 'Dự án nghiên cứu kỹ thuật và giải pháp công nghệ do học sinh tự lên ý tưởng và chế tạo.',
-                        mainImage: p.Img || '',
+                        title: p.bookName || `Đồ án ${subject} #${pIdx + 1}`,
+                        desc: 'Dự án nghiên cứu kỹ thuật và giải pháp công nghệ do học sinh tự lên ý tưởng, thiết kế và hoàn thiện.',
+                        mainImage: mainImg,
                         subImage: p.Video || '',
-                        teacherQuote: p.Comment ? `Nhận xét: ${p.Comment}` : 'Học viên thể hiện tư duy sáng tạo xuất sắc trong suốt quá trình hoàn thiện đồ án.',
+                        teacherQuote: p.Comment ? p.Comment.replace(/^Nhận xét:\s*/i, '') : 'Học viên thể hiện tư duy sáng tạo xuất sắc trong suốt quá trình thực hiện đồ án.',
                         metrics: [
-                            `Học viên: ${stu.Name}`,
-                            `Mã số: ${stu.ID}`,
-                            `Khóa học: ${stu.Course?.[0]?.course?.ID || 'SYS-AIR'}`
+                            `Khóa: ${courseCode}`,
+                            `Môn học: ${subject}`
                         ]
                     });
                 });
             } else {
                 // Nếu chưa có Presentation chi tiết, lấy sản phẩm đại diện
+                const hasValidImg = stu.Profile?.ImgPJ?.[0] && typeof stu.Profile.ImgPJ[0] === 'string' && stu.Profile.ImgPJ[0].trim().length > 5 && !stu.Profile.ImgPJ[0].includes('Tiếng Anh');
+                const mainImg = hasValidImg ? stu.Profile.ImgPJ[0] : getFallbackImage(subject);
+
                 showcases.push({
                     id: `${stu._id}-default`,
                     studentId: stu._id,
                     studentCode: stu.ID,
                     name: stu.Name,
                     school: stu.School || 'Trung tâm SYS-AIR',
-                    subject: stu.Course?.[0]?.course?.Type || 'Robotics & STEM',
+                    subject: subject,
                     avatar: stu.Avt || '',
-                    title: `Đồ án Ứng dụng Thực tế - ${stu.Name}`,
-                    desc: stu.Profile?.Intro || 'Sản phẩm sáng tạo ứng dụng thuật toán và mô hình lắp ráp cơ cấu động lực học.',
-                    mainImage: stu.Profile?.ImgPJ?.[0] || '',
+                    title: `Đồ án Ứng dụng Thực tế - ${subject}`,
+                    desc: stu.Profile?.Intro || 'Sản phẩm sáng tạo ứng dụng thuật toán và mô hình kỹ thuật động lực học.',
+                    mainImage: mainImg,
                     subImage: stu.Profile?.ImgSkill || '',
                     teacherQuote: 'Học viên nắm vững kiến thức nền tảng và có khả năng áp dụng linh hoạt vào mô hình thực tế.',
                     metrics: [
-                        `Học viên: ${stu.Name}`,
-                        `Mã số: ${stu.ID}`,
-                        `Khóa học: ${stu.Course?.[0]?.course?.ID || 'SYS-AIR'}`
+                        `Khóa: ${courseCode}`,
+                        `Môn học: ${subject}`
                     ]
                 });
             }
         });
 
-        // Nếu DB chưa có học sinh nào có profile, cung cấp dữ liệu seed mẫu
+        // Nếu DB chưa có học sinh nào có profile, cung cấp dữ liệu seed mẫu đa dạng
         if (showcases.length === 0) {
             showcases = [
                 {
@@ -87,10 +112,10 @@ export async function GET(request) {
                     school: 'Archimedes Academy',
                     subject: 'Robotics & STEM',
                     title: 'Xe Tự Hành Dò Đường & Tránh Vật Cản',
-                    desc: 'Dự án chế tạo xe 3 bánh tự hành ứng dụng cảm biến siêu âm quét vật cản và sa bàn tự động.',
+                    desc: 'Dự án chế tạo xe 3 bánh tự hành ứng dụng cảm biến siêu âm quét vật cản và sa bàn tự động bằng thuật toán PID.',
                     mainImage: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80',
                     teacherQuote: 'An có tư duy phân tích bài toán rất mạch lạc, kiên trì thử nghiệm đến khi đạt độ chính xác cao nhất.',
-                    metrics: ['Thời gian hoàn thiện: 3 tuần', 'Số linh kiện: 142 chi tiết', 'Tỷ lệ né vật cản: 98%']
+                    metrics: ['Khóa học: ROBOT-PRO-01', 'Thời gian: 8 tuần', 'Cảm biến: Siêu âm HC-SR04']
                 },
                 {
                     id: 'seed-2',
@@ -100,10 +125,36 @@ export async function GET(request) {
                     school: 'Vinschool Times City',
                     subject: 'AI & Data Science',
                     title: 'Mô hình Nhận diện Cảm xúc Khuôn mặt AI',
-                    desc: 'Ứng dụng thị giác máy tính Computer Vision phân tích biểu cảm gương mặt học sinh trong lớp học.',
-                    mainImage: 'https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=800&q=80',
-                    teacherQuote: 'Phương Anh có niềm say mê đặc biệt với thuật toán phân loại dữ liệu và học máy.',
-                    metrics: ['Độ chính xác mô hình: 94.2%', 'Bộ dữ liệu: 1,200 ảnh', 'Ngôn ngữ: Python']
+                    desc: 'Ứng dụng thị giác máy tính Computer Vision phân tích biểu cảm gương mặt học sinh trong lớp học và đánh giá mức độ tập trung.',
+                    mainImage: 'https://images.unsplash.com/photo-1555255707-c07966088b7b?auto=format&fit=crop&w=800&q=80',
+                    teacherQuote: 'Phương Anh có niềm say mê đặc biệt với thuật toán phân loại dữ liệu và học máy, hoàn thành xuất sắc đồ án.',
+                    metrics: ['Khóa học: AI-CORE-02', 'Độ chính xác: 94.2%', 'Ngôn ngữ: Python / OpenCV']
+                },
+                {
+                    id: 'seed-3',
+                    studentId: 'seed-minhduc',
+                    studentCode: 'AI0003',
+                    name: 'Lê Minh Đức',
+                    school: 'THCS Giảng Võ',
+                    subject: 'Lập trình Python',
+                    title: 'Hệ thống Quản lý Thư viện Mini & Chatbot Tự Động',
+                    desc: 'Phần mềm desktop quản lý đầu sách, mượn trả tự động kết hợp chatbot hỗ trợ tìm kiếm tài liệu học tập.',
+                    mainImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
+                    teacherQuote: 'Đức tổ chức cấu trúc dữ liệu rất bài bản, tư duy lập trình hướng đối tượng vững vàng.',
+                    metrics: ['Khóa học: PY-APP-01', 'Giao diện: CustomTkinter', 'CSDL: SQLite']
+                },
+                {
+                    id: 'seed-4',
+                    studentId: 'seed-baongoc',
+                    studentCode: 'AI0004',
+                    name: 'Phạm Bảo Ngọc',
+                    school: 'THCS Đoàn Thị Điểm',
+                    subject: 'Thiết kế Game',
+                    title: 'Trò Chơi 2D Vượt Chướng Ngại Vật "Eco Adventure"',
+                    desc: 'Tựa game phiêu lưu truyền tải thông điệp bảo vệ môi trường, vượt mê cung và thu thập rác tái chế với hiệu ứng vật lý tùy chỉnh.',
+                    mainImage: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
+                    teacherQuote: 'Bảo Ngọc có gu thẩm mỹ đồ họa rất tốt và khả năng thiết kế cơ chế gameplay cuốn hút.',
+                    metrics: ['Khóa học: GAME-2D-03', 'Engine: Pygame', 'Màn chơi: 5 levels']
                 }
             ];
         }

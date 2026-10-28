@@ -31,9 +31,16 @@ export async function getNotifications({ userId, role, page = 1, limit = 20, sta
 
   const skip = (page - 1) * limit
   const [data, total] = await Promise.all([
-    Notification.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    Notification.find(query)
+      .populate('ref_student', 'ID Name Avt')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
     Notification.countDocuments(query),
   ])
+
+  const { default: Student } = await import('@/models/student')
 
   const enriched = await Promise.all(data.map(async (notif) => {
     let readStatus = null
@@ -41,7 +48,28 @@ export async function getNotifications({ userId, role, page = 1, limit = 20, sta
       const recipient = await NotificationRecipient.findOne({ notification: notif._id, user: userId }).lean()
       readStatus = recipient?.status || null
     }
-    return { ...notif, read_status: readStatus }
+
+    let studentAvt = notif.ref_student?.Avt || null
+    let studentId = notif.ref_student?.ID || null
+    let studentName = notif.ref_student?.Name || null
+
+    if (!studentAvt && (notif.type === 'STUDENT_LEAVE_REQUEST' || notif.type === 'STUDENT_LEAVE_CANCEL')) {
+      const match = notif.title?.match(/\((HS-[^\)]+)\)/)
+      if (match) {
+        studentId = match[1]
+        const s = await Student.findOne({ ID: match[1] }).select('Avt Name ID').lean()
+        if (s?.Avt) studentAvt = s.Avt
+        if (s?.Name) studentName = s.Name
+      }
+    }
+
+    return { 
+      ...notif, 
+      read_status: readStatus,
+      student_avatar: studentAvt,
+      student_id: studentId,
+      student_name: studentName,
+    }
   }))
 
   return { data: enriched, pagination: { page, limit, total, total_pages: Math.ceil(total / limit) } }

@@ -21,7 +21,7 @@ export default function useNotification() {
 
   const fetchRecent = useCallback(async () => {
     try {
-      const res = await fetch('/api/notifications?limit=5')
+      const res = await fetch('/api/notifications?limit=20')
       const json = await res.json()
       if (json.success) {
         setNotifications(json.data || [])
@@ -52,7 +52,7 @@ export default function useNotification() {
         try {
           const data = JSON.parse(e.data)
           if (data.type === 'new_notification') {
-            setNotifications(prev => [data.notification, ...prev].slice(0, 5))
+            setNotifications(prev => [data.notification, ...prev].slice(0, 20))
             setUnreadCount(prev => prev + 1)
           } else if (data.type === 'count_update') {
             if (data.total_unread !== undefined) {

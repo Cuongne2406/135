@@ -188,11 +188,28 @@ export default async function StudentEPortfolioPage({ params }) {
         'Tinh thần Đồng đội': '92%',
         'Sáng tạo & Cải tiến': '87%'
     };
+    let hasCustomSkill = false;
     if (student.Profile?.Skill) {
-        if (student.Profile.Skill instanceof Map) {
+        if (student.Profile.Skill instanceof Map && student.Profile.Skill.size > 0) {
             skillsMap = Object.fromEntries(student.Profile.Skill);
-        } else if (typeof student.Profile.Skill === 'object') {
+            hasCustomSkill = true;
+        } else if (typeof student.Profile.Skill === 'object' && Object.keys(student.Profile.Skill).length > 0) {
             skillsMap = student.Profile.Skill;
+            hasCustomSkill = true;
+        }
+    }
+
+    // Fallback nếu Profile.Skill rỗng: lấy từ bản nháp aiPortfolioDraft của khóa học
+    if (!hasCustomSkill && enrolledCourses.length > 0) {
+        for (const ec of enrolledCourses) {
+            const courseDraft = ec.course?.aiPortfolioDraft;
+            if (Array.isArray(courseDraft) && courseDraft.length > 0) {
+                const myDraft = courseDraft.find(d => d.ID === student.ID);
+                if (myDraft?.skills) {
+                    skillsMap = myDraft.skills;
+                    break;
+                }
+            }
         }
     }
 

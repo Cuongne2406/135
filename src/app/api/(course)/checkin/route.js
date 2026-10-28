@@ -9,9 +9,16 @@ import mongoose from 'mongoose'
 import { revalidateTag } from 'next/cache'
 import { Re_coursetry } from '@/data/course'
 import { reloadCourse, reloadCoursetry } from '@/data/actions/reload'
+import authenticate from '@/utils/authenticate'
+import { sendInstantCheckinZaloNotification } from '@/services/zaloAutomation.service'
 
 export async function GET(req) {
   try {
+    const { user } = await authenticate(req);
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(req.url)
     const month = +searchParams.get('month')
     const year = +searchParams.get('year')
@@ -73,6 +80,12 @@ export async function GET(req) {
 
 export async function POST(req) {
   try {
+    const { user } = await authenticate(req);
+    if (!user) {
+      return NextResponse.json({ status: 1, mes: 'Chưa đăng nhập.' }, { status: 401 });
+    }
+    const isAdminOrAcademic = user.role.includes('Admin') || user.role.includes('Academic');
+
     const { courseId, sessionId, attendanceData } = await req.json()
     if (!courseId || !sessionId || !Array.isArray(attendanceData))
       return NextResponse.json({ status: 1, mes: 'Thiếu tham số' }, { status: 400 })
@@ -86,6 +99,15 @@ export async function POST(req) {
     if (course) {
       const lesson = course.Detail.find(d => d._id.equals(sessionIdObj));
       if (lesson) sessionDate = lesson.Day;
+
+      if (!isAdminOrAcademic) {
+        const isAuthorizedTeacher = String(course.TeacherHR) === String(user._id) ||
+          String(lesson?.Teacher) === String(user._id) ||
+          String(lesson?.TeachingAs) === String(user._id);
+        if (!isAuthorizedTeacher) {
+          return NextResponse.json({ status: 1, mes: 'Bạn không có quyền điểm danh lớp học này.' }, { status: 403 });
+        }
+      }
 
       for (const a of attendanceData) {
         const checkinNum = Number(a.checkin);
@@ -128,15 +150,18 @@ export async function POST(req) {
             { upsert: true, new: true }
           );
         } else if (isPresent) {
-          // 1. Đặt lại makeupStatus: NOT_REQUIRED
-          updateFields['Student.$[stu].Learn.$[les].makeupStatus'] = 'NOT_REQUIRED';
-          // 2. Tự động xóa bản ghi trong MakeupSession nếu đang ở trạng thái MAKEUP_REQUIRED hoặc MAKEUP_PENDING
-          await MakeupSession.findOneAndDelete({
-            studentId: a.studentId,
-            course: course._id,
-            lesson: sessionIdObj,
-            makeupStatus: { $in: ['MAKEUP_REQUIRED', 'MAKEUP_PENDING'] }
-          });
+          // Bảo toàn trạng thái nếu học sinh đã hoàn thành học bù (MAKEUP_COMPLETED)
+          if (currentMakeupStatus !== 'MAKEUP_COMPLETED') {
+            // 1. Đặt lại makeupStatus: NOT_REQUIRED
+            updateFields['Student.$[stu].Learn.$[les].makeupStatus'] = 'NOT_REQUIRED';
+            // 2. Tự động xóa bản ghi trong MakeupSession nếu đang ở trạng thái MAKEUP_REQUIRED hoặc MAKEUP_PENDING
+            await MakeupSession.findOneAndDelete({
+              studentId: a.studentId,
+              course: course._id,
+              lesson: sessionIdObj,
+              makeupStatus: { $in: ['MAKEUP_REQUIRED', 'MAKEUP_PENDING'] }
+            });
+          }
         }
 
         await PostCourse.updateOne(
@@ -144,12 +169,21 @@ export async function POST(req) {
           { $set: updateFields },
           { arrayFilters: [{ 'stu.ID': a.studentId }, { 'les.Lesson': sessionIdObj }] }
         );
+
+        // Kích hoạt thông báo Zalo Điểm danh tức thì (Checkin 1: Có mặt | Checkin 2: Cảnh báo vắng | Checkin 3: Bỏ qua)
+        sendInstantCheckinZaloNotification({
+          studentId: a.studentId,
+          courseId: course._id,
+          lessonId: sessionIdObj,
+          checkin: checkinNum
+        }).catch(err => console.error('[INSTANT_CHECKIN_ZALO_ERROR]', err));
       }
 
       // Ghi nhận nhật ký kiểm toán hệ thống
       await writeSystemLog({
         type: 'ATTENDANCE_CHECKIN',
         status: true,
+        createBy: user._id,
         note: `Điểm danh lớp ${course.ID} buổi ${sessionId}`,
         details: {
           courseId: course._id,
@@ -165,6 +199,14 @@ export async function POST(req) {
 
       const lesson = trialCourse.sessions.find(s => s._id.equals(sessionIdObj));
       if (lesson) sessionDate = lesson.day;
+
+      if (!isAdminOrAcademic) {
+        const isAuthorizedTeacher = String(lesson?.teacher) === String(user._id) ||
+          String(lesson?.teachingAs) === String(user._id);
+        if (!isAuthorizedTeacher) {
+          return NextResponse.json({ status: 1, mes: 'Bạn không có quyền điểm danh lớp học thử này.' }, { status: 403 });
+        }
+      }
 
       const studentHumanIds = attendanceData.map(a => a.studentId);
       const studentsFound = await PostStudent.find({ ID: { $in: studentHumanIds } }, { _id: 1, ID: 1 }).lean();

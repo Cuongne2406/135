@@ -7,12 +7,17 @@ import Area from '@/models/area'
 import User from '@/models/users'
 import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs'
+import authenticate from '@/utils/authenticate'
 
 export async function GET(request) {
     if (process.env.NODE_ENV === 'production') {
         return NextResponse.json({ error: 'Chức năng Test Seed bị vô hiệu hóa trên môi trường Production' }, { status: 403 });
     }
     try {
+        const { user } = await authenticate(request);
+        if (!user || !user.role?.includes('Admin')) {
+            return NextResponse.json({ error: 'Chỉ Admin mới có quyền thực thi Test Seed.' }, { status: 403 });
+        }
         await connectDB()
 
         const existing = await Course.findOne({ ID: /^TEST-/ })

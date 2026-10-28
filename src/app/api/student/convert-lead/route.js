@@ -9,6 +9,7 @@ import authenticate from '@/utils/authenticate';
 import { writeSystemLog } from '@/utils/auditLog';
 import { ProfileDefault, statusStudent } from '@/data/default';
 import { reloadStudent, reloadCourse } from '@/data/actions/reload';
+import { getNextStudentId } from '@/utils/studentIdGenerator';
 import mongoose from 'mongoose';
 
 export async function GET(req) {
@@ -69,10 +70,17 @@ export async function POST(req) {
             return NextResponse.json({ status: 1, mes: 'Khóa học không tồn tại.' }, { status: 404 });
         }
 
-        // 2. Tạo mã học viên tự động (AI0001, AI0002, ...)
-        const lastStudent = await PostStudent.findOne({ ID: /^AI\d{4}$/ }).sort({ ID: -1 }).select('ID').lean();
-        const nextIdNumber = lastStudent ? parseInt(lastStudent.ID.slice(2), 10) + 1 : 1;
-        const newStudentId = 'AI' + String(nextIdNumber).padStart(4, '0');
+        // 2. Kiểm tra trùng số điện thoại
+        const existingStudent = await PostStudent.findOne({ Phone: phone.trim() }).select('ID Name').lean();
+        if (existingStudent) {
+            return NextResponse.json({
+                status: 1,
+                mes: `Số điện thoại ${phone} đã thuộc về học sinh ${existingStudent.Name} (Mã: ${existingStudent.ID}). Không thể tạo học sinh trùng lặp.`
+            }, { status: 400 });
+        }
+
+        // 3. Tạo mã học viên tự động nguyên tử (AI0001, AI0002, ...)
+        const newStudentId = await getNextStudentId();
 
         // 3. Khởi tạo mảng buổi học cho học sinh trong Course.Detail
         const learnEntries = (course.Detail || [])

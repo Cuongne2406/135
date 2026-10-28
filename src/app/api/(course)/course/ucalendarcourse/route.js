@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { Types, isValidObjectId } from 'mongoose';
 import { reloadCourse } from '@/data/actions/reload';
 import { checkScheduleConflict } from '@/utils/scheduleConflict';
+import authenticate from '@/utils/authenticate';
 
 const APPSCRIPT = process.env.GOOGLE_APPSCRIPT_CALENDAR_URL || process.env.GOOGLE_APPSCRIPT_URL || 'https://script.google.com/macros/s/AKfycbxhq2HUS3Jhhh0XF9PPr_ldJ1redmb1JAN5hZjaeYzvb_AyJiVifEXsW-MdKqpBfEeZww/exec';
 const CREATE_LESSON_REQUIRED = ['Day', 'Topic', 'Room', 'Time', 'Teacher'];
@@ -33,14 +34,31 @@ const formatDay = d => {
 
 export async function POST(request) {
     try {
+        const { user } = await authenticate(request);
+        if (!user) {
+            return NextResponse.json({ status: 1, mes: 'Chưa đăng nhập.' }, { status: 401 });
+        }
+        const isAdminOrAcademic = user.role.includes('Admin') || user.role.includes('Academic');
+        if (!isAdminOrAcademic && !user.role.includes('Teacher')) {
+            return NextResponse.json({ status: 1, mes: 'Bạn không có quyền chỉnh sửa lịch khóa học.' }, { status: 403 });
+        }
+
         const { courseId, detailId, data, student = [], type } = await request.json();
-        console.log(type);
         
         if (!courseId || !data || typeof data !== 'object') {
             return NextResponse.json({ status: 1, mes: 'Thiếu courseId hoặc data' }, { status: 400 });
         }
 
         await connectDB();
+
+        if (!isAdminOrAcademic) {
+            const courseDoc = await PostCourse.findById(courseId).select('TeacherHR Detail').lean();
+            const isAuthorizedTeacher = String(courseDoc?.TeacherHR) === String(user._id) ||
+                courseDoc?.Detail?.some(d => String(d._id) === String(detailId) && (String(d.Teacher) === String(user._id) || String(d.TeachingAs) === String(user._id)));
+            if (!isAuthorizedTeacher) {
+                return NextResponse.json({ status: 1, mes: 'Bạn không có quyền chỉnh sửa lịch của lớp học này.' }, { status: 403 });
+            }
+        }
         if (type === 'Học bù') {
             const missing = CREATE_LESSON_REQUIRED.filter(k => !(k in data));
             if (missing.length) {

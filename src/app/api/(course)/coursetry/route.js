@@ -9,6 +9,7 @@ import Area from '@/models/area'
 import jsonRes from '@/utils/response'
 import '@/models/users'
 import '@/models/book'
+import authenticate from '@/utils/authenticate'
 
 const TRIAL_ID = new Types.ObjectId('6871bc14ada3650715efc786')
 const PARENT_ID = '1Ri-Cl-R7Exl7vP6Qy8tDHtoiSqMXVmhf'
@@ -129,6 +130,10 @@ export async function GET() {
 
 export async function POST(request) {
     try {
+        const { user } = await authenticate(request);
+        if (!user || (!user.role.includes('Admin') && !user.role.includes('Academic'))) {
+            return jsonRes(403, { status: false, mes: 'Bạn không có quyền thêm buổi học thử.', data: null });
+        }
         await dbConnect()
         const { day, time, room, book, topicId, teacher, teachingAs, studentIds = [], note = '' } = await request.json()
 
@@ -184,6 +189,10 @@ export async function POST(request) {
 
 export async function PUT(request) {
     try {
+        const { user } = await authenticate(request);
+        if (!user || (!user.role.includes('Admin') && !user.role.includes('Academic'))) {
+            return jsonRes(403, { status: false, mes: 'Bạn không có quyền chỉnh sửa buổi học thử.', data: null });
+        }
         await dbConnect()
         const { sessionId, students, ...fields } = await request.json()
         if (!Types.ObjectId.isValid(sessionId))

@@ -22,9 +22,7 @@ import Pay from '@/app/student/list/ui/pay';
 import Export from '../exportStudents';
 import SendCmt from '../sencmt';
 import { getEportfolioUrl } from '@/utils/env';
-import TemplateSelector from '../templateSelector';
 import ReviewSheetModal from '../reviewSheet';
-import DriveFolderModal from '../driveFolderModal';
 import CourseHealthBar from '@/components/(features)/courseHealthBar';
 import AutoDateMatcherModal from '../autoDateMatcher';
 import ShareQrModal from '../shareQrModal';
@@ -54,7 +52,6 @@ export default function Detail({ data = [], params, book, users, studentsx }) {
 
     const [loading, setLoading] = useState(false);
     const [openReviewSheet, setOpenReviewSheet] = useState(false);
-    const [openDriveModal, setOpenDriveModal] = useState(false);
     const [openAutoDateMatcher, setOpenAutoDateMatcher] = useState(false);
     const [openQrModal, setOpenQrModal] = useState(false);
     const [notification, setNotification] = useState({
@@ -467,37 +464,6 @@ export default function Detail({ data = [], params, book, users, studentsx }) {
                                             <p className='text-sm font-normal text-[var(--text-primary)]' style={{ color: 'white' }}> Xác nhận hoàn thành</p>
                                         </div>}
                                     <Export />
-                                    <TemplateSelector course={data} book={book} />
-                                    <button
-                                        type="button"
-                                        onClick={() => setOpenDriveModal(true)}
-                                        className="px-3 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 flex items-center gap-1.5 rounded-lg text-xs font-semibold cursor-pointer shadow-xs transition-colors whitespace-nowrap"
-                                        style={{ marginTop: 8 }}
-                                        title="Đổi Folder Google Drive ảnh cho lớp học (Bản Demo)"
-                                    >
-                                        <span>📁</span>
-                                        <span>Folder Drive</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setOpenAutoDateMatcher(true)}
-                                        className="px-3 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 flex items-center gap-1.5 rounded-lg text-xs font-semibold cursor-pointer shadow-xs transition-colors whitespace-nowrap"
-                                        style={{ marginTop: 8 }}
-                                        title="Tự động đọc EXIF ngày chụp và phân loại ảnh vào 7 buổi học"
-                                    >
-                                        <span>⚡</span>
-                                        <span>Khớp Ảnh Tự Động</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setOpenReviewSheet(true)}
-                                        className="px-3 py-2 bg-[var(--main_d)] hover:bg-[var(--main_b)] text-white flex items-center gap-1.5 rounded-lg text-xs font-semibold cursor-pointer border-none shadow-xs transition-colors whitespace-nowrap"
-                                        style={{ marginTop: 8 }}
-                                        title="Mở Bảng Tuyển Chọn AI & Xuất Bản ePortfolio Học Viên"
-                                    >
-                                        <span>✨</span>
-                                        <span>Duyệt ePortfolio (AI)</span>
-                                    </button>
                                     <button
                                         type="button"
                                         onClick={() => setOpenQrModal(true)}
@@ -507,24 +473,6 @@ export default function Detail({ data = [], params, book, users, studentsx }) {
                                     >
                                         <span>Xuất & Mã QR</span>
                                     </button>
-                                    <Link
-                                        href="/preview-templates"
-                                        className="px-3 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 flex items-center gap-1.5 rounded-lg text-xs font-semibold cursor-pointer shadow-xs transition-colors no-underline whitespace-nowrap"
-                                        style={{ marginTop: 8 }}
-                                        title="Xem & So Sánh 15 Mẫu Giao Diện"
-                                    >
-                                        <span>🎨</span>
-                                        <span>Kho Template (15)</span>
-                                    </Link>
-                                    <Link
-                                        href="/portfolio-lookbook"
-                                        className="px-3 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 flex items-center gap-1.5 rounded-lg text-xs font-semibold cursor-pointer shadow-xs transition-colors no-underline whitespace-nowrap"
-                                        style={{ marginTop: 8 }}
-                                        title="Xem Kỷ Yếu ePortfolio Tạp Chí Khổ A4"
-                                    >
-                                        <span>📖</span>
-                                        <span>Kỷ Yếu Lookbook</span>
-                                    </Link>
                                 </>
 
                             }
@@ -627,20 +575,6 @@ export default function Detail({ data = [], params, book, users, studentsx }) {
                         open: true,
                         status: true,
                         mes: '⚡ Xuất bản Portfolio & hoàn thành khóa học thành công!'
-                    });
-                    reload();
-                }}
-            />
-
-            <DriveFolderModal
-                isOpen={openDriveModal}
-                onClose={() => setOpenDriveModal(false)}
-                course={data}
-                onSuccess={() => {
-                    setNotification({
-                        open: true,
-                        status: true,
-                        mes: '📁 Đã cập nhật Folder Drive cho khóa học (Bản demo)!'
                     });
                     reload();
                 }}

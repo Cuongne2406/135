@@ -20,7 +20,7 @@ export function middleware(request) {
     const { pathname } = request.nextUrl;
 
     // 1. Cho phép truy cập công khai vào các đường dẫn public
-    const publicPaths = ['/login', '/share', '/api/login', '/api/check'];
+    const publicPaths = ['/login', '/share', '/api/login', '/api/check', '/parent', '/api/parent', '/api/cron'];
     const isPublic = publicPaths.some(path => pathname === path || pathname.startsWith(`${path}/`));
 
     // Lấy cookie token hoặc Authorization header
@@ -31,13 +31,17 @@ export function middleware(request) {
     const isExpired = isTokenExpired(rawToken);
     const hasValidToken = Boolean(rawToken && !isExpired);
 
+    // Chuẩn bị headers chuyển tiếp x-pathname để RootLayout nhận diện
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-pathname', pathname);
+
     // 2. Nếu đã đăng nhập với token hợp lệ mà truy cập /login thì tự động chuyển hướng về trang chủ
     if (pathname === '/login') {
         if (hasValidToken) {
             return NextResponse.redirect(new URL('/', request.url));
         }
         // Token đã hết hạn -> Cho phép vào trang /login và xóa cookie hết hạn
-        const res = NextResponse.next();
+        const res = NextResponse.next({ request: { headers: requestHeaders } });
         if (rawToken && isExpired) {
             res.cookies.delete(tokenCookieName);
             res.cookies.delete('token');
@@ -47,7 +51,7 @@ export function middleware(request) {
 
     // 3. Nếu đang truy cập trang công khai khác thì cho qua
     if (isPublic) {
-        return NextResponse.next();
+        return NextResponse.next({ request: { headers: requestHeaders } });
     }
 
     // 4. Nếu chưa có token hoặc token đã hết hạn -> Chuyển hướng về trang /login và xóa cookie cũ
@@ -55,7 +59,7 @@ export function middleware(request) {
         // Nếu là request API -> Trả về lỗi 401 Unauthorized thay vì redirect HTML
         if (pathname.startsWith('/api/')) {
             if (pathname.startsWith('/api/login') || pathname.startsWith('/api/share')) {
-                return NextResponse.next();
+                return NextResponse.next({ request: { headers: requestHeaders } });
             }
             const res = NextResponse.json(
                 { status: false, mes: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.' },
@@ -78,7 +82,7 @@ export function middleware(request) {
         return res;
     }
 
-    return NextResponse.next();
+    return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {

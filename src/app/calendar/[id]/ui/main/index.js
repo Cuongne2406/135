@@ -13,6 +13,7 @@ import ImageUploader from '../formimage';
 import StudentCourseImageManager from '../formimages';
 import { Svg_Detail } from '@/components/(icon)/svg';
 import Link from 'next/link';
+import { srcImage } from '@/function';
 
 const updateAttendance = async (courseId, sessionId, attendanceData) => {
     const r = await fetch('/api/checkin', {
@@ -48,8 +49,9 @@ export default function Main({ data }) {
         Name: stu.Name,
         Image: stu.attendance?.Image ?? [],
         Checkin: stu.attendance?.Checkin,
+        absenceReason: stu.attendance?.absenceReason ?? '',
         originalComment: stu.attendance?.Cmt ?? [],
-        Avt: stu.Avt ? `https://lh3.googleusercontent.com/d/${stu.Avt}` : 'https://lh3.googleusercontent.com/d/1iq7y8VE0OyFIiHmpnV_ueunNsTeHK1bG'
+        Avt: srcImage(stu.Avt)
     }));
 
     const cur = s => (att[s.ID] !== undefined ? att[s.ID] : s.Checkin);
@@ -152,7 +154,7 @@ export default function Main({ data }) {
             {showImagePopup && (
                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1050, cursor: 'pointer' }} onClick={() => setShowImagePopup(false)}>
                     <div style={{ position: 'relative', width: '60vh', height: '60vh', backgroundColor: 'white', overflow: 'hidden', borderRadius: '8px' }} onClick={(e) => e.stopPropagation()}>
-                        <Image src={popupImageUrl} alt="Student Avatar Popup" fill sizes="60vh" style={{ objectFit: 'contain' }} />
+                        <Image src={popupImageUrl} alt="Student Avatar Popup" fill sizes="60vh" style={{ objectFit: 'contain' }} unoptimized />
                     </div>
                 </div>
             )}
@@ -228,9 +230,20 @@ export default function Main({ data }) {
                                                 <div className="text-sm font-normal text-[var(--text-primary)]" style={{ flex: 1, padding: '12px 8px', fontWeight: 500 }}>{stu.ID}</div>
                                                 <div className="text-sm font-normal text-[var(--text-primary)]" style={{ flex: 3, padding: '0 8px', fontWeight: 500, display: 'flex', gap: 8, alignItems: 'center' }}>
                                                     <div className="w-9 h-9 relative shrink-0 overflow-hidden cursor-pointer" style={{ borderRadius: 5 }} onClick={() => handleImageClick(stu.Avt)}>
-                                                        <Image fill sizes="35px" className="object-cover" src={stu.Avt} alt={stu.Name} />
+                                                        <Image fill sizes="35px" className="object-cover" src={stu.Avt} alt={stu.Name} unoptimized />
                                                     </div>
-                                                    {stu.Name}
+                                                    <div className="flex flex-col min-w-0">
+                                                        <span className="truncate">{stu.Name}</span>
+                                                        {(cur(stu) == '3' || Boolean(stu.absenceReason)) && (
+                                                            <span 
+                                                                className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 mt-0.5 truncate max-w-[220px]"
+                                                                title={stu.absenceReason || 'Phụ huynh xin nghỉ phép'}
+                                                            >
+                                                                <span>⚠️</span>
+                                                                <span className="truncate">{stu.absenceReason ? `Phép: ${stu.absenceReason}` : 'Vắng có phép'}</span>
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <div style={{ flex: 3, display: 'flex', alignItems: 'center' }}>
                                                     {attendanceOptions.map(v => (

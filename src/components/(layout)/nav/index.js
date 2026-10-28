@@ -36,11 +36,7 @@ const academicChildren = [
   { href: '/academic/report', content: 'Báo cáo chuyên cần', allowedRoles: ['admin', 'teacher', 'academic'] },
 ]
 
-const Svg_Palette = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" {...props}>
-    <path d="M512 256c0 .9 0 1.8 0 2.7c-.4 36.5-33.6 61.3-70.1 61.3L344 320c-26.5 0-48 21.5-48 48c0 3.4 .4 6.7 1 9.9c2.1 10.2 6.5 20 10.8 29.9c6.1 13.8 12.1 27.5 12.1 42c0 35.3-28.7 62.2-63.8 62.2c-2.4 0-4.8-.1-7.1-.4C115 496.2 0 388.9 0 256C0 114.6 114.6 0 256 0S512 114.6 512 256zM128 288a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm64-96a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zm128 0a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm96 96a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>
-  </svg>
-);
+
 
 const Svg_Lookbook = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" {...props}>
@@ -82,13 +78,7 @@ const initialNavItems = [
     content: 'Khóa học',
     allowedRoles: ['admin', 'teacher', 'hr', 'client', 'sale', 'academic']
   },
-  { 
-    href: '/preview-templates', 
-    icon: <Svg_Palette height={22} width={22} fill={'var(--text-secondary)'} />, 
-    content: 'Kho Template',
-    badge: '15 Mẫu',
-    allowedRoles: ['admin', 'teacher', 'academic']
-  },
+
   { 
     href: '/portfolio-lookbook', 
     icon: <Svg_Lookbook height={22} width={22} fill={'var(--text-secondary)'} />, 

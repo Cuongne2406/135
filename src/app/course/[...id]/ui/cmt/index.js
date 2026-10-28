@@ -73,7 +73,6 @@ export default function CommentPopup({ data, course, lesson }) {
             }
             const result = await response.json();
             setCmt([2, { text: result.output }]);
-            await Re_course_one(data.course);
             router.refresh();
         } catch (error) {
             setNoti({ open: true, mes: error.message, status: false });
@@ -113,7 +112,6 @@ export default function CommentPopup({ data, course, lesson }) {
             }
 
             setNoti({ open: true, mes: 'Cập nhật nhận xét thành công!', status: true });
-            await Re_course_one(data.course);
             router.refresh();
         } catch (error) {
             setNoti({ open: true, mes: error.message, status: false });

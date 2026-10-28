@@ -262,14 +262,6 @@ export default function Navbar({ data = [], book = [], user, areas = [], trys, t
                     </div>
                     <div className='flex gap-2 items-center flex-wrap'>
                         <Link
-                            href="/preview-templates"
-                            className="h-9 px-3 rounded-md font-medium text-xs cursor-pointer flex items-center gap-1.5 bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 transition-colors no-underline"
-                            title="Xem và so sánh 15 mẫu Template ePortfolio"
-                        >
-                            <span>🎨</span>
-                            <span>Kho Template</span>
-                        </Link>
-                        <Link
                             href="/portfolio-lookbook"
                             className="h-9 px-3 rounded-md font-medium text-xs cursor-pointer flex items-center gap-1.5 bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 transition-colors no-underline"
                             title="Xem ấn phẩm Kỷ yếu Tạp chí A4"

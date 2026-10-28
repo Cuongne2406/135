@@ -211,10 +211,10 @@ export async function POST(req) {
 
         if (geminiApiKey && allCourseImages.length > 0 && studentDocs.length > 0) {
             try {
-                // Giới hạn tối đa 24 ảnh đại diện từ các buổi học để gửi AI trong thời gian tối ưu
-                const sampleImages = allCourseImages.slice(0, 24);
+                // Giới hạn tối đa 8 ảnh đại diện từ các buổi học để gửi AI trong thời gian tối ưu và kiểm soát kích thước payload < 2MB
+                const sampleImages = allCourseImages.slice(0, 8);
                 
-                // Tải đồng thời song song 24 ảnh base64
+                // Tải đồng thời song song 8 ảnh base64
                 const base64Results = await Promise.allSettled(
                     sampleImages.map(img => fetchImageBase64(img.id, 2500))
                 );
@@ -291,7 +291,9 @@ Trả về duy nhất định dạng JSON thuần (không kèm markdown code blo
 `;
 
                     const contents = [prompt, ...imagePayloads.map(p => ({ inlineData: p.inlineData }))];
-                    const aiResult = await model.generateContent(contents);
+                    const geminiPromise = model.generateContent(contents);
+                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Gemini API timeout sau 15 giây')), 15000));
+                    const aiResult = await Promise.race([geminiPromise, timeoutPromise]);
                     const rawText = aiResult.response.text().trim();
                     const jsonCleaned = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
                     const parsed = JSON.parse(jsonCleaned);
@@ -368,6 +370,29 @@ Trả về duy nhất định dạng JSON thuần (không kèm markdown code blo
 
         // 7. Lưu lại bản nháp vào Database để tái sử dụng ngay lập tức các lần sau
         await PostCourse.updateOne({ _id: courseId }, { $set: { aiPortfolioDraft: finalDraft } }, { strict: false });
+
+        // 8. Đồng bộ tự động sang Hồ sơ năng lực (Profile) của từng học sinh
+        const studentBulkOps = finalDraft.map(item => {
+            const setObj = {};
+            if (item.skills) setObj['Profile.Skill'] = item.skills;
+            if (item.comment) setObj['Profile.Intro'] = item.comment;
+            if (item.coverImg) setObj['Profile.Avatar'] = item.coverImg;
+            const projectImgs = [item.projectImg1, item.projectImg2].filter(Boolean);
+            if (projectImgs.length > 0) setObj['Profile.ImgPJ'] = projectImgs;
+
+            return {
+                updateOne: {
+                    filter: { ID: item.ID },
+                    update: { $set: setObj }
+                }
+            };
+        });
+
+        if (studentBulkOps.length > 0) {
+            await PostStudent.bulkWrite(studentBulkOps).catch(err => {
+                console.warn('[AI-Curate] Lỗi đồng bộ sang PostStudent.Profile:', err.message);
+            });
+        }
 
         return NextResponse.json({
             status: 2,

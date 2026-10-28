@@ -198,18 +198,22 @@ export default async function PublicStudentMasterPortfolioPage({ params }) {
 
             <div className="max-w-2xl mx-auto space-y-5">
                 {/* 1. Header Khẳng Định Bản Quyền */}
-                <div className="bg-slate-900 text-white rounded-2xl p-6 text-center shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--main_d)] rounded-full blur-3xl opacity-20 pointer-events-none" />
+                <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 text-center shadow-xs relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-56 h-56 bg-sky-100/50 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-44 h-44 bg-blue-50/50 rounded-full blur-2xl pointer-events-none" />
                     
-                    <p className="text-[11px] uppercase tracking-widest text-sky-400 font-bold mb-1">
-                        SysAir STEM Education &bull; Lifelong e-Portfolio
-                    </p>
-                    <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight mb-1 text-white">
-                        Hồ Sơ Năng Lực Học Tập Số
-                    </h1>
-                    <p className="text-xs text-slate-300">
-                        Theo dõi toàn diện quá trình trưởng thành và sản phẩm sáng tạo của học viên
-                    </p>
+                    <div className="relative z-10">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-sky-50 text-[var(--main_d)] border border-sky-100 mb-2">
+                            <Sparkles className="w-3.5 h-3.5 text-[var(--main_d)]" />
+                            <span>SysAir STEM Education &bull; Lifelong e-Portfolio</span>
+                        </div>
+                        <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 mb-1.5">
+                            Hồ Sơ Năng Lực Học Tập Số
+                        </h1>
+                        <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-md mx-auto">
+                            Theo dõi toàn diện quá trình trưởng thành và sản phẩm sáng tạo của học viên
+                        </p>
+                    </div>
                 </div>
 
                 {/* 2. Profile Hero Card */}

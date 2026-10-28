@@ -161,6 +161,28 @@ export async function POST(request) {
             return NextResponse.json({ success: false, error: 'Không tìm thấy học sinh' }, { status: 404 });
         }
 
+        const isAdminOrAcademic = user.role?.includes('Admin') || user.role?.includes('Academic');
+        if (!isAdminOrAcademic) {
+            if (!courseId || !mongoose.Types.ObjectId.isValid(courseId)) {
+                return NextResponse.json({ success: false, error: 'Giáo viên bắt buộc phải chọn khóa học khi nhập điểm.' }, { status: 400 });
+            }
+            const courseDoc = await PostCourse.findOne({
+                _id: courseId,
+                $or: [
+                    { TeacherHR: user._id },
+                    { 'Detail.Teacher': user._id },
+                    { 'Detail.TeachingAs': user._id }
+                ]
+            }).lean();
+            if (!courseDoc) {
+                return NextResponse.json({ success: false, error: 'Bạn chỉ có quyền nhập điểm cho lớp học bạn trực tiếp phụ trách.' }, { status: 403 });
+            }
+            const studentInCourse = (courseDoc.Student || []).some(s => s.ID === student.ID);
+            if (!studentInCourse) {
+                return NextResponse.json({ success: false, error: 'Học sinh không thuộc danh sách lớp học này.' }, { status: 403 });
+            }
+        }
+
         const newScore = {
             testName: testName.trim(),
             courseId: courseId && mongoose.Types.ObjectId.isValid(courseId) ? new mongoose.Types.ObjectId(courseId) : null,

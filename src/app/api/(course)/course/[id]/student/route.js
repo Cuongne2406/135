@@ -57,15 +57,25 @@ export async function POST(request, { params }) {
 
 export async function PUT(req, { params }) {
     try {
-        const { id: courseId } = await params;
-        const { studentId, action, note } = await req.json();
-        if (!courseId || !studentId || !action || !note) {
-            return NextResponse.json({ status: false, mes: 'Thiếu thông tin (courseId, studentId, action, note).' }, { status: 400 });
+        const { user } = await authenticate(req);
+        if (!user) {
+            return NextResponse.json({ status: false, mes: 'Xác thực không thành công.' }, { status: 401 });
         }
+        const { id: courseId } = await params;
         if (!isValidObjectId(courseId)) {
             return NextResponse.json({ status: false, mes: 'ID khóa học không hợp lệ.' }, { status: 400 });
         }
         await connectDB();
+        const targetCourse = await PostCourse.findById(courseId, { TeacherHR: 1 }).lean();
+        const isAdminOrAcademic = user.role.includes('Admin') || user.role.includes('Academic') || String(targetCourse?.TeacherHR) === String(user._id);
+        if (!isAdminOrAcademic) {
+            return NextResponse.json({ status: false, mes: 'Bạn không có quyền thực hiện chức năng này.' }, { status: 403 });
+        }
+
+        const { studentId, action, note } = await req.json();
+        if (!courseId || !studentId || !action || !note) {
+            return NextResponse.json({ status: false, mes: 'Thiếu thông tin (courseId, studentId, action, note).' }, { status: 400 });
+        }
         const student = await PostStudent.findOne({ ID: studentId });
         if (!student) {
             return NextResponse.json({ status: false, mes: 'Không tìm thấy học sinh.' }, { status: 404 });
@@ -99,7 +109,10 @@ export async function PUT(req, { params }) {
             case 'reserve':
                 updateCoursePromise = PostCourse.updateOne(
                     { _id: courseId, 'Student.ID': studentId },
-                    { $pull: { 'Student.$.Learn': { Checkin: 0 } } }
+                    { 
+                        $set: { 'Student.$.status': 1 },
+                        $pull: { 'Student.$.Learn': { Checkin: 0 } }
+                    }
                 );
                 updateStudentPromise = PostStudent.updateOne(
                     { ID: studentId, 'Course.course': courseId },

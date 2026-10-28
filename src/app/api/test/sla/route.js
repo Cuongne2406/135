@@ -5,6 +5,7 @@ import PostBook from '@/models/book'
 import PostArea from '@/models/area'
 import PostUser from '@/models/users'
 import mongoose from 'mongoose'
+import authenticate from '@/utils/authenticate'
 
 function todayAt(h, m) {
     const d = new Date()
@@ -17,6 +18,10 @@ export async function GET(request) {
         return NextResponse.json({ error: 'Chức năng Test SLA bị vô hiệu hóa trên môi trường Production' }, { status: 403 });
     }
     try {
+        const { user } = await authenticate(request);
+        if (!user || !user.role?.includes('Admin')) {
+            return NextResponse.json({ error: 'Chỉ Admin mới có quyền thực thi Test SLA.' }, { status: 403 });
+        }
         await connectDB()
 
         await PostCourse.deleteMany({ ID: /^SLA-TEST-/ })

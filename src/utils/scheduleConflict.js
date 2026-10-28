@@ -13,8 +13,10 @@ export function parseTimeRange(timeStr) {
     const parts = timeStr.split('-').map(s => s.trim());
 
     function toMinutes(t) {
-        if (!t) return null;
-        const match = t.match(/(\d{1,2})[:h](\d{2})/i) || t.match(/^(\d{1,2})$/);
+        if (!t || typeof t !== 'string') return null;
+        const clean = t.trim().toLowerCase().replace(/\s+/g, '').replace(/p$/, '');
+        // Hỗ trợ các định dạng: "8h30", "08:30", "8h00", "8h", "8"
+        const match = clean.match(/^(\d{1,2})(?:[:h](\d{1,2}))?h?$/);
         if (!match) return null;
         const h = parseInt(match[1], 10);
         const m = match[2] ? parseInt(match[2], 10) : 0;
@@ -43,24 +45,44 @@ export function isTimeOverlapping(rangeA, rangeB) {
 }
 
 /**
- * Lấy mốc bắt đầu và kết thúc của một ngày Dương lịch (00:00:00 - 23:59:59.999)
+ * Lấy mốc bắt đầu và kết thúc của một ngày Dương lịch (00:00:00 - 23:59:59.999) theo múi giờ Việt Nam (UTC+7)
  */
 export function getDayBounds(dateInput) {
     if (!dateInput) return null;
     let d;
     if (typeof dateInput === 'string' && dateInput.includes('/')) {
         const [day, month, year] = dateInput.split('/').map(Number);
-        d = new Date(year, month - 1, day);
+        d = new Date(Date.UTC(year, month - 1, day));
+    } else if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput.trim())) {
+        const [year, month, day] = dateInput.trim().split('-').map(Number);
+        d = new Date(Date.UTC(year, month - 1, day));
     } else {
         d = new Date(dateInput);
     }
     if (isNaN(d.getTime())) return null;
 
-    const start = new Date(d);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(d);
-    end.setHours(23, 59, 59, 999);
-    return { start, end };
+    // Chuẩn hóa theo múi giờ Việt Nam (UTC+7)
+    // Để quét trọn vẹn cả trường hợp lưu dạng UTC 00:00:00 và lưu theo giờ địa phương GMT+7
+    const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
+    const vnTime = new Date(d.getTime() + VN_OFFSET_MS);
+    const y = vnTime.getUTCFullYear();
+    const m = vnTime.getUTCMonth();
+    const day = vnTime.getUTCDate();
+
+    // Bắt đầu ngày VN (00:00:00 GMT+7 = 17:00:00 UTC hôm trước)
+    const vnStart = new Date(Date.UTC(y, m, day, 0, 0, 0, 0) - VN_OFFSET_MS);
+    // Kết thúc ngày VN (23:59:59.999 GMT+7 = 16:59:59.999 UTC hôm nay)
+    const vnEnd = new Date(Date.UTC(y, m, day, 23, 59, 59, 999) - VN_OFFSET_MS);
+
+    // Mốc UTC nguyên ngày (nếu dữ liệu lưu mốc UTC midnight 00:00:00)
+    const utcStart = new Date(Date.UTC(y, m, day, 0, 0, 0, 0));
+    const utcEnd = new Date(Date.UTC(y, m, day, 23, 59, 59, 999));
+
+    const start = new Date(Math.min(vnStart.getTime(), utcStart.getTime()));
+    const end = new Date(Math.max(vnEnd.getTime(), utcEnd.getTime()));
+    const formatted = `${String(day).padStart(2, '0')}/${String(m + 1).padStart(2, '0')}/${y}`;
+
+    return { start, end, formatted };
 }
 
 /**
@@ -99,7 +121,7 @@ export async function checkScheduleConflict({
     const roomOid = (roomId && mongoose.Types.ObjectId.isValid(roomId)) ? new mongoose.Types.ObjectId(roomId) : null;
     const teacherOid = (teacherId && mongoose.Types.ObjectId.isValid(teacherId)) ? new mongoose.Types.ObjectId(teacherId) : null;
 
-    const dateFormatted = bounds.start.toLocaleDateString('vi-VN');
+    const dateFormatted = bounds.formatted || bounds.start.toLocaleDateString('vi-VN');
 
     // 1. Kiểm tra trong Khóa học chính quy (Course.Detail)
     const courseSessions = await PostCourse.aggregate([

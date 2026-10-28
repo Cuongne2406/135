@@ -66,7 +66,8 @@ export function calculateCourseHealth(course) {
             for (const stu of students) {
                 const learnList = Array.isArray(stu.Learn) ? stu.Learn : Object.values(stu.Learn || {});
                 const match = learnList.find(l => l.Lesson?.toString() === lessonId);
-                if (match && (match.Checkin === '1' || match.Checkin === '2' || match.Checkin === '3')) {
+                const checkinVal = Number(match?.Checkin);
+                if (match && (checkinVal === 1 || checkinVal === 2 || checkinVal === 3)) {
                     hasCheckin = true;
                     break;
                 }

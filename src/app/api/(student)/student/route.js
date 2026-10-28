@@ -11,6 +11,7 @@ import { uploadImageToDrive } from '@/function/drive/image'
 import { reloadStudent } from '@/data/actions/reload'
 import authenticate from '@/utils/authenticate'
 import { getZaloUid } from '@/function/drive/appscript'
+import { getNextStudentId } from '@/utils/studentIdGenerator'
 
 // Tạo học sinh mới
 export async function POST(request) {
@@ -22,11 +23,23 @@ export async function POST(request) {
         }
         const formData = await request.formData();
         const avtFolderId = process.env.GOOGLE_DRIVE_STUDENT_AVT_FOLDER_ID || '1h8n0ueMwKumXlYkCDKffgNCyKYRIUJQy';
-        if (avtFile?.size > 0) { avt = await uploadImageToDrive(avtFile, avtFolderId); }
-        const lastStudent = await PostStudent.findOne({ ID: /^AI\d{4}$/ }).sort({ ID: -1 }).select('ID').lean();
-        const nextIdNumber = lastStudent ? parseInt(lastStudent.ID.slice(2), 10) + 1 : 1;
+        const avtFile = formData.get('Avt') || formData.get('avt');
+        let avt = '';
+        if (avtFile && typeof avtFile !== 'string' && avtFile.size > 0) {
+            avt = await uploadImageToDrive(avtFile, avtFolderId);
+        }
+
+        const phone = formData.get('Phone')?.trim();
+        if (phone) {
+            const existingStudent = await PostStudent.findOne({ Phone: phone }).select('ID Name').lean();
+            if (existingStudent) {
+                return jsonRes(400, { status: false, mes: `Số điện thoại ${phone} đã thuộc về học sinh ${existingStudent.Name} (Mã: ${existingStudent.ID}).` });
+            }
+        }
+
+        const studentId = await getNextStudentId();
         const newStudent = new PostStudent({
-            ID: 'AI' + String(nextIdNumber).padStart(4, '0'),
+            ID: studentId,
             Avt: avt,
             Name: formData.get('Name'),
             BD: formData.get('BD'),
@@ -41,7 +54,6 @@ export async function POST(request) {
         });
         const savedStudent = await newStudent.save();
         let finalMessage = 'Tạo học sinh mới thành công!';
-        const phone = formData.get('Phone');
         if (phone) {
             const zaloResult = await getZaloUid(phone);
             if (zaloResult.uid) {

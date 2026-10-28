@@ -43,6 +43,7 @@ export default function MakeupPage() {
             setSessions(json.items || [])
         } catch (err) {
             console.error(err)
+            setMsg('Không thể tải danh sách học bù. Vui lòng kiểm tra kết nối mạng.')
         } finally {
             setLoading(false)
         }
@@ -77,6 +78,7 @@ export default function MakeupPage() {
             }
         } catch (err) {
             console.error(err)
+            setMsg('Lỗi khi xóa phiên học bù: ' + (err.message || 'Lỗi mạng'))
         }
     }
 

@@ -44,6 +44,7 @@ const LearnDetailSchema = new Schema({
 
 const StudentSchema = new Schema({
     ID: { type: String, required: true },
+    status: { type: Number, enum: [0, 1, 2], default: 0 }, // 0: Đang học, 1: Bảo lưu, 2: Đã rút
     Learn: { type: [LearnDetailSchema], default: [] },
 });
 

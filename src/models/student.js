@@ -59,6 +59,7 @@ const postSchema = new Schema({
   ID: {
     type: String,
     required: true,
+    unique: true,
   },
   Uid: {
     type: String
@@ -84,6 +85,10 @@ const postSchema = new Schema({
   },
   Phone: {
     type: String
+  },
+  zaloChatId: {
+    type: String,
+    default: ''
   },
   Email: {
     type: String
@@ -120,7 +125,7 @@ const postSchema = new Schema({
   Note: { type: [LearnDetailSchema], default: [] }
 }, { versionKey: false })
 
-postSchema.index({ ID: 1 });
+postSchema.index({ ID: 1 }, { unique: true });
 postSchema.index({ Phone: 1 });
 postSchema.index({ Uid: 1 });
 postSchema.index({ 'Course.course': 1 });

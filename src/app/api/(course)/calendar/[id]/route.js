@@ -36,6 +36,8 @@ const buildStudents = (raw, mapById, lessonId) =>
             Avt: info.Avt ?? null,
             attendance: {
                 Checkin: a.Checkin ?? (st.checkin ? 1 : 0),
+                absenceReason: a.absenceReason ?? '',
+                makeupStatus: a.makeupStatus ?? '',
                 Cmt: a.Cmt ?? a.cmt ?? [],
                 CmtFn: a.CmtFn ?? st.cmtFn ?? '',
                 Note: a.Note ?? st.note ?? '',
