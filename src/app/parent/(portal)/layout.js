@@ -79,20 +79,18 @@ function ParentLayoutInner({ children }) {
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-2.5 min-w-0">
-                                                    <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center relative shrink-0 border border-slate-200 text-white font-bold select-none text-[11px] shadow-2xs">
+                                                    <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center relative shrink-0 border border-slate-200 shadow-2xs">
                                                         {child.Avt ? (
                                                             <img
                                                                 src={child.Avt}
                                                                 alt={child.Name}
-                                                                className="w-full h-full object-cover"
+                                                                className="w-full h-full object-cover relative z-10"
                                                                 onError={(e) => {
                                                                     e.currentTarget.style.display = 'none';
                                                                 }}
                                                             />
                                                         ) : null}
-                                                        <span className="absolute inset-0 flex items-center justify-center -z-0">
-                                                            {child.Name ? child.Name.trim().split(' ').pop().charAt(0) : 'B'}
-                                                        </span>
+                                                        <User className="w-4 h-4 text-slate-400 absolute" />
                                                     </div>
                                                     <div className="truncate">
                                                         <p className="font-semibold truncate">{child.Name}</p>

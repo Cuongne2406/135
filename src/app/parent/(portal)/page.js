@@ -93,21 +93,19 @@ export default function ParentDashboardPage() {
             {/* THẺ 1: HỒ SƠ HỌC VIÊN */}
             <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs relative overflow-hidden">
                 <div className="flex items-center gap-3.5">
-                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 border border-slate-200 relative shadow-xs text-white font-bold text-xl select-none">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200 relative shadow-xs">
                         {student?.Avt ? (
                             <img
                                 key={student?.ID}
                                 src={student?.Avt}
                                 alt={student?.Name || 'Học viên'}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover relative z-10"
                                 onError={(e) => {
                                     e.currentTarget.style.display = 'none';
                                 }}
                             />
                         ) : null}
-                        <span className="absolute inset-0 flex items-center justify-center -z-0">
-                            {student?.Name ? student.Name.trim().split(' ').pop().charAt(0) : 'B'}
-                        </span>
+                        <User className="w-7 h-7 text-slate-400 absolute" />
                     </div>
                     <div className="flex-1 min-w-0">
                         <h2 className="text-base font-bold text-slate-900 leading-tight">

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Phone, ArrowRight, ShieldCheck, User, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Phone, ArrowRight, ShieldCheck, User, Sparkles, CheckCircle2, Bot, ExternalLink } from 'lucide-react';
 
 export default function ParentLoginPage() {
     const router = useRouter();
@@ -171,8 +171,69 @@ export default function ParentLoginPage() {
                     </div>
                 </div>
 
+                {/* BANNER KẾT NỐI ZALO BOT TỰ ĐỘNG (AUTO ASSISTANT) */}
+                <div className="mt-4 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-2xl p-4 text-white shadow-md relative overflow-hidden border border-blue-400/30">
+                    <div className="absolute -right-8 -top-8 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none" />
+                    <div className="absolute -left-8 -bottom-8 w-28 h-28 bg-cyan-400/10 rounded-full blur-xl pointer-events-none" />
+
+                    <div className="relative z-10 space-y-3">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-white/15 backdrop-blur-xs flex items-center justify-center font-bold text-sm text-cyan-200 border border-white/20">
+                                    <Bot className="w-4 h-4 text-cyan-300" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
+                                        BOT 135TIET
+                                        <span className="text-[10px] bg-cyan-400/20 text-cyan-200 px-1.5 py-0.5 rounded-full font-semibold border border-cyan-300/30">
+                                            Auto 24/7
+                                        </span>
+                                    </h3>
+                                    <p className="text-[10px] text-blue-100/80">Trợ Lý Tự Động Gửi Tin Nhắn Zalo</p>
+                                </div>
+                            </div>
+                            <span className="flex items-center gap-1 text-[10px] text-emerald-300 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                Đang trực tuyến
+                            </span>
+                        </div>
+
+                        <p className="text-xs text-blue-50/90 leading-relaxed">
+                            Nhận thông báo tự động mỗi ngày trực tiếp qua Zalo mà không cần mở website:
+                        </p>
+
+                        <div className="grid grid-cols-1 gap-1.5 text-[11px] text-blue-100/90">
+                            <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/10">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
+                                <span>Báo điểm danh có mặt ngay khi con đến lớp</span>
+                            </div>
+                            <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/10">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
+                                <span>Gửi lời nhận xét & album ảnh thực hành cuối buổi</span>
+                            </div>
+                            <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/10">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
+                                <span>Nhắc lịch học thông minh trước ngày học mới</span>
+                            </div>
+                        </div>
+
+                        <a
+                            href="https://bot.zaloplatforms.com/groups/invite/bot.XhbsDIes"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full py-2.5 px-3 bg-white hover:bg-blue-50 text-blue-700 font-bold text-xs rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer no-underline group active:scale-[0.98]"
+                        >
+                            <div className="w-5 h-5 rounded-full bg-[#0068FF] text-white flex items-center justify-center text-[10px] font-black shrink-0">
+                                Z
+                            </div>
+                            <span>Bấm Để Kết Nối Nhận Tin Zalo Bot</span>
+                            <ExternalLink className="w-3.5 h-3.5 text-blue-500 group-hover:translate-x-0.5 transition-transform" />
+                        </a>
+                    </div>
+                </div>
+
                 {/* Hướng dẫn trợ giúp */}
-                <div className="mt-6 text-center text-xs text-slate-400 space-y-1">
+                <div className="mt-5 text-center text-xs text-slate-400 space-y-1">
                     <p>Hệ thống bảo mật dữ liệu theo tiêu chuẩn đào tạo trẻ em.</p>
                     <p>Nếu đổi số điện thoại, vui lòng liên hệ phòng Học vụ trung tâm.</p>
                 </div>
@@ -199,20 +260,18 @@ export default function ParentLoginPage() {
                                     onClick={() => handleSelectStudent(stu.ID)}
                                     className="p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-blue-50/60 hover:border-blue-300 transition-all cursor-pointer flex items-center gap-3 group"
                                 >
-                                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 border border-slate-200 relative text-white font-bold select-none text-sm shadow-2xs">
+                                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200 relative shadow-2xs">
                                         {stu.Avt ? (
                                             <img
                                                 src={stu.Avt}
                                                 alt={stu.Name}
-                                                className="w-full h-full object-cover"
+                                                className="w-full h-full object-cover relative z-10"
                                                 onError={(e) => {
                                                     e.currentTarget.style.display = 'none';
                                                 }}
                                             />
                                         ) : null}
-                                        <span className="absolute inset-0 flex items-center justify-center -z-0">
-                                            {stu.Name ? stu.Name.trim().split(' ').pop().charAt(0) : 'B'}
-                                        </span>
+                                        <User className="w-5 h-5 text-slate-400 absolute" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-blue-600">

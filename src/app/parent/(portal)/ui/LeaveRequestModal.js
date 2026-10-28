@@ -111,22 +111,25 @@ export default function LeaveRequestModal({
         : 'Chưa cập nhật ngày';
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-            <div className="bg-white w-full max-w-lg rounded-2xl border border-slate-200/90 shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div 
+            onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-3.5 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn"
+        >
+            <div className="bg-white w-full max-w-lg rounded-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[min(90vh,calc(100dvh-2rem))] my-auto">
                 
                 {/* Header */}
-                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                             isAlreadyExcused ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700'
                         }`}>
                             {isAlreadyExcused ? <AlertCircle className="w-5 h-5" /> : <Calendar className="w-5 h-5" />}
                         </div>
                         <div>
-                            <h3 className="text-base font-bold text-slate-800 m-0">
+                            <h3 className="text-base font-bold text-slate-800 m-0 leading-tight">
                                 {isAlreadyExcused ? 'Thông Tin Xin Nghỉ Phép' : 'Đơn Xin Nghỉ Phép'}
                             </h3>
-                            <p className="text-xs text-slate-500 m-0">
+                            <p className="text-xs text-slate-500 m-0 mt-0.5">
                                 {isAlreadyExcused ? 'Buổi học này đã được ghi nhận xin nghỉ' : 'Báo trước cho Trung tâm & Thầy Cô'}
                             </p>
                         </div>
@@ -140,90 +143,132 @@ export default function LeaveRequestModal({
                     </button>
                 </div>
 
-                {/* Body Form */}
-                <div className="p-5 overflow-y-auto space-y-4">
-                    {errorMsg && (
-                        <div className="p-3 bg-red-50 border border-red-200 text-xs text-red-700 rounded-xl flex items-center gap-2">
-                            <AlertCircle className="w-4 h-4 shrink-0" />
-                            <span>{errorMsg}</span>
-                        </div>
-                    )}
-
-                    {/* Card tóm tắt buổi học */}
-                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70 text-xs space-y-1.5">
-                        <div className="flex items-center justify-between text-slate-500">
-                            <span className="font-medium">Học viên:</span>
-                            <span className="font-bold text-slate-800">{student?.Name} ({student?.ID})</span>
-                        </div>
-                        <div className="flex items-center justify-between text-slate-500">
-                            <span className="font-medium">Buổi học:</span>
-                            <span className="font-bold text-slate-800">
-                                Buổi {lesson.index || '•'}: {lesson.TopicName || 'Bài học Robotics'}
-                            </span>
-                        </div>
-                        <div className="flex items-center justify-between text-slate-500">
-                            <span className="font-medium">Thời gian:</span>
-                            <span className="text-slate-700">{lessonDateStr} • {lesson.Time || '08:00 - 10:00'}</span>
-                        </div>
-                    </div>
-
-                    {/* Trường hợp ĐÃ BÁO NGHỈ: Hiển thị lý do hiện tại & Nút Hủy */}
-                    {isAlreadyExcused ? (
-                        <div className="space-y-4 pt-1">
-                            <div className="p-4 bg-amber-50/80 border border-amber-200 rounded-xl space-y-2">
-                                <div className="flex items-center gap-2 text-amber-800 font-bold text-xs">
-                                    <CheckCircle2 className="w-4 h-4 text-amber-600" />
-                                    <span>Trạng thái: Vắng có phép (Đã ghi nhận)</span>
-                                </div>
-                                <p className="text-xs text-amber-900 m-0 pl-6">
-                                    <b>Lý do ghi nhận:</b> {lesson.absenceReason || 'Phụ huynh xin nghỉ phép'}
-                                </p>
-                            </div>
-
-                            <p className="text-xs text-slate-500 leading-relaxed">
-                                Nếu gia đình sắp xếp được thời gian cho bé đi học bình thường, Ba/Mẹ có thể bấm nút bên dưới để khôi phục lịch học.
-                            </p>
-
-                            {!confirmCancel ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setConfirmCancel(true)}
-                                    disabled={loading}
-                                    className="w-full py-2.5 px-4 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs disabled:opacity-50"
-                                >
-                                    <RotateCcw className="w-4 h-4 text-slate-500" />
-                                    <span>Hủy báo nghỉ (Cho con đi học lại)</span>
-                                </button>
-                            ) : (
-                                <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl space-y-2.5 animate-fadeIn">
-                                    <p className="text-xs text-rose-800 font-medium m-0">
-                                        Ba/Mẹ có chắc chắn muốn hủy đơn xin nghỉ và khôi phục lịch học bình thường cho bé?
-                                    </p>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => setConfirmCancel(false)}
-                                            disabled={loading}
-                                            className="flex-1 py-2 px-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold cursor-pointer transition-colors"
-                                        >
-                                            Quay lại
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={executeCancelLeave}
-                                            disabled={loading}
-                                            className="flex-1 py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer border-none transition-colors shadow-xs disabled:opacity-50"
-                                        >
-                                            <RotateCcw className="w-3.5 h-3.5" />
-                                            <span>{loading ? 'Đang hủy...' : 'Xác nhận hủy'}</span>
-                                        </button>
-                                    </div>
+                {/* Body & Footer */}
+                {isAlreadyExcused ? (
+                    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                        <div className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
+                            {errorMsg && (
+                                <div className="p-3 bg-red-50 border border-red-200 text-xs text-red-700 rounded-xl flex items-center gap-2">
+                                    <AlertCircle className="w-4 h-4 shrink-0" />
+                                    <span>{errorMsg}</span>
                                 </div>
                             )}
+
+                            {/* Card tóm tắt buổi học */}
+                            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70 text-xs space-y-1.5">
+                                <div className="flex items-center justify-between text-slate-500">
+                                    <span className="font-medium">Học viên:</span>
+                                    <span className="font-bold text-slate-800">{student?.Name} ({student?.ID})</span>
+                                </div>
+                                <div className="flex items-center justify-between text-slate-500">
+                                    <span className="font-medium">Buổi học:</span>
+                                    <span className="font-bold text-slate-800">
+                                        Buổi {lesson.index || '•'}: {lesson.TopicName || 'Bài học Robotics'}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between text-slate-500">
+                                    <span className="font-medium">Thời gian:</span>
+                                    <span className="text-slate-700">{lessonDateStr} • {lesson.Time || '08:00 - 10:00'}</span>
+                                </div>
+                            </div>
+
+                            {/* Thông tin vắng */}
+                            <div className="space-y-4 pt-1">
+                                <div className="p-4 bg-amber-50/80 border border-amber-200 rounded-xl space-y-2">
+                                    <div className="flex items-center gap-2 text-amber-800 font-bold text-xs">
+                                        <CheckCircle2 className="w-4 h-4 text-amber-600" />
+                                        <span>Trạng thái: Vắng có phép (Đã ghi nhận)</span>
+                                    </div>
+                                    <p className="text-xs text-amber-900 m-0 pl-6">
+                                        <b>Lý do ghi nhận:</b> {lesson.absenceReason || 'Phụ huynh xin nghỉ phép'}
+                                    </p>
+                                </div>
+
+                                <p className="text-xs text-slate-500 leading-relaxed">
+                                    Nếu gia đình sắp xếp được thời gian cho bé đi học bình thường, Ba/Mẹ có thể bấm nút bên dưới để khôi phục lịch học.
+                                </p>
+
+                                {!confirmCancel ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => setConfirmCancel(true)}
+                                        disabled={loading}
+                                        className="w-full py-2.5 px-4 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+                                    >
+                                        <RotateCcw className="w-4 h-4 text-slate-500" />
+                                        <span>Hủy báo nghỉ (Cho con đi học lại)</span>
+                                    </button>
+                                ) : (
+                                    <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl space-y-2.5 animate-fadeIn">
+                                        <p className="text-xs text-rose-800 font-medium m-0">
+                                            Ba/Mẹ có chắc chắn muốn hủy đơn xin nghỉ và khôi phục lịch học bình thường cho bé?
+                                        </p>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setConfirmCancel(false)}
+                                                disabled={loading}
+                                                className="flex-1 py-2 px-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold cursor-pointer transition-colors"
+                                            >
+                                                Quay lại
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={executeCancelLeave}
+                                                disabled={loading}
+                                                className="flex-1 py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer border-none transition-colors shadow-xs disabled:opacity-50"
+                                            >
+                                                <RotateCcw className="w-3.5 h-3.5" />
+                                                <span>{loading ? 'Đang hủy...' : 'Xác nhận hủy'}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    ) : (
-                        /* Trường hợp CHƯA BÁO NGHỈ: Form chọn lý do */
-                        <form onSubmit={handleSubmit} className="space-y-4">
+
+                        {/* Footer Đóng */}
+                        <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end shrink-0">
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                disabled={loading}
+                                className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer border border-slate-200 transition-colors"
+                            >
+                                Đóng
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    /* Trường hợp CHƯA BÁO NGHỈ: Form chọn lý do với body scrollable & footer cố định */
+                    <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                        <div className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
+                            {errorMsg && (
+                                <div className="p-3 bg-red-50 border border-red-200 text-xs text-red-700 rounded-xl flex items-center gap-2">
+                                    <AlertCircle className="w-4 h-4 shrink-0" />
+                                    <span>{errorMsg}</span>
+                                </div>
+                            )}
+
+                            {/* Card tóm tắt buổi học */}
+                            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/70 text-xs space-y-1.5">
+                                <div className="flex items-center justify-between text-slate-500">
+                                    <span className="font-medium">Học viên:</span>
+                                    <span className="font-bold text-slate-800">{student?.Name} ({student?.ID})</span>
+                                </div>
+                                <div className="flex items-center justify-between text-slate-500">
+                                    <span className="font-medium">Buổi học:</span>
+                                    <span className="font-bold text-slate-800">
+                                        Buổi {lesson.index || '•'}: {lesson.TopicName || 'Bài học Robotics'}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between text-slate-500">
+                                    <span className="font-medium">Thời gian:</span>
+                                    <span className="text-slate-700">{lessonDateStr} • {lesson.Time || '08:00 - 10:00'}</span>
+                                </div>
+                            </div>
+
+                            {/* Bộ chọn lý do */}
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 mb-2">
                                     Lý do xin nghỉ phép:
@@ -236,12 +281,12 @@ export default function LeaveRequestModal({
                                             onClick={() => setSelectedReason(r.label)}
                                             className={`p-2.5 rounded-xl border text-left text-xs font-medium flex items-center gap-2 transition-all cursor-pointer ${
                                                 selectedReason === r.label
-                                                    ? 'bg-sky-50 border-sky-300 text-sky-800 shadow-xs'
+                                                    ? 'bg-sky-50 border-sky-300 text-sky-800 shadow-xs ring-1 ring-sky-300'
                                                     : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                                             }`}
                                         >
-                                            <span className="text-base">{r.icon}</span>
-                                            <span className="truncate">{r.label}</span>
+                                            <span className="text-base shrink-0">{r.icon}</span>
+                                            <span className="leading-snug">{r.label}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -279,28 +324,29 @@ export default function LeaveRequestModal({
                                     {note.length}/250 ký tự
                                 </span>
                             </div>
+                        </div>
 
-                            <div className="pt-2 flex items-center gap-2.5 justify-end">
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    disabled={loading}
-                                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer border-none transition-colors"
-                                >
-                                    Đóng
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="px-4 py-2 bg-[var(--main_d)] hover:bg-[var(--main_b)] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer border-none shadow-xs transition-colors disabled:opacity-50"
-                                >
-                                    <Send className="w-3.5 h-3.5" />
-                                    <span>{loading ? 'Đang gửi...' : 'Gửi đơn xin nghỉ'}</span>
-                                </button>
-                            </div>
-                        </form>
-                    )}
-                </div>
+                        {/* Footer với các nút bấm được tách biệt, viền sắc nét, không bị che/đè */}
+                        <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5 shrink-0">
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                disabled={loading}
+                                className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer border border-slate-200 transition-colors"
+                            >
+                                Đóng
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer border-none shadow-xs transition-colors disabled:opacity-50"
+                            >
+                                <Send className="w-3.5 h-3.5" />
+                                <span>{loading ? 'Đang gửi...' : 'Gửi đơn xin nghỉ'}</span>
+                            </button>
+                        </div>
+                    </form>
+                )}
             </div>
         </div>
     );
