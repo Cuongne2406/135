@@ -47,8 +47,9 @@ sys-air-*.json
 *.key
 
 # local datasets, media and scratch
-dataset_eportfolio/
-public/dataset_eportfolio/
+/dataset_eportfolio/
+public/dataset_eportfolio/AIROBOTIC/
+public/dataset_eportfolio/Laptrinhscratch/
 minh chứng/
 motahethong/
 scratch/

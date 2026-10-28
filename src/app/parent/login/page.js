@@ -199,15 +199,20 @@ export default function ParentLoginPage() {
                                     onClick={() => handleSelectStudent(stu.ID)}
                                     className="p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-blue-50/60 hover:border-blue-300 transition-all cursor-pointer flex items-center gap-3 group"
                                 >
-                                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-white shrink-0 border border-slate-200 relative">
-                                        <Image
-                                            src={stu.Avt}
-                                            alt={stu.Name}
-                                            fill
-                                            sizes="40px"
-                                            className="object-cover"
-                                            unoptimized
-                                        />
+                                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-blue-100 flex items-center justify-center shrink-0 border border-slate-200 relative text-blue-700 font-bold select-none">
+                                        {stu.Avt ? (
+                                            <img
+                                                src={stu.Avt}
+                                                alt={stu.Name}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                }}
+                                            />
+                                        ) : null}
+                                        <span className="text-sm font-bold text-blue-700">
+                                            {stu.Name ? stu.Name.trim().split(' ').pop().charAt(0) : 'B'}
+                                        </span>
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-blue-600">

@@ -79,8 +79,20 @@ function ParentLayoutInner({ children }) {
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-2.5 min-w-0">
-                                                    <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-100 relative shrink-0 border border-slate-200">
-                                                        <Image src={child.Avt} alt={child.Name} fill sizes="28px" className="object-cover" unoptimized />
+                                                    <div className="w-7 h-7 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center relative shrink-0 border border-slate-200 text-blue-700 font-bold select-none">
+                                                        {child.Avt ? (
+                                                            <img
+                                                                src={child.Avt}
+                                                                alt={child.Name}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    e.currentTarget.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        ) : null}
+                                                        <span className="text-[11px] font-bold text-blue-700">
+                                                            {child.Name ? child.Name.trim().split(' ').pop().charAt(0) : 'B'}
+                                                        </span>
                                                     </div>
                                                     <div className="truncate">
                                                         <p className="font-semibold truncate">{child.Name}</p>
@@ -115,26 +127,28 @@ function ParentLayoutInner({ children }) {
                     {children}
                 </main>
 
-                {/* Bottom Navigation Bar */}
-                <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 max-w-md w-full bg-white border-t border-slate-200 flex items-center justify-around py-2 z-30 shadow-md">
-                    {navItems.map((item) => {
-                        const Icon = item.icon;
-                        const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all ${
-                                    isActive
-                                        ? 'text-blue-600 font-bold'
-                                        : 'text-slate-500 hover:text-slate-800'
-                                }`}
-                            >
-                                <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[1.8px]'}`} />
-                                <span className="text-[11px] leading-tight">{item.label}</span>
-                            </Link>
-                        );
-                    })}
+                {/* Bottom Navigation Bar - Cố định 100% ở đáy màn hình, không bao giờ dịch chuyển khi cuộn */}
+                <nav className="fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-lg">
+                    <div className="max-w-md mx-auto flex items-center justify-around py-2 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+                        {navItems.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all ${
+                                        isActive
+                                            ? 'text-blue-600 font-bold'
+                                            : 'text-slate-500 hover:text-slate-800'
+                                    }`}
+                                >
+                                    <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[1.8px]'}`} />
+                                    <span className="text-[11px] leading-tight">{item.label}</span>
+                                </Link>
+                            );
+                        })}
+                    </div>
                 </nav>
             </div>
         </div>

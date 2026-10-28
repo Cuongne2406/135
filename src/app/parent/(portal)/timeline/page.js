@@ -184,9 +184,10 @@ export default function ParentTimelinePage() {
                                 )}
 
                                 {lesson.CmtFn && (
-                                    <p className="mt-2 text-xs text-slate-600 italic line-clamp-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                    <div className="mt-2.5 text-xs text-slate-700 italic bg-slate-50 p-3 rounded-xl border border-slate-200/80 leading-relaxed break-words shadow-2xs">
+                                        <span className="text-blue-600 font-semibold not-italic mr-1.5">💬 Nhận xét:</span>
                                         "{lesson.CmtFn}"
-                                    </p>
+                                    </div>
                                 )}
 
                                 <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-blue-600 font-semibold">
