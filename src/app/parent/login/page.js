@@ -171,64 +171,60 @@ export default function ParentLoginPage() {
                     </div>
                 </div>
 
-                {/* BANNER KẾT NỐI ZALO BOT TỰ ĐỘNG (AUTO ASSISTANT) */}
-                <div className="mt-4 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-2xl p-4 text-white shadow-md relative overflow-hidden border border-blue-400/30">
-                    <div className="absolute -right-8 -top-8 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none" />
-                    <div className="absolute -left-8 -bottom-8 w-28 h-28 bg-cyan-400/10 rounded-full blur-xl pointer-events-none" />
-
-                    <div className="relative z-10 space-y-3">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-lg bg-white/15 backdrop-blur-xs flex items-center justify-center font-bold text-sm text-cyan-200 border border-white/20">
-                                    <Bot className="w-4 h-4 text-cyan-300" />
-                                </div>
-                                <div>
-                                    <h3 className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-                                        BOT 135TIET
-                                        <span className="text-[10px] bg-cyan-400/20 text-cyan-200 px-1.5 py-0.5 rounded-full font-semibold border border-cyan-300/30">
-                                            Auto 24/7
-                                        </span>
-                                    </h3>
-                                    <p className="text-[10px] text-blue-100/80">Trợ Lý Tự Động Gửi Tin Nhắn Zalo</p>
-                                </div>
+                {/* KHỐI KẾT NỐI TRỢ LÝ TỰ ĐỘNG ZALO BOT (THIẾT KẾ TỐI GIẢN - ĐỒNG BỘ HỆ THỐNG) */}
+                <div className="mt-4 bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3.5">
+                    {/* Header: Tối giản, thanh lịch, dễ đọc */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shrink-0 border border-blue-100">
+                                <Bot className="w-4 h-4" />
                             </div>
-                            <span className="flex items-center gap-1 text-[10px] text-emerald-300 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                Đang trực tuyến
-                            </span>
-                        </div>
-
-                        <p className="text-xs text-blue-50/90 leading-relaxed">
-                            Nhận thông báo tự động mỗi ngày trực tiếp qua Zalo mà không cần mở website:
-                        </p>
-
-                        <div className="grid grid-cols-1 gap-1.5 text-[11px] text-blue-100/90">
-                            <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/10">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
-                                <span>Báo điểm danh có mặt ngay khi con đến lớp</span>
-                            </div>
-                            <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/10">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
-                                <span>Gửi lời nhận xét & album ảnh thực hành cuối buổi</span>
-                            </div>
-                            <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/10">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
-                                <span>Nhắc lịch học thông minh trước ngày học mới</span>
+                            <div>
+                                <h3 className="text-xs font-bold text-slate-800 m-0">
+                                    Trợ Lý Tự Động Zalo (24/7)
+                                </h3>
+                                <p className="text-[11px] text-slate-500 m-0">Nhận thông báo của bé trực tiếp qua Zalo</p>
                             </div>
                         </div>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Trực tuyến
+                        </span>
+                    </div>
 
+                    {/* Danh sách 3 tiện ích tự động - Nền xám nhạt, chữ tương phản cao */}
+                    <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 space-y-2 text-xs text-slate-600">
+                        <div className="flex items-start gap-2">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
+                            <span>Tự động báo điểm danh có mặt ngay khi con đến lớp</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
+                            <span>Gửi hình ảnh thực hành & nhận xét của Thầy/Cô cuối buổi</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
+                            <span>Nhắc lịch học thông minh và hỗ trợ xin nghỉ phép</span>
+                        </div>
+                    </div>
+
+                    {/* Nút hành động Chat 1-1 với Zalo Bot */}
+                    <div className="space-y-2">
                         <a
-                            href="https://bot.zaloplatforms.com/groups/invite/bot.XhbsDIes"
+                            href="https://zalo.me/s/bot.XhbsDIes"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full py-2.5 px-3 bg-white hover:bg-blue-50 text-blue-700 font-bold text-xs rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer no-underline group active:scale-[0.98]"
+                            className="w-full py-2.5 px-4 bg-[#0068FF] hover:bg-[#0057d6] text-white font-semibold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer no-underline group active:scale-[0.99]"
                         >
-                            <div className="w-5 h-5 rounded-full bg-[#0068FF] text-white flex items-center justify-center text-[10px] font-black shrink-0">
+                            <div className="w-4 h-4 rounded-full bg-white text-[#0068FF] flex items-center justify-center text-[9px] font-black shrink-0">
                                 Z
                             </div>
-                            <span>Bấm Để Kết Nối Nhận Tin Zalo Bot</span>
-                            <ExternalLink className="w-3.5 h-3.5 text-blue-500 group-hover:translate-x-0.5 transition-transform" />
+                            <span>Nhắn Tin 1-1 Với Bot Zalo</span>
+                            <ExternalLink className="w-3.5 h-3.5 text-blue-200 group-hover:translate-x-0.5 transition-transform" />
                         </a>
+                        <p className="text-[11px] text-slate-400 text-center m-0">
+                            Hoặc tìm kiếm từ khóa <strong className="text-slate-600 font-semibold">Bot 135Tiet</strong> trên ứng dụng Zalo
+                        </p>
                     </div>
                 </div>
 
