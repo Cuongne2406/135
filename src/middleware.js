@@ -20,7 +20,7 @@ export function middleware(request) {
     const { pathname } = request.nextUrl;
 
     // 1. Cho phép truy cập công khai vào các đường dẫn public
-    const publicPaths = ['/login', '/share', '/api/login', '/api/check', '/parent', '/api/parent', '/api/cron'];
+    const publicPaths = ['/login', '/share', '/api/login', '/api/logout', '/api/check', '/parent', '/api/parent', '/api/cron', '/api/zalo'];
     const isPublic = publicPaths.some(path => pathname === path || pathname.startsWith(`${path}/`));
 
     // Lấy cookie token hoặc Authorization header
