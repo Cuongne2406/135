@@ -274,7 +274,7 @@ export default function Nav({ data }) {
       console.error('Logout error:', error);
     } finally {
       setload(false);
-      window.location.reload();
+      window.location.href = '/login';
     }
   };
 
