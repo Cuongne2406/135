@@ -74,9 +74,8 @@ function ParentLayoutInner({ children }) {
                                                     setShowSwitchMenu(false);
                                                     switchStudent(child.ID);
                                                 }}
-                                                className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-50 cursor-pointer transition-colors ${
-                                                    child.ID === currentStudent?.ID ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-slate-700'
-                                                }`}
+                                                className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-50 cursor-pointer transition-colors ${child.ID === currentStudent?.ID ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-slate-700'
+                                                    }`}
                                             >
                                                 <div className="flex items-center gap-2.5 min-w-0">
                                                     <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center relative shrink-0 border border-slate-200 shadow-2xs">
@@ -135,11 +134,10 @@ function ParentLayoutInner({ children }) {
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all ${
-                                        isActive
+                                    className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all ${isActive
                                             ? 'text-blue-600 font-bold'
                                             : 'text-slate-500 hover:text-slate-800'
-                                    }`}
+                                        }`}
                                 >
                                     <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5px]' : 'stroke-[1.8px]'}`} />
                                     <span className="text-[11px] leading-tight">{item.label}</span>

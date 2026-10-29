@@ -3,28 +3,28 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-    CheckCircle2, 
-    XCircle, 
-    AlertCircle, 
-    Clock, 
-    MapPin, 
-    User, 
-    MessageSquare, 
-    Image as ImageIcon, 
-    ChevronRight, 
-    Award, 
-    Calendar, 
+import {
+    CheckCircle2,
+    XCircle,
+    AlertCircle,
+    Clock,
+    MapPin,
+    User,
+    MessageSquare,
+    Image as ImageIcon,
+    ChevronRight,
+    Award,
+    Calendar,
     BookOpen
 } from 'lucide-react';
 import { useParent } from './context';
 import LeaveRequestModal from './ui/LeaveRequestModal';
 
 export default function ParentDashboardPage() {
-    const { 
-        overviewData: data, 
-        loading, 
-        switching, 
+    const {
+        overviewData: data,
+        loading,
+        switching,
         refreshOverview,
         selectCourse,
         selectedCourseId,
@@ -149,11 +149,10 @@ export default function ParentDashboardPage() {
                                     key={c._id}
                                     type="button"
                                     onClick={() => selectCourse(c._id)}
-                                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 border ${
-                                        isSelected
+                                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 border ${isSelected
                                             ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                                             : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                                    }`}
+                                        }`}
                                 >
                                     <BookOpen className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-blue-600'}`} />
                                     <span className="truncate max-w-[170px]">{c.BookName}</span>

@@ -69,10 +69,18 @@ export default function NotificationBell({ collapsed }) {
       return
     }
 
-    if (notification.ref_lesson) {
-      router.push(`/calendar/${notification.ref_lesson}`)
-    } else if (notification.ref_course) {
-      router.push(`/course/${notification.ref_course}`)
+    const refLessonId = typeof notification.ref_lesson === 'object' && notification.ref_lesson !== null
+      ? (notification.ref_lesson._id || notification.ref_lesson.id)
+      : notification.ref_lesson
+
+    const refCourseId = typeof notification.ref_course === 'object' && notification.ref_course !== null
+      ? (notification.ref_course._id || notification.ref_course.id)
+      : notification.ref_course
+
+    if (refLessonId) {
+      router.push(`/calendar/${refLessonId}`)
+    } else if (refCourseId) {
+      router.push(`/course/${refCourseId}`)
     } else {
       router.push(`/notifications/${notification._id}`)
     }

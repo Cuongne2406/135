@@ -4,18 +4,18 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
-    ArrowLeft, 
-    Calendar, 
-    Clock, 
-    MapPin, 
-    User, 
-    CheckCircle2, 
-    XCircle, 
-    AlertCircle, 
-    MessageSquare, 
-    Download, 
-    X, 
+import {
+    ArrowLeft,
+    Calendar,
+    Clock,
+    MapPin,
+    User,
+    CheckCircle2,
+    XCircle,
+    AlertCircle,
+    MessageSquare,
+    Download,
+    X,
     ZoomIn,
     Sparkles,
     Check
@@ -266,7 +266,7 @@ export default function ParentSessionDetailPage() {
 
             {/* LIGHTBOX PHÓNG TO ẢNH */}
             {lightboxImage && (
-                <div 
+                <div
                     className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150"
                     onClick={() => setLightboxImage(null)}
                 >

@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
-    Award, 
-    BookOpen, 
-    ExternalLink, 
-    Printer, 
-    Share2, 
-    Sparkles, 
-    GraduationCap, 
+import {
+    Award,
+    BookOpen,
+    ExternalLink,
+    Printer,
+    Share2,
+    Sparkles,
+    GraduationCap,
     FileText,
     CheckCircle2
 } from 'lucide-react';

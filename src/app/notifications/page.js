@@ -133,7 +133,21 @@ export default function NotificationsPage() {
                       return
                     }
 
-                    router.push(n.ref_course ? `/course/${n.ref_course}` : `/notifications/${n._id}`)
+                    const refLessonId = typeof n.ref_lesson === 'object' && n.ref_lesson !== null
+                      ? (n.ref_lesson._id || n.ref_lesson.id)
+                      : n.ref_lesson
+
+                    const refCourseId = typeof n.ref_course === 'object' && n.ref_course !== null
+                      ? (n.ref_course._id || n.ref_course.id)
+                      : n.ref_course
+
+                    if (refLessonId) {
+                      router.push(`/calendar/${refLessonId}`)
+                    } else if (refCourseId) {
+                      router.push(`/course/${refCourseId}`)
+                    } else {
+                      router.push(`/notifications/${n._id}`)
+                    }
                   }}
                   className={`flex items-start gap-3 p-4 rounded-lg border-l-4 transition-colors cursor-pointer hover:bg-[var(--hover)] bg-[var(--bg-primary)]
                     ${isUnread ? 'border-l-[var(--main_d)] bg-blue-50/20' : 'border-l-transparent'}`}

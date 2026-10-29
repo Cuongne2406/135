@@ -1,6 +1,7 @@
 'use server';
 import fetchApi from '@/utils/fetchApi';
 import { revalidateTag } from 'next/cache';
+import { getLessonDetailData } from '@/data/database/lesson';
 
 export async function Data_coursetry() {
     try {
@@ -37,15 +38,11 @@ export async function Data_calendar(month, year) {
 
 export async function Data_lesson(id) {
     try {
-        const res = await fetchApi(`/calendar/${id}`, {
-            method: 'GET',
-            cache: "force-cache",
-            next: { tags: [`data_lesson${id}`] }
-        });
-
-        return res.data || [];
+        const data = await getLessonDetailData(id);
+        return data || { course: null, session: null, students: [] };
     } catch (err) {
-        return { data: [] };
+        console.error('[Data_lesson Error]', err);
+        return { course: null, session: null, students: [] };
     }
 }
 

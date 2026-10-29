@@ -201,7 +201,7 @@ export default async function PublicStudentMasterPortfolioPage({ params }) {
                 <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 text-center shadow-xs relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-56 h-56 bg-sky-100/50 rounded-full blur-3xl pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-44 h-44 bg-blue-50/50 rounded-full blur-2xl pointer-events-none" />
-                    
+
                     <div className="relative z-10">
                         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-sky-50 text-[var(--main_d)] border border-sky-100 mb-2">
                             <Sparkles className="w-3.5 h-3.5 text-[var(--main_d)]" />
@@ -354,11 +354,10 @@ export default async function PublicStudentMasterPortfolioPage({ params }) {
                                                     {courseData?.Type || courseData?.ID || `Khóa học #${i + 1}`}
                                                 </span>
                                                 <span
-                                                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                                        isFinished
+                                                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${isFinished
                                                             ? 'bg-emerald-100 text-emerald-800'
                                                             : 'bg-blue-100 text-blue-800'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {isFinished ? 'Đã tốt nghiệp' : 'Đang theo học'}
                                                 </span>

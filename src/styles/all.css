@@ -69,7 +69,12 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-button, a, [role="button"], input, select, textarea {
+button,
+a,
+[role="button"],
+input,
+select,
+textarea {
   touch-action: manipulation;
 }
 

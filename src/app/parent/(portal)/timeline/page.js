@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-    Calendar, 
-    Clock, 
-    MapPin, 
-    CheckCircle2, 
-    XCircle, 
-    AlertCircle, 
-    ChevronRight, 
+import {
+    Calendar,
+    Clock,
+    MapPin,
+    CheckCircle2,
+    XCircle,
+    AlertCircle,
+    ChevronRight,
     BookOpen,
     Sparkles,
     Check,
@@ -112,11 +112,10 @@ export default function ParentTimelinePage() {
                                         selectCourse?.(c._id);
                                         fetchTimeline(c._id);
                                     }}
-                                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 border ${
-                                        isSelected
+                                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 border ${isSelected
                                             ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                                             : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                                    }`}
+                                        }`}
                                 >
                                     <BookOpen className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-blue-600'}`} />
                                     <span className="truncate max-w-[170px]">{c.BookName}</span>
