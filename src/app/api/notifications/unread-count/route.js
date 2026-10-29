@@ -1,4 +1,7 @@
-import { NextResponse } from 'next/server'
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+import { NextResponse } from 'next/server';
 import authenticate from '@/utils/authenticate'
 import { getUnreadCount } from '@/data/database/notification'
 

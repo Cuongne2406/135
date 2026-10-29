@@ -84,13 +84,13 @@ export async function POST(request) {
         );
 
         if (learnIndex !== -1) {
-            // Không tự động đổi Checkin = 3 (việc điểm danh là quyền thủ công của giáo viên)
+            course.Student[stuIndex].Learn[learnIndex].Checkin = 3;
             course.Student[stuIndex].Learn[learnIndex].absenceReason = fullReason;
             course.Student[stuIndex].Learn[learnIndex].makeupStatus = 'MAKEUP_PENDING';
         } else {
             course.Student[stuIndex].Learn.push({
                 Lesson: lesson._id,
-                Checkin: 0,
+                Checkin: 3,
                 absenceReason: fullReason,
                 makeupStatus: 'MAKEUP_PENDING',
                 Cmt: [],

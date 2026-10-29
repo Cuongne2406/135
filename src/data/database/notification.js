@@ -4,6 +4,9 @@ import NotificationRecipient from '@/models/notificationRecipient'
 import NotificationLog from '@/models/notificationLog'
 import NotificationSetting from '@/models/notificationSetting'
 import NotificationTemplate from '@/models/notificationTemplate'
+import Student from '@/models/student'
+import User from '@/models/users'
+import Course from '@/models/course'
 
 async function broadcast(notificationId) {
   try {
@@ -39,8 +42,6 @@ export async function getNotifications({ userId, role, page = 1, limit = 20, sta
       .lean(),
     Notification.countDocuments(query),
   ])
-
-  const { default: Student } = await import('@/models/student')
 
   const enriched = await Promise.all(data.map(async (notif) => {
     let readStatus = null

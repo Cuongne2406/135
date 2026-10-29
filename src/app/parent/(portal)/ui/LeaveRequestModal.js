@@ -17,7 +17,7 @@ export default function LeaveRequestModal({
     student,
     onSuccess
 }) {
-    const isAlreadyExcused = lesson?.Checkin === 3;
+    const isAlreadyExcused = lesson?.Checkin === 3 || Boolean(lesson?.absenceReason) || lesson?.makeupStatus === 'MAKEUP_PENDING';
 
     const [selectedReason, setSelectedReason] = useState(PRESET_REASONS[0].label);
     const [customReason, setCustomReason] = useState('');

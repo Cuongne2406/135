@@ -16,7 +16,7 @@ export function ParentProvider({ children }) {
         try {
             const cId = courseIdOverride !== undefined ? courseIdOverride : selectedCourseId;
             const url = cId ? `/api/parent/overview?courseId=${cId}` : '/api/parent/overview';
-            const res = await fetch(url);
+            const res = await fetch(url, { cache: 'no-store' });
             if (res.status === 401) {
                 router.push('/parent/login');
                 return null;

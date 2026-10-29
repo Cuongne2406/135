@@ -179,7 +179,7 @@ export default function ParentDashboardPage() {
 
                     <div className="space-y-3.5 divide-y divide-slate-100">
                         {sessionsToShow.map((sess, idx) => {
-                            const isExcused = sess.Checkin === 3;
+                            const isExcused = sess.Checkin === 3 || Boolean(sess.absenceReason) || sess.makeupStatus === 'MAKEUP_PENDING';
                             return (
                                 <div key={sess._id || idx} className={idx > 0 ? 'pt-3.5 space-y-2' : 'space-y-2'}>
                                     <div className="flex items-center justify-between gap-2">
@@ -196,7 +196,7 @@ export default function ParentDashboardPage() {
                                         {isExcused ? (
                                             <span className="text-xs font-semibold px-2 py-0.5 rounded-full border bg-amber-50 text-amber-700 border-amber-200 flex items-center gap-1 shrink-0">
                                                 <AlertCircle className="w-3.5 h-3.5" />
-                                                Đã báo nghỉ
+                                                Đã xin nghỉ phép
                                             </span>
                                         ) : (
                                             <span className="text-xs font-semibold px-2 py-0.5 rounded-full border bg-sky-50 text-sky-700 border-sky-200 flex items-center gap-1 shrink-0">

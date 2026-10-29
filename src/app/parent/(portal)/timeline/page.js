@@ -61,7 +61,14 @@ export default function ParentTimelinePage() {
     const activeCourseId = data?.activeCourseId || selectedCourseId || course?._id;
     const completedCount = lessons.filter(l => l.Checkin > 0 || l.isPast).length;
 
-    const getStatusProps = (checkin) => {
+    const getStatusProps = (checkin, absenceReason) => {
+        if (checkin === 3 || Boolean(absenceReason)) {
+            return {
+                label: 'Có phép',
+                badgeCls: 'bg-amber-50 text-amber-700 border-amber-200',
+                dotCls: 'bg-amber-500 border-amber-200'
+            };
+        }
         switch (checkin) {
             case 1:
                 return {
@@ -143,7 +150,7 @@ export default function ParentTimelinePage() {
             {/* Trục dòng thời gian (Vertical Timeline) */}
             <div className="relative pl-5 space-y-4 before:absolute before:left-2 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200">
                 {lessons.map((lesson) => {
-                    const status = getStatusProps(lesson.Checkin);
+                    const status = getStatusProps(lesson.Checkin, lesson.absenceReason);
                     return (
                         <div key={lesson._id} className="relative group">
                             {/* Chấm tròn mốc thời gian */}
@@ -177,7 +184,7 @@ export default function ParentTimelinePage() {
                                     </span>
                                 </div>
 
-                                {lesson.Checkin === 3 && (
+                                {(lesson.Checkin === 3 || Boolean(lesson.absenceReason)) && (
                                     <p className="mt-2 text-xs text-amber-800 bg-amber-50 p-2 rounded-lg border border-amber-200">
                                         <b>Đã xin nghỉ:</b> {lesson.absenceReason || 'Phụ huynh xin nghỉ phép'}
                                     </p>

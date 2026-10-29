@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Home, Calendar, Award, LogOut, ChevronDown, Check } from 'lucide-react';
+import { Home, Calendar, Award, LogOut, ChevronDown, Check, User } from 'lucide-react';
 import { ParentProvider, useParent } from './context';
 
 function ParentLayoutInner({ children }) {

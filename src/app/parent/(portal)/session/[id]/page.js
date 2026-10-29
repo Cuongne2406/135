@@ -36,7 +36,7 @@ export default function ParentSessionDetailPage() {
     const fetchSession = React.useCallback(async () => {
         if (!lessonId) return;
         try {
-            const res = await fetch(`/api/parent/session/${lessonId}`);
+            const res = await fetch(`/api/parent/session/${lessonId}`, { cache: 'no-store' });
             if (res.status === 401) {
                 router.push('/parent/login');
                 return;
@@ -156,11 +156,11 @@ export default function ParentSessionDetailPage() {
                 </div>
 
                 {/* Phần Báo Nghỉ Phép dành cho phụ huynh nếu buổi học chưa diễn ra */}
-                {lesson.Checkin === 3 ? (
+                {lesson.Checkin === 3 || Boolean(lesson.absenceReason) ? (
                     <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-xl flex items-center justify-between gap-2 text-xs">
                         <div className="min-w-0">
                             <span className="font-bold text-amber-800 flex items-center gap-1">
-                                <AlertCircle className="w-3.5 h-3.5" /> Trạng thái: Vắng có phép
+                                <AlertCircle className="w-3.5 h-3.5" /> Trạng thái: Đã xin nghỉ phép
                             </span>
                             <span className="text-amber-900 truncate block mt-0.5">
                                 <b>Lý do:</b> {lesson.absenceReason || 'Phụ huynh xin nghỉ phép'}

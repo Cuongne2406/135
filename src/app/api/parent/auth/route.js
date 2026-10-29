@@ -7,7 +7,15 @@ import { srcImage } from '@/function';
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { phone, activeStudentId } = body;
+        let { phone, activeStudentId } = body;
+
+        if (!phone) {
+            const token = request.cookies.get(PARENT_COOKIE_NAME)?.value;
+            const decoded = verifyParentToken(token);
+            if (decoded?.phone) {
+                phone = decoded.phone;
+            }
+        }
 
         const cleanPhone = normalizePhone(phone);
         if (!cleanPhone || cleanPhone.length < 9) {
