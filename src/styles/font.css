@@ -1,0 +1,88 @@
+:root {
+    --font-size-xxs: 0.6875rem; /* 11px */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 0.875rem; /* 14px */
+    --font-size-md: 1rem;       /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --popup-50: 50%;
+    --popup-30: 480px;
+}
+
+/* Typography Hierarchy - Enterprise Minimalist (Linear / Vercel) */
+h1 {
+    font-size: 1.25rem; /* 20px - text-xl */
+    font-weight: 600;
+    line-height: 1.4;
+    color: #0f172a; /* Slate 900 */
+    letter-spacing: -0.025em;
+    margin: 0;
+}
+
+h2 {
+    font-size: 1.125rem; /* 18px - text-lg */
+    font-weight: 600;
+    line-height: 1.4;
+    color: #0f172a; /* Slate 900 */
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+h3 {
+    font-size: 1rem; /* 16px - text-base */
+    font-weight: 600;
+    line-height: 1.4;
+    color: #0f172a; /* Slate 900 */
+    margin: 0;
+}
+
+h4 {
+    font-size: 0.875rem; /* 14px - text-sm */
+    font-weight: 600;
+    line-height: 1.4;
+    color: #1e293b; /* Slate 800 */
+    margin: 0;
+}
+
+h5 {
+    font-size: 0.8125rem; /* 13px */
+    font-weight: 500;
+    line-height: 1.4;
+    color: #475569; /* Slate 600 */
+    margin: 0;
+}
+
+h6 {
+    font-size: 0.75rem; /* 12px - text-xs */
+    font-weight: 500;
+    line-height: 1.4;
+    color: #64748b; /* Slate 500 */
+    margin: 0;
+}
+
+label {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    color: #334155; /* Slate 700 */
+    margin: 0;
+}
+
+p {
+    font-size: 0.875rem; /* 14px */
+    color: #334155; /* Slate 700 */
+    line-height: 1.5;
+    margin: 0;
+}
+
+.text_w_400 {
+    font-weight: 400;
+}
+
+.text_w_500 {
+    font-weight: 500;
+}
+
+.text_w_600 {
+    font-weight: 600;
+}

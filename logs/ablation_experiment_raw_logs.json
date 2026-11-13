@@ -1,0 +1,839 @@
+{
+  "metadata": {
+    "title": "Functional Verification & Ablation Study Raw Logs (FSM, 4-Stage SLA, Excuse Filter)",
+    "reference": "JSLHU-SysAir_v9.docx (Mục 4.2, 4.3, 4.5, Bảng 5, Bảng 7)",
+    "executed_at": "2026-11-13T09:02:57.356Z",
+    "git_commit": "d0c148e",
+    "dataset_file": "data/seeded_40_sessions_and_attendance.json",
+    "dataset_summary": {
+      "courses_count": 5,
+      "sessions_per_course": 8,
+      "total_sessions": 40,
+      "enrolled_students_per_course": 10,
+      "synthetic_students_total": 12,
+      "compliant_on_time_sessions": 22,
+      "delayed_sla_scenarios": 18,
+      "total_absences": 12,
+      "unexcused_absences_checkin_2": 6,
+      "excused_absences_checkin_3": 6,
+      "zalo_simulated_logs_count": 34
+    },
+    "untested_auxiliary_features_note": "Cơ chế chống gửi trùng thông báo trong 24 giờ, thuật toán kiểm tra xung đột phòng học, cơ chế Cascading Cleanup và ghi vết writeSystemLog đã được cài đặt trong mã nguồn nhưng chưa được kiểm thử riêng trong bộ kịch bản này.",
+    "environment": {
+      "cpu": "AMD Ryzen 5 5600 6-Core Processor              ",
+      "cores_threads": 12,
+      "ram_gb": 16,
+      "os_platform": "Windows_NT 10.0.26200 (x64)",
+      "node_version": "v24.12.0"
+    }
+  },
+  "rq1_fsm_two_tier_verification": {
+    "executed_at": "2026-11-13T09:02:57.354Z",
+    "duration_ms": 0.113,
+    "total_sessions_checked": 40,
+    "total_absence_cases": 12,
+    "modifiedCheckinCount": 0,
+    "state_distribution_8_states": {
+      "state_1_NOT_REQUIRED": 28,
+      "state_2_MAKEUP_REQUIRED_initial": 6,
+      "state_3_MAKEUP_PENDING_initial": 6,
+      "state_4_MAKEUP_SCHEDULED_transitioned": 6,
+      "state_5_MAKEUP_COMPLETED_final": 4,
+      "state_6_MAKEUP_ABSENT_final": 2,
+      "state_7_MAKEUP_EXPIRED_final": 3,
+      "state_8_MAKEUP_CANCELLED_final": 3
+    },
+    "absence_records_detail": [
+      {
+        "session_id": "CRS-K01-S03",
+        "course_id": "CRS-K01",
+        "student_id": "HS01",
+        "layer1_checkin_before": 2,
+        "layer1_checkin_after": 2,
+        "initial_state": "MAKEUP_REQUIRED",
+        "transition_path": [
+          "MAKEUP_REQUIRED",
+          "MAKEUP_SCHEDULED",
+          "MAKEUP_COMPLETED"
+        ],
+        "final_state": "MAKEUP_COMPLETED"
+      },
+      {
+        "session_id": "CRS-K01-S05",
+        "course_id": "CRS-K01",
+        "student_id": "HS02",
+        "layer1_checkin_before": 3,
+        "layer1_checkin_after": 3,
+        "initial_state": "MAKEUP_PENDING",
+        "transition_path": [
+          "MAKEUP_PENDING",
+          "MAKEUP_SCHEDULED",
+          "MAKEUP_COMPLETED"
+        ],
+        "final_state": "MAKEUP_COMPLETED"
+      },
+      {
+        "session_id": "CRS-K02-S01",
+        "course_id": "CRS-K02",
+        "student_id": "HS05",
+        "layer1_checkin_before": 2,
+        "layer1_checkin_after": 2,
+        "initial_state": "MAKEUP_REQUIRED",
+        "transition_path": [
+          "MAKEUP_REQUIRED",
+          "MAKEUP_EXPIRED"
+        ],
+        "final_state": "MAKEUP_EXPIRED"
+      },
+      {
+        "session_id": "CRS-K02-S02",
+        "course_id": "CRS-K02",
+        "student_id": "HS03",
+        "layer1_checkin_before": 2,
+        "layer1_checkin_after": 2,
+        "initial_state": "MAKEUP_REQUIRED",
+        "transition_path": [
+          "MAKEUP_REQUIRED",
+          "MAKEUP_SCHEDULED",
+          "MAKEUP_ABSENT"
+        ],
+        "final_state": "MAKEUP_ABSENT"
+      },
+      {
+        "session_id": "CRS-K02-S05",
+        "course_id": "CRS-K02",
+        "student_id": "HS06",
+        "layer1_checkin_before": 2,
+        "layer1_checkin_after": 2,
+        "initial_state": "MAKEUP_REQUIRED",
+        "transition_path": [
+          "MAKEUP_REQUIRED",
+          "MAKEUP_SCHEDULED",
+          "MAKEUP_COMPLETED"
+        ],
+        "final_state": "MAKEUP_COMPLETED"
+      },
+      {
+        "session_id": "CRS-K03-S03",
+        "course_id": "CRS-K03",
+        "student_id": "HS07",
+        "layer1_checkin_before": 3,
+        "layer1_checkin_after": 3,
+        "initial_state": "MAKEUP_PENDING",
+        "transition_path": [
+          "MAKEUP_PENDING",
+          "MAKEUP_SCHEDULED",
+          "MAKEUP_COMPLETED"
+        ],
+        "final_state": "MAKEUP_COMPLETED"
+      },
+      {
+        "session_id": "CRS-K03-S04",
+        "course_id": "CRS-K03",
+        "student_id": "HS04",
+        "layer1_checkin_before": 3,
+        "layer1_checkin_after": 3,
+        "initial_state": "MAKEUP_PENDING",
+        "transition_path": [
+          "MAKEUP_PENDING",
+          "MAKEUP_CANCELLED"
+        ],
+        "final_state": "MAKEUP_CANCELLED"
+      },
+      {
+        "session_id": "CRS-K03-S07",
+        "course_id": "CRS-K03",
+        "student_id": "HS08",
+        "layer1_checkin_before": 3,
+        "layer1_checkin_after": 3,
+        "initial_state": "MAKEUP_PENDING",
+        "transition_path": [
+          "MAKEUP_PENDING",
+          "MAKEUP_SCHEDULED",
+          "MAKEUP_ABSENT"
+        ],
+        "final_state": "MAKEUP_ABSENT"
+      },
+      {
+        "session_id": "CRS-K04-S03",
+        "course_id": "CRS-K04",
+        "student_id": "HS09",
+        "layer1_checkin_before": 2,
+        "layer1_checkin_after": 2,
+        "initial_state": "MAKEUP_REQUIRED",
+        "transition_path": [
+          "MAKEUP_REQUIRED",
+          "MAKEUP_EXPIRED"
+        ],
+        "final_state": "MAKEUP_EXPIRED"
+      },
+      {
+        "session_id": "CRS-K04-S08",
+        "course_id": "CRS-K04",
+        "student_id": "HS10",
+        "layer1_checkin_before": 3,
+        "layer1_checkin_after": 3,
+        "initial_state": "MAKEUP_PENDING",
+        "transition_path": [
+          "MAKEUP_PENDING",
+          "MAKEUP_EXPIRED"
+        ],
+        "final_state": "MAKEUP_EXPIRED"
+      },
+      {
+        "session_id": "CRS-K05-S03",
+        "course_id": "CRS-K05",
+        "student_id": "HS11",
+        "layer1_checkin_before": 2,
+        "layer1_checkin_after": 2,
+        "initial_state": "MAKEUP_REQUIRED",
+        "transition_path": [
+          "MAKEUP_REQUIRED",
+          "MAKEUP_CANCELLED"
+        ],
+        "final_state": "MAKEUP_CANCELLED"
+      },
+      {
+        "session_id": "CRS-K05-S06",
+        "course_id": "CRS-K05",
+        "student_id": "HS12",
+        "layer1_checkin_before": 3,
+        "layer1_checkin_after": 3,
+        "initial_state": "MAKEUP_PENDING",
+        "transition_path": [
+          "MAKEUP_PENDING",
+          "MAKEUP_CANCELLED"
+        ],
+        "final_state": "MAKEUP_CANCELLED"
+      }
+    ]
+  },
+  "table_5_sla_and_excuse_filter_verification": [
+    {
+      "item": "Mốc 1 (T0 + 30'): điểm danh",
+      "scenarios_in_script": 8,
+      "correctly_handled": 8,
+      "false_positives_fp": 0,
+      "false_negatives_fn": 0
+    },
+    {
+      "item": "Mốc 2 (T0 + 60'): nhật ký",
+      "scenarios_in_script": 5,
+      "correctly_handled": 5,
+      "false_positives_fp": 0,
+      "false_negatives_fn": 0
+    },
+    {
+      "item": "Mốc 3 (T0 + 90'): minh chứng",
+      "scenarios_in_script": 3,
+      "correctly_handled": 3,
+      "false_positives_fp": 0,
+      "false_negatives_fn": 0
+    },
+    {
+      "item": "Mốc 4 (T0 + 120'): INCIDENT",
+      "scenarios_in_script": 2,
+      "correctly_handled": 2,
+      "false_positives_fp": 0,
+      "false_negatives_fn": 0
+    },
+    {
+      "item": "Tổng động cơ SLA (trên 18 ca trễ & 22 buổi đúng hạn)",
+      "scenarios_in_script": 18,
+      "correctly_handled": 18,
+      "false_positives_fp": 0,
+      "false_negatives_fn": 0
+    },
+    {
+      "item": "Excuse Filter (trên 12 trường hợp vắng)",
+      "scenarios_in_script": "12 (6 có phép, 6 không phép)",
+      "correctly_handled": "12 (chặn 6, gửi 6)",
+      "false_positives_fp": 0,
+      "false_negatives_fn": 0
+    }
+  ],
+  "table_7_ablation_study": {
+    "Config 1 (Full System)": {
+      "description": "Hệ thống đầy đủ (Động cơ SLA 4 mốc 30/60/90/120 phút + Bộ lọc đơn xin nghỉ Excuse Filter)",
+      "runs_count": 10,
+      "mean_execution_time_ms": 0.091,
+      "summary": {
+        "sla_detection_rate": "18/18",
+        "sla_early_resolution_rate": "16/18 (88.9%)",
+        "incident_escalations": 2,
+        "false_alarm_parent_notifications_fp": 0,
+        "excuse_filtering_accuracy": "12/12 (100.0%)"
+      },
+      "runs": [
+        {
+          "run_id": 1,
+          "timestamp": "2026-11-13T09:02:57.355Z",
+          "duration_ms": 0.056,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 2,
+          "timestamp": "2026-11-13T09:02:57.355Z",
+          "duration_ms": 0.026,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 3,
+          "timestamp": "2026-11-13T09:02:57.355Z",
+          "duration_ms": 0.013,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 4,
+          "timestamp": "2026-11-13T09:02:57.355Z",
+          "duration_ms": 0.011,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 5,
+          "timestamp": "2026-11-13T09:02:57.355Z",
+          "duration_ms": 0.01,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 6,
+          "timestamp": "2026-11-13T09:02:57.355Z",
+          "duration_ms": 0.01,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 7,
+          "timestamp": "2026-11-13T09:02:57.355Z",
+          "duration_ms": 0.01,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 8,
+          "timestamp": "2026-11-13T09:02:57.355Z",
+          "duration_ms": 0.011,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 9,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.747,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 10,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.014,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        }
+      ]
+    },
+    "Config 2 (Single Checkpoint 120m)": {
+      "description": "Chỉ kiểm tra một lần tại mốc 120 phút (Tắt các mốc cảnh báo sớm 30, 60, 90 phút)",
+      "runs_count": 10,
+      "mean_execution_time_ms": 0.007,
+      "summary": {
+        "sla_detection_rate": "18/18 (tại mốc 120')",
+        "sla_early_resolution_rate": "0/18 (0.0%)",
+        "incident_escalations": 18,
+        "false_alarm_parent_notifications_fp": 0,
+        "excuse_filtering_accuracy": "12/12 (100.0%)"
+      },
+      "runs": [
+        {
+          "run_id": 1,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.011,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 2,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.007,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 3,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.006,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 4,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.006,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 5,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.006,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 6,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.006,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 7,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.006,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 8,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.006,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 9,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.008,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 10,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.007,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        }
+      ]
+    },
+    "Config 3 (Without Excuse Filter)": {
+      "description": "Tắt bộ lọc đơn xin nghỉ Excuse Filter (Giữ nguyên động cơ SLA 4 mốc)",
+      "runs_count": 10,
+      "mean_execution_time_ms": 0.01,
+      "summary": {
+        "sla_detection_rate": "18/18",
+        "sla_early_resolution_rate": "16/18 (88.9%)",
+        "incident_escalations": 2,
+        "false_alarm_parent_notifications_fp": 6,
+        "excuse_filtering_accuracy": "6/12 (50.0%)"
+      },
+      "runs": [
+        {
+          "run_id": 1,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.011,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 6,
+          "excuse_filter_routing_accuracy": "6/12 (50.0%)",
+          "zalo_simulated_logs_created": 40
+        },
+        {
+          "run_id": 2,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.009,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 6,
+          "excuse_filter_routing_accuracy": "6/12 (50.0%)",
+          "zalo_simulated_logs_created": 40
+        },
+        {
+          "run_id": 3,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.008,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 6,
+          "excuse_filter_routing_accuracy": "6/12 (50.0%)",
+          "zalo_simulated_logs_created": 40
+        },
+        {
+          "run_id": 4,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.016,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 6,
+          "excuse_filter_routing_accuracy": "6/12 (50.0%)",
+          "zalo_simulated_logs_created": 40
+        },
+        {
+          "run_id": 5,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.011,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 6,
+          "excuse_filter_routing_accuracy": "6/12 (50.0%)",
+          "zalo_simulated_logs_created": 40
+        },
+        {
+          "run_id": 6,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.009,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 6,
+          "excuse_filter_routing_accuracy": "6/12 (50.0%)",
+          "zalo_simulated_logs_created": 40
+        },
+        {
+          "run_id": 7,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.009,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 6,
+          "excuse_filter_routing_accuracy": "6/12 (50.0%)",
+          "zalo_simulated_logs_created": 40
+        },
+        {
+          "run_id": 8,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.009,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 6,
+          "excuse_filter_routing_accuracy": "6/12 (50.0%)",
+          "zalo_simulated_logs_created": 40
+        },
+        {
+          "run_id": 9,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.009,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 6,
+          "excuse_filter_routing_accuracy": "6/12 (50.0%)",
+          "zalo_simulated_logs_created": 40
+        },
+        {
+          "run_id": 10,
+          "timestamp": "2026-11-13T09:02:57.356Z",
+          "duration_ms": 0.008,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "16/18 (88.9%)",
+          "incident_escalations": 2,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 8,
+            "60": 5,
+            "90": 3,
+            "120": 2
+          },
+          "false_alarm_parent_notifications_fp": 6,
+          "excuse_filter_routing_accuracy": "6/12 (50.0%)",
+          "zalo_simulated_logs_created": 40
+        }
+      ]
+    }
+  }
+}

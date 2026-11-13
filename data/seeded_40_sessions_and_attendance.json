@@ -1,0 +1,2509 @@
+{
+  "metadata": {
+    "description": "Bộ kịch bản kiểm thử chức năng 40 buổi học (5 khóa học CRS-K01..CRS-K05 × 8 buổi, 12 học sinh giả định HS01..HS12, mỗi khóa 10 học sinh đăng ký)",
+    "reference": "JSLHU-SysAir_v9.docx (Mục 3.2, 3.4, 3.5, 3.7, 4.2, 4.3, 4.5, Bảng 5, Bảng 7)",
+    "courses_count": 5,
+    "sessions_per_course": 8,
+    "total_sessions": 40,
+    "synthetic_students": [
+      "HS01",
+      "HS02",
+      "HS03",
+      "HS04",
+      "HS05",
+      "HS06",
+      "HS07",
+      "HS08",
+      "HS09",
+      "HS10",
+      "HS11",
+      "HS12"
+    ],
+    "enrolled_students_per_course": 10,
+    "synthetic_teachers": [
+      "GV01",
+      "GV02",
+      "GV03",
+      "GV04",
+      "GV05"
+    ],
+    "sla_scenarios_breakdown": {
+      "compliant_sessions_on_time": 22,
+      "delayed_sessions_total": 18,
+      "checkpoint_30m_reminder": 8,
+      "checkpoint_60m_warning1": 5,
+      "checkpoint_90m_warning2": 3,
+      "checkpoint_120m_incident": 2,
+      "early_resolved_before_120m": 16,
+      "escalated_to_incident_at_120m": 2
+    },
+    "attendance_and_fsm_breakdown": {
+      "total_representative_events": 40,
+      "present_checkin_1": 28,
+      "unexcused_absence_checkin_2": 6,
+      "excused_absence_checkin_3": 6,
+      "total_absences": 12,
+      "fsm_initial_states": {
+        "NOT_REQUIRED": 28,
+        "MAKEUP_REQUIRED": 6,
+        "MAKEUP_PENDING": 6
+      },
+      "fsm_transitioned_scheduled": 6,
+      "fsm_final_states_for_12_absences": {
+        "MAKEUP_COMPLETED": 4,
+        "MAKEUP_ABSENT": 2,
+        "MAKEUP_EXPIRED": 3,
+        "MAKEUP_CANCELLED": 3
+      },
+      "zalo_simulated_logs_count": 34,
+      "excuse_filter_suppressed_count": 6
+    }
+  },
+  "courses": [
+    {
+      "course_id": "CRS-K01",
+      "course_name": "Robotics Cơ bản",
+      "course_code": "K01",
+      "room": "Lab 01",
+      "teacher": "GV01",
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10"
+      ],
+      "topics": [
+        "Bài 1: Nhập môn Cơ điện tử & Cảm biến",
+        "Bài 2: Thiết kế Hệ thống Bánh răng & Động cơ",
+        "Bài 3: Cảm biến siêu âm & Tránh vật cản",
+        "Bài 4: Lập trình Vi điều khiển trung tâm",
+        "Bài 5: Xe dò đường tự hành",
+        "Bài 6: Tối ưu cơ chế lái vượt mê cung",
+        "Bài 7: Tích hợp cảm biến đa chiều",
+        "Bài 8: Báo cáo đồ án Robotics Cơ bản"
+      ]
+    },
+    {
+      "course_id": "CRS-K02",
+      "course_name": "Scratch AI",
+      "course_code": "K02",
+      "room": "Lab 02",
+      "teacher": "GV02",
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS11",
+        "HS12"
+      ],
+      "topics": [
+        "Bài 1: Tổng quan lập trình Scratch AI",
+        "Bài 2: Nhận diện cử chỉ tay (AI Vision)",
+        "Bài 3: Nhận diện cử chỉ & Thị giác AI",
+        "Bài 4: Xử lý âm thanh và giọng nói",
+        "Bài 5: Huấn luyện mô hình phân loại ảnh",
+        "Bài 6: Tích hợp AI vào trò chơi tương tác",
+        "Bài 7: Điều khiển thiết bị ngoại vi qua AI",
+        "Bài 8: Báo cáo đồ án Scratch AI"
+      ]
+    },
+    {
+      "course_id": "CRS-K03",
+      "course_name": "Cánh tay Robot",
+      "course_code": "K03",
+      "room": "Lab 03",
+      "teacher": "GV03",
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "topics": [
+        "Bài 1: Cơ học khớp quay và bậc tự do",
+        "Bài 2: Điều khiển động cơ Servo chính xác",
+        "Bài 3: Động học thuận và điều khiển góc quay",
+        "Bài 4: Điều khiển cánh tay gắp vật thể",
+        "Bài 5: Cảm biến lực và giới hạn hành trình",
+        "Bài 6: Tự động hóa chu trình phân loại",
+        "Bài 7: Đồng bộ hóa hai cánh tay robot",
+        "Bài 8: Báo cáo đồ án Cánh tay Robot"
+      ]
+    },
+    {
+      "course_id": "CRS-K04",
+      "course_name": "IoT & Hệ thống nhúng",
+      "course_code": "K04",
+      "room": "Lab 04",
+      "teacher": "GV04",
+      "enrolled_students": [
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "topics": [
+        "Bài 1: Kiến trúc vi điều khiển kết nối mạng",
+        "Bài 2: Giao thức truyền thông cảm biến",
+        "Bài 3: Thu thập dữ liệu môi trường",
+        "Bài 4: Điều khiển thiết bị qua giao diện web",
+        "Bài 5: Cảnh báo tự động theo ngưỡng đo",
+        "Bài 6: Quản lý năng lượng cho nút mạng",
+        "Bài 7: Bảo mật kết nối thiết bị nhúng",
+        "Bài 8: Báo cáo đồ án IoT thông minh"
+      ]
+    },
+    {
+      "course_id": "CRS-K05",
+      "course_name": "Toán Tư duy STEM",
+      "course_code": "K05",
+      "room": "Lab 05",
+      "teacher": "GV05",
+      "enrolled_students": [
+        "HS01",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS12"
+      ],
+      "topics": [
+        "Bài 1: Tư duy tập hợp và quy luật dãy số",
+        "Bài 2: Hình học không gian và mô hình 3D",
+        "Bài 3: Đại số Boole và mạch logic",
+        "Bài 4: Thuật toán tìm đường đi ngắn nhất",
+        "Bài 5: Hệ tọa độ và biến đổi hình học",
+        "Bài 6: Mã hóa thông tin và suy luận logic",
+        "Bài 7: Xác suất thực nghiệm trong mô phỏng",
+        "Bài 8: Báo cáo chuyên đề Toán Tư duy STEM"
+      ]
+    }
+  ],
+  "sessions": [
+    {
+      "session_id": "CRS-K01-S01",
+      "course_id": "CRS-K01",
+      "course_name": "Robotics Cơ bản",
+      "course_code": "K01",
+      "session_index": 1,
+      "topic": "Bài 1: Nhập môn Cơ điện tử & Cảm biến",
+      "room": "Lab 01",
+      "teacher": "GV01",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS01",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K01-S02",
+      "course_id": "CRS-K01",
+      "course_name": "Robotics Cơ bản",
+      "course_code": "K01",
+      "session_index": 2,
+      "topic": "Bài 2: Thiết kế Hệ thống Bánh răng & Động cơ",
+      "room": "Lab 01",
+      "teacher": "GV01",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-01",
+        "trigger_checkpoint_minutes": 30,
+        "warning_level": "REMINDER",
+        "missing_item": "ATTENDANCE",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 42
+      },
+      "representative_attendance_event": {
+        "student_id": "HS02",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K01-S03",
+      "course_id": "CRS-K01",
+      "course_name": "Robotics Cơ bản",
+      "course_code": "K01",
+      "session_index": 3,
+      "topic": "Bài 3: Cảm biến siêu âm & Tránh vật cản",
+      "room": "Lab 01",
+      "teacher": "GV01",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS01",
+        "checkin_code": 2,
+        "status_label": "Vắng không phép",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_ABSENT",
+        "makeup_record": {
+          "makeup_id": "MKP-01",
+          "initial_fsm_state": "MAKEUP_REQUIRED",
+          "final_fsm_state": "MAKEUP_COMPLETED",
+          "fsm_transition_path": [
+            "MAKEUP_REQUIRED",
+            "MAKEUP_SCHEDULED",
+            "MAKEUP_COMPLETED"
+          ],
+          "days_since_original_date": 7,
+          "makeup_schedule": "24/07 14:00 (Lab 01)"
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K01-S04",
+      "course_id": "CRS-K01",
+      "course_name": "Robotics Cơ bản",
+      "course_code": "K01",
+      "session_index": 4,
+      "topic": "Bài 4: Lập trình Vi điều khiển trung tâm",
+      "room": "Lab 01",
+      "teacher": "GV01",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-02",
+        "trigger_checkpoint_minutes": 30,
+        "warning_level": "REMINDER",
+        "missing_item": "ATTENDANCE",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 42
+      },
+      "representative_attendance_event": {
+        "student_id": "HS04",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K01-S05",
+      "course_id": "CRS-K01",
+      "course_name": "Robotics Cơ bản",
+      "course_code": "K01",
+      "session_index": 5,
+      "topic": "Bài 5: Xe dò đường tự hành",
+      "room": "Lab 01",
+      "teacher": "GV01",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS02",
+        "checkin_code": 3,
+        "status_label": "Vắng có phép",
+        "has_valid_leave_request": true,
+        "excuse_filter_action": "SUPPRESSED_BY_EXCUSE_FILTER",
+        "zalo_log_status": null,
+        "zalo_notification_type": null,
+        "makeup_record": {
+          "makeup_id": "MKP-02",
+          "initial_fsm_state": "MAKEUP_PENDING",
+          "final_fsm_state": "MAKEUP_COMPLETED",
+          "fsm_transition_path": [
+            "MAKEUP_PENDING",
+            "MAKEUP_SCHEDULED",
+            "MAKEUP_COMPLETED"
+          ],
+          "days_since_original_date": 6,
+          "makeup_schedule": "25/07 09:00 (Lab 01)"
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K01-S06",
+      "course_id": "CRS-K01",
+      "course_name": "Robotics Cơ bản",
+      "course_code": "K01",
+      "session_index": 6,
+      "topic": "Bài 6: Tối ưu cơ chế lái vượt mê cung",
+      "room": "Lab 01",
+      "teacher": "GV01",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-03",
+        "trigger_checkpoint_minutes": 30,
+        "warning_level": "REMINDER",
+        "missing_item": "ATTENDANCE",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 42
+      },
+      "representative_attendance_event": {
+        "student_id": "HS06",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K01-S07",
+      "course_id": "CRS-K01",
+      "course_name": "Robotics Cơ bản",
+      "course_code": "K01",
+      "session_index": 7,
+      "topic": "Bài 7: Tích hợp cảm biến đa chiều",
+      "room": "Lab 01",
+      "teacher": "GV01",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS07",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K01-S08",
+      "course_id": "CRS-K01",
+      "course_name": "Robotics Cơ bản",
+      "course_code": "K01",
+      "session_index": 8,
+      "topic": "Bài 8: Báo cáo đồ án Robotics Cơ bản",
+      "room": "Lab 01",
+      "teacher": "GV01",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-04",
+        "trigger_checkpoint_minutes": 30,
+        "warning_level": "REMINDER",
+        "missing_item": "ATTENDANCE",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 42
+      },
+      "representative_attendance_event": {
+        "student_id": "HS08",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K02-S01",
+      "course_id": "CRS-K02",
+      "course_name": "Scratch AI",
+      "course_code": "K02",
+      "session_index": 1,
+      "topic": "Bài 1: Tổng quan lập trình Scratch AI",
+      "room": "Lab 02",
+      "teacher": "GV02",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS05",
+        "checkin_code": 2,
+        "status_label": "Vắng không phép",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_ABSENT",
+        "makeup_record": {
+          "makeup_id": "MKP-03",
+          "initial_fsm_state": "MAKEUP_REQUIRED",
+          "final_fsm_state": "MAKEUP_EXPIRED",
+          "fsm_transition_path": [
+            "MAKEUP_REQUIRED",
+            "MAKEUP_EXPIRED"
+          ],
+          "days_since_original_date": 35,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K02-S02",
+      "course_id": "CRS-K02",
+      "course_name": "Scratch AI",
+      "course_code": "K02",
+      "session_index": 2,
+      "topic": "Bài 2: Nhận diện cử chỉ tay (AI Vision)",
+      "room": "Lab 02",
+      "teacher": "GV02",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-05",
+        "trigger_checkpoint_minutes": 30,
+        "warning_level": "REMINDER",
+        "missing_item": "ATTENDANCE",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 42
+      },
+      "representative_attendance_event": {
+        "student_id": "HS03",
+        "checkin_code": 2,
+        "status_label": "Vắng không phép",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_ABSENT",
+        "makeup_record": {
+          "makeup_id": "MKP-04",
+          "initial_fsm_state": "MAKEUP_REQUIRED",
+          "final_fsm_state": "MAKEUP_ABSENT",
+          "fsm_transition_path": [
+            "MAKEUP_REQUIRED",
+            "MAKEUP_SCHEDULED",
+            "MAKEUP_ABSENT"
+          ],
+          "days_since_original_date": 10,
+          "makeup_schedule": "26/07 15:30 (Lab 02)"
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K02-S03",
+      "course_id": "CRS-K02",
+      "course_name": "Scratch AI",
+      "course_code": "K02",
+      "session_index": 3,
+      "topic": "Bài 3: Nhận diện cử chỉ & Thị giác AI",
+      "room": "Lab 02",
+      "teacher": "GV02",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS01",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K02-S04",
+      "course_id": "CRS-K02",
+      "course_name": "Scratch AI",
+      "course_code": "K02",
+      "session_index": 4,
+      "topic": "Bài 4: Xử lý âm thanh và giọng nói",
+      "room": "Lab 02",
+      "teacher": "GV02",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-06",
+        "trigger_checkpoint_minutes": 30,
+        "warning_level": "REMINDER",
+        "missing_item": "ATTENDANCE",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 42
+      },
+      "representative_attendance_event": {
+        "student_id": "HS02",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K02-S05",
+      "course_id": "CRS-K02",
+      "course_name": "Scratch AI",
+      "course_code": "K02",
+      "session_index": 5,
+      "topic": "Bài 5: Huấn luyện mô hình phân loại ảnh",
+      "room": "Lab 02",
+      "teacher": "GV02",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS06",
+        "checkin_code": 2,
+        "status_label": "Vắng không phép",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_ABSENT",
+        "makeup_record": {
+          "makeup_id": "MKP-05",
+          "initial_fsm_state": "MAKEUP_REQUIRED",
+          "final_fsm_state": "MAKEUP_COMPLETED",
+          "fsm_transition_path": [
+            "MAKEUP_REQUIRED",
+            "MAKEUP_SCHEDULED",
+            "MAKEUP_COMPLETED"
+          ],
+          "days_since_original_date": 8,
+          "makeup_schedule": "27/07 15:00 (Lab 02)"
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K02-S06",
+      "course_id": "CRS-K02",
+      "course_name": "Scratch AI",
+      "course_code": "K02",
+      "session_index": 6,
+      "topic": "Bài 6: Tích hợp AI vào trò chơi tương tác",
+      "room": "Lab 02",
+      "teacher": "GV02",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-07",
+        "trigger_checkpoint_minutes": 30,
+        "warning_level": "REMINDER",
+        "missing_item": "ATTENDANCE",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 42
+      },
+      "representative_attendance_event": {
+        "student_id": "HS04",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K02-S07",
+      "course_id": "CRS-K02",
+      "course_name": "Scratch AI",
+      "course_code": "K02",
+      "session_index": 7,
+      "topic": "Bài 7: Điều khiển thiết bị ngoại vi qua AI",
+      "room": "Lab 02",
+      "teacher": "GV02",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS05",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K02-S08",
+      "course_id": "CRS-K02",
+      "course_name": "Scratch AI",
+      "course_code": "K02",
+      "session_index": 8,
+      "topic": "Bài 8: Báo cáo đồ án Scratch AI",
+      "room": "Lab 02",
+      "teacher": "GV02",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-08",
+        "trigger_checkpoint_minutes": 30,
+        "warning_level": "REMINDER",
+        "missing_item": "ATTENDANCE",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 42
+      },
+      "representative_attendance_event": {
+        "student_id": "HS06",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K03-S01",
+      "course_id": "CRS-K03",
+      "course_name": "Cánh tay Robot",
+      "course_code": "K03",
+      "session_index": 1,
+      "topic": "Bài 1: Cơ học khớp quay và bậc tự do",
+      "room": "Lab 03",
+      "teacher": "GV03",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS09",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K03-S02",
+      "course_id": "CRS-K03",
+      "course_name": "Cánh tay Robot",
+      "course_code": "K03",
+      "session_index": 2,
+      "topic": "Bài 2: Điều khiển động cơ Servo chính xác",
+      "room": "Lab 03",
+      "teacher": "GV03",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-09",
+        "trigger_checkpoint_minutes": 60,
+        "warning_level": "WARNING-1",
+        "missing_item": "LESSON_LOG",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 74
+      },
+      "representative_attendance_event": {
+        "student_id": "HS10",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K03-S03",
+      "course_id": "CRS-K03",
+      "course_name": "Cánh tay Robot",
+      "course_code": "K03",
+      "session_index": 3,
+      "topic": "Bài 3: Động học thuận và điều khiển góc quay",
+      "room": "Lab 03",
+      "teacher": "GV03",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS07",
+        "checkin_code": 3,
+        "status_label": "Vắng có phép",
+        "has_valid_leave_request": true,
+        "excuse_filter_action": "SUPPRESSED_BY_EXCUSE_FILTER",
+        "zalo_log_status": null,
+        "zalo_notification_type": null,
+        "makeup_record": {
+          "makeup_id": "MKP-06",
+          "initial_fsm_state": "MAKEUP_PENDING",
+          "final_fsm_state": "MAKEUP_COMPLETED",
+          "fsm_transition_path": [
+            "MAKEUP_PENDING",
+            "MAKEUP_SCHEDULED",
+            "MAKEUP_COMPLETED"
+          ],
+          "days_since_original_date": 9,
+          "makeup_schedule": "28/07 10:00 (Lab 03)"
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K03-S04",
+      "course_id": "CRS-K03",
+      "course_name": "Cánh tay Robot",
+      "course_code": "K03",
+      "session_index": 4,
+      "topic": "Bài 4: Điều khiển cánh tay gắp vật thể",
+      "room": "Lab 03",
+      "teacher": "GV03",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-10",
+        "trigger_checkpoint_minutes": 60,
+        "warning_level": "WARNING-1",
+        "missing_item": "LESSON_LOG",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 74
+      },
+      "representative_attendance_event": {
+        "student_id": "HS04",
+        "checkin_code": 3,
+        "status_label": "Vắng có phép",
+        "has_valid_leave_request": true,
+        "excuse_filter_action": "SUPPRESSED_BY_EXCUSE_FILTER",
+        "zalo_log_status": null,
+        "zalo_notification_type": null,
+        "makeup_record": {
+          "makeup_id": "MKP-07",
+          "initial_fsm_state": "MAKEUP_PENDING",
+          "final_fsm_state": "MAKEUP_CANCELLED",
+          "fsm_transition_path": [
+            "MAKEUP_PENDING",
+            "MAKEUP_CANCELLED"
+          ],
+          "days_since_original_date": 5,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K03-S05",
+      "course_id": "CRS-K03",
+      "course_name": "Cánh tay Robot",
+      "course_code": "K03",
+      "session_index": 5,
+      "topic": "Bài 5: Cảm biến lực và giới hạn hành trình",
+      "room": "Lab 03",
+      "teacher": "GV03",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS01",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K03-S06",
+      "course_id": "CRS-K03",
+      "course_name": "Cánh tay Robot",
+      "course_code": "K03",
+      "session_index": 6,
+      "topic": "Bài 6: Tự động hóa chu trình phân loại",
+      "room": "Lab 03",
+      "teacher": "GV03",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-11",
+        "trigger_checkpoint_minutes": 60,
+        "warning_level": "WARNING-1",
+        "missing_item": "LESSON_LOG",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 74
+      },
+      "representative_attendance_event": {
+        "student_id": "HS02",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K03-S07",
+      "course_id": "CRS-K03",
+      "course_name": "Cánh tay Robot",
+      "course_code": "K03",
+      "session_index": 7,
+      "topic": "Bài 7: Đồng bộ hóa hai cánh tay robot",
+      "room": "Lab 03",
+      "teacher": "GV03",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS08",
+        "checkin_code": 3,
+        "status_label": "Vắng có phép",
+        "has_valid_leave_request": true,
+        "excuse_filter_action": "SUPPRESSED_BY_EXCUSE_FILTER",
+        "zalo_log_status": null,
+        "zalo_notification_type": null,
+        "makeup_record": {
+          "makeup_id": "MKP-08",
+          "initial_fsm_state": "MAKEUP_PENDING",
+          "final_fsm_state": "MAKEUP_ABSENT",
+          "fsm_transition_path": [
+            "MAKEUP_PENDING",
+            "MAKEUP_SCHEDULED",
+            "MAKEUP_ABSENT"
+          ],
+          "days_since_original_date": 12,
+          "makeup_schedule": "29/07 14:00 (Lab 03)"
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K03-S08",
+      "course_id": "CRS-K03",
+      "course_name": "Cánh tay Robot",
+      "course_code": "K03",
+      "session_index": 8,
+      "topic": "Bài 8: Báo cáo đồ án Cánh tay Robot",
+      "room": "Lab 03",
+      "teacher": "GV03",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-12",
+        "trigger_checkpoint_minutes": 60,
+        "warning_level": "WARNING-1",
+        "missing_item": "LESSON_LOG",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 74
+      },
+      "representative_attendance_event": {
+        "student_id": "HS04",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K04-S01",
+      "course_id": "CRS-K04",
+      "course_name": "IoT & Hệ thống nhúng",
+      "course_code": "K04",
+      "session_index": 1,
+      "topic": "Bài 1: Kiến trúc vi điều khiển kết nối mạng",
+      "room": "Lab 04",
+      "teacher": "GV04",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS06",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K04-S02",
+      "course_id": "CRS-K04",
+      "course_name": "IoT & Hệ thống nhúng",
+      "course_code": "K04",
+      "session_index": 2,
+      "topic": "Bài 2: Giao thức truyền thông cảm biến",
+      "room": "Lab 04",
+      "teacher": "GV04",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-13",
+        "trigger_checkpoint_minutes": 60,
+        "warning_level": "WARNING-1",
+        "missing_item": "LESSON_LOG",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 74
+      },
+      "representative_attendance_event": {
+        "student_id": "HS07",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K04-S03",
+      "course_id": "CRS-K04",
+      "course_name": "IoT & Hệ thống nhúng",
+      "course_code": "K04",
+      "session_index": 3,
+      "topic": "Bài 3: Thu thập dữ liệu môi trường",
+      "room": "Lab 04",
+      "teacher": "GV04",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS09",
+        "checkin_code": 2,
+        "status_label": "Vắng không phép",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_ABSENT",
+        "makeup_record": {
+          "makeup_id": "MKP-09",
+          "initial_fsm_state": "MAKEUP_REQUIRED",
+          "final_fsm_state": "MAKEUP_EXPIRED",
+          "fsm_transition_path": [
+            "MAKEUP_REQUIRED",
+            "MAKEUP_EXPIRED"
+          ],
+          "days_since_original_date": 33,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K04-S04",
+      "course_id": "CRS-K04",
+      "course_name": "IoT & Hệ thống nhúng",
+      "course_code": "K04",
+      "session_index": 4,
+      "topic": "Bài 4: Điều khiển thiết bị qua giao diện web",
+      "room": "Lab 04",
+      "teacher": "GV04",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-14",
+        "trigger_checkpoint_minutes": 90,
+        "warning_level": "WARNING-2",
+        "missing_item": "RESOURCE_EVIDENCE",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 105
+      },
+      "representative_attendance_event": {
+        "student_id": "HS10",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K04-S05",
+      "course_id": "CRS-K04",
+      "course_name": "IoT & Hệ thống nhúng",
+      "course_code": "K04",
+      "session_index": 5,
+      "topic": "Bài 5: Cảnh báo tự động theo ngưỡng đo",
+      "room": "Lab 04",
+      "teacher": "GV04",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS11",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K04-S06",
+      "course_id": "CRS-K04",
+      "course_name": "IoT & Hệ thống nhúng",
+      "course_code": "K04",
+      "session_index": 6,
+      "topic": "Bài 6: Quản lý năng lượng cho nút mạng",
+      "room": "Lab 04",
+      "teacher": "GV04",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS12",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K04-S07",
+      "course_id": "CRS-K04",
+      "course_name": "IoT & Hệ thống nhúng",
+      "course_code": "K04",
+      "session_index": 7,
+      "topic": "Bài 7: Bảo mật kết nối thiết bị nhúng",
+      "room": "Lab 04",
+      "teacher": "GV04",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-15",
+        "trigger_checkpoint_minutes": 90,
+        "warning_level": "WARNING-2",
+        "missing_item": "RESOURCE_EVIDENCE",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 105
+      },
+      "representative_attendance_event": {
+        "student_id": "HS02",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K04-S08",
+      "course_id": "CRS-K04",
+      "course_name": "IoT & Hệ thống nhúng",
+      "course_code": "K04",
+      "session_index": 8,
+      "topic": "Bài 8: Báo cáo đồ án IoT thông minh",
+      "room": "Lab 04",
+      "teacher": "GV04",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS02",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS09",
+        "HS10",
+        "HS11",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS10",
+        "checkin_code": 3,
+        "status_label": "Vắng có phép",
+        "has_valid_leave_request": true,
+        "excuse_filter_action": "SUPPRESSED_BY_EXCUSE_FILTER",
+        "zalo_log_status": null,
+        "zalo_notification_type": null,
+        "makeup_record": {
+          "makeup_id": "MKP-10",
+          "initial_fsm_state": "MAKEUP_PENDING",
+          "final_fsm_state": "MAKEUP_EXPIRED",
+          "fsm_transition_path": [
+            "MAKEUP_PENDING",
+            "MAKEUP_EXPIRED"
+          ],
+          "days_since_original_date": 32,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K05-S01",
+      "course_id": "CRS-K05",
+      "course_name": "Toán Tư duy STEM",
+      "course_code": "K05",
+      "session_index": 1,
+      "topic": "Bài 1: Tư duy tập hợp và quy luật dãy số",
+      "room": "Lab 05",
+      "teacher": "GV05",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS04",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K05-S02",
+      "course_id": "CRS-K05",
+      "course_name": "Toán Tư duy STEM",
+      "course_code": "K05",
+      "session_index": 2,
+      "topic": "Bài 2: Hình học không gian và mô hình 3D",
+      "room": "Lab 05",
+      "teacher": "GV05",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-16",
+        "trigger_checkpoint_minutes": 90,
+        "warning_level": "WARNING-2",
+        "missing_item": "RESOURCE_EVIDENCE",
+        "remediation_status": "RESOLVED_EARLY",
+        "simulated_remediation_triggered": true,
+        "simulated_update_minutes_after_end": 105
+      },
+      "representative_attendance_event": {
+        "student_id": "HS05",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K05-S03",
+      "course_id": "CRS-K05",
+      "course_name": "Toán Tư duy STEM",
+      "course_code": "K05",
+      "session_index": 3,
+      "topic": "Bài 3: Đại số Boole và mạch logic",
+      "room": "Lab 05",
+      "teacher": "GV05",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS11",
+        "checkin_code": 2,
+        "status_label": "Vắng không phép",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_ABSENT",
+        "makeup_record": {
+          "makeup_id": "MKP-11",
+          "initial_fsm_state": "MAKEUP_REQUIRED",
+          "final_fsm_state": "MAKEUP_CANCELLED",
+          "fsm_transition_path": [
+            "MAKEUP_REQUIRED",
+            "MAKEUP_CANCELLED"
+          ],
+          "days_since_original_date": 4,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K05-S04",
+      "course_id": "CRS-K05",
+      "course_name": "Toán Tư duy STEM",
+      "course_code": "K05",
+      "session_index": 4,
+      "topic": "Bài 4: Thuật toán tìm đường đi ngắn nhất",
+      "room": "Lab 05",
+      "teacher": "GV05",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS07",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K05-S05",
+      "course_id": "CRS-K05",
+      "course_name": "Toán Tư duy STEM",
+      "course_code": "K05",
+      "session_index": 5,
+      "topic": "Bài 5: Hệ tọa độ và biến đổi hình học",
+      "room": "Lab 05",
+      "teacher": "GV05",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-17",
+        "trigger_checkpoint_minutes": 120,
+        "warning_level": "INCIDENT",
+        "missing_item": "UNCOMPLETED_REPORT",
+        "remediation_status": "ESCALATED_INCIDENT",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": null
+      },
+      "representative_attendance_event": {
+        "student_id": "HS08",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K05-S06",
+      "course_id": "CRS-K05",
+      "course_name": "Toán Tư duy STEM",
+      "course_code": "K05",
+      "session_index": 6,
+      "topic": "Bài 6: Mã hóa thông tin và suy luận logic",
+      "room": "Lab 05",
+      "teacher": "GV05",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS12",
+        "checkin_code": 3,
+        "status_label": "Vắng có phép",
+        "has_valid_leave_request": true,
+        "excuse_filter_action": "SUPPRESSED_BY_EXCUSE_FILTER",
+        "zalo_log_status": null,
+        "zalo_notification_type": null,
+        "makeup_record": {
+          "makeup_id": "MKP-12",
+          "initial_fsm_state": "MAKEUP_PENDING",
+          "final_fsm_state": "MAKEUP_CANCELLED",
+          "fsm_transition_path": [
+            "MAKEUP_PENDING",
+            "MAKEUP_CANCELLED"
+          ],
+          "days_since_original_date": 6,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K05-S07",
+      "course_id": "CRS-K05",
+      "course_name": "Toán Tư duy STEM",
+      "course_code": "K05",
+      "session_index": 7,
+      "topic": "Bài 7: Xác suất thực nghiệm trong mô phỏng",
+      "room": "Lab 05",
+      "teacher": "GV05",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "DELAYED",
+        "delay_scenario_id": "SLA-SCENARIO-18",
+        "trigger_checkpoint_minutes": 120,
+        "warning_level": "INCIDENT",
+        "missing_item": "UNCOMPLETED_REPORT",
+        "remediation_status": "ESCALATED_INCIDENT",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": null
+      },
+      "representative_attendance_event": {
+        "student_id": "HS10",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    },
+    {
+      "session_id": "CRS-K05-S08",
+      "course_id": "CRS-K05",
+      "course_name": "Toán Tư duy STEM",
+      "course_code": "K05",
+      "session_index": 8,
+      "topic": "Bài 8: Báo cáo chuyên đề Toán Tư duy STEM",
+      "room": "Lab 05",
+      "teacher": "GV05",
+      "enrolled_students_count": 10,
+      "enrolled_students": [
+        "HS01",
+        "HS03",
+        "HS04",
+        "HS05",
+        "HS06",
+        "HS07",
+        "HS08",
+        "HS09",
+        "HS10",
+        "HS12"
+      ],
+      "schedule": {
+        "start_minutes_of_day": 510,
+        "end_minutes_of_day": 600,
+        "duration_minutes": 90
+      },
+      "sla_monitoring": {
+        "status": "COMPLIANT",
+        "delay_scenario_id": null,
+        "trigger_checkpoint_minutes": null,
+        "warning_level": null,
+        "missing_item": null,
+        "remediation_status": "SUBMITTED_ON_TIME",
+        "simulated_remediation_triggered": false,
+        "simulated_update_minutes_after_end": 10
+      },
+      "representative_attendance_event": {
+        "student_id": "HS12",
+        "checkin_code": 1,
+        "status_label": "Có mặt",
+        "has_valid_leave_request": false,
+        "excuse_filter_action": "PASSED_TO_ZALO_DISPATCH",
+        "zalo_log_status": "SIMULATED",
+        "zalo_notification_type": "INSTANT_CHECKIN_PRESENT",
+        "makeup_record": {
+          "makeup_id": null,
+          "initial_fsm_state": "NOT_REQUIRED",
+          "final_fsm_state": "NOT_REQUIRED",
+          "fsm_transition_path": [
+            "NOT_REQUIRED"
+          ],
+          "days_since_original_date": 0,
+          "makeup_schedule": null
+        }
+      }
+    }
+  ]
+}
