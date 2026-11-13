@@ -2,8 +2,8 @@
   "metadata": {
     "title": "Functional Verification & Ablation Study Raw Logs (FSM, 4-Stage SLA, Excuse Filter)",
     "reference": "JSLHU-SysAir_v9.docx (Mục 4.2, 4.3, 4.5, Bảng 5, Bảng 7)",
-    "executed_at": "2026-11-13T09:02:57.356Z",
-    "git_commit": "d0c148e",
+    "executed_at": "2026-11-13T09:13:49.168Z",
+    "git_commit": "ca59dc4",
     "dataset_file": "data/seeded_40_sessions_and_attendance.json",
     "dataset_summary": {
       "courses_count": 5,
@@ -28,8 +28,8 @@
     }
   },
   "rq1_fsm_two_tier_verification": {
-    "executed_at": "2026-11-13T09:02:57.354Z",
-    "duration_ms": 0.113,
+    "executed_at": "2026-11-13T09:13:49.166Z",
+    "duration_ms": 0.103,
     "total_sessions_checked": 40,
     "total_absence_cases": 12,
     "modifiedCheckinCount": 0,
@@ -256,7 +256,7 @@
     "Config 1 (Full System)": {
       "description": "Hệ thống đầy đủ (Động cơ SLA 4 mốc 30/60/90/120 phút + Bộ lọc đơn xin nghỉ Excuse Filter)",
       "runs_count": 10,
-      "mean_execution_time_ms": 0.091,
+      "mean_execution_time_ms": 0.079,
       "summary": {
         "sla_detection_rate": "18/18",
         "sla_early_resolution_rate": "16/18 (88.9%)",
@@ -267,8 +267,8 @@
       "runs": [
         {
           "run_id": 1,
-          "timestamp": "2026-11-13T09:02:57.355Z",
-          "duration_ms": 0.056,
+          "timestamp": "2026-11-13T09:13:49.167Z",
+          "duration_ms": 0.071,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -285,8 +285,8 @@
         },
         {
           "run_id": 2,
-          "timestamp": "2026-11-13T09:02:57.355Z",
-          "duration_ms": 0.026,
+          "timestamp": "2026-11-13T09:13:49.167Z",
+          "duration_ms": 0.022,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -303,8 +303,8 @@
         },
         {
           "run_id": 3,
-          "timestamp": "2026-11-13T09:02:57.355Z",
-          "duration_ms": 0.013,
+          "timestamp": "2026-11-13T09:13:49.167Z",
+          "duration_ms": 0.015,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -321,8 +321,8 @@
         },
         {
           "run_id": 4,
-          "timestamp": "2026-11-13T09:02:57.355Z",
-          "duration_ms": 0.011,
+          "timestamp": "2026-11-13T09:13:49.167Z",
+          "duration_ms": 0.013,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -339,8 +339,8 @@
         },
         {
           "run_id": 5,
-          "timestamp": "2026-11-13T09:02:57.355Z",
-          "duration_ms": 0.01,
+          "timestamp": "2026-11-13T09:13:49.167Z",
+          "duration_ms": 0.012,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -357,8 +357,8 @@
         },
         {
           "run_id": 6,
-          "timestamp": "2026-11-13T09:02:57.355Z",
-          "duration_ms": 0.01,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.614,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -375,8 +375,8 @@
         },
         {
           "run_id": 7,
-          "timestamp": "2026-11-13T09:02:57.355Z",
-          "duration_ms": 0.01,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.013,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -393,7 +393,7 @@
         },
         {
           "run_id": 8,
-          "timestamp": "2026-11-13T09:02:57.355Z",
+          "timestamp": "2026-11-13T09:13:49.168Z",
           "duration_ms": 0.011,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
@@ -411,8 +411,8 @@
         },
         {
           "run_id": 9,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.747,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.01,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -429,8 +429,8 @@
         },
         {
           "run_id": 10,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.014,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.01,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -450,7 +450,7 @@
     "Config 2 (Single Checkpoint 120m)": {
       "description": "Chỉ kiểm tra một lần tại mốc 120 phút (Tắt các mốc cảnh báo sớm 30, 60, 90 phút)",
       "runs_count": 10,
-      "mean_execution_time_ms": 0.007,
+      "mean_execution_time_ms": 0.008,
       "summary": {
         "sla_detection_rate": "18/18 (tại mốc 120')",
         "sla_early_resolution_rate": "0/18 (0.0%)",
@@ -461,8 +461,8 @@
       "runs": [
         {
           "run_id": 1,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.011,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.013,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "0/18 (0.0%)",
           "incident_escalations": 18,
@@ -479,133 +479,7 @@
         },
         {
           "run_id": 2,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.007,
-          "detected_delayed_cases": "18/18",
-          "early_resolved_before_120m": "0/18 (0.0%)",
-          "incident_escalations": 18,
-          "sla_fp_on_compliant_sessions": 0,
-          "checkpoint_hits": {
-            "30": 0,
-            "60": 0,
-            "90": 0,
-            "120": 18
-          },
-          "false_alarm_parent_notifications_fp": 0,
-          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
-          "zalo_simulated_logs_created": 34
-        },
-        {
-          "run_id": 3,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.006,
-          "detected_delayed_cases": "18/18",
-          "early_resolved_before_120m": "0/18 (0.0%)",
-          "incident_escalations": 18,
-          "sla_fp_on_compliant_sessions": 0,
-          "checkpoint_hits": {
-            "30": 0,
-            "60": 0,
-            "90": 0,
-            "120": 18
-          },
-          "false_alarm_parent_notifications_fp": 0,
-          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
-          "zalo_simulated_logs_created": 34
-        },
-        {
-          "run_id": 4,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.006,
-          "detected_delayed_cases": "18/18",
-          "early_resolved_before_120m": "0/18 (0.0%)",
-          "incident_escalations": 18,
-          "sla_fp_on_compliant_sessions": 0,
-          "checkpoint_hits": {
-            "30": 0,
-            "60": 0,
-            "90": 0,
-            "120": 18
-          },
-          "false_alarm_parent_notifications_fp": 0,
-          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
-          "zalo_simulated_logs_created": 34
-        },
-        {
-          "run_id": 5,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.006,
-          "detected_delayed_cases": "18/18",
-          "early_resolved_before_120m": "0/18 (0.0%)",
-          "incident_escalations": 18,
-          "sla_fp_on_compliant_sessions": 0,
-          "checkpoint_hits": {
-            "30": 0,
-            "60": 0,
-            "90": 0,
-            "120": 18
-          },
-          "false_alarm_parent_notifications_fp": 0,
-          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
-          "zalo_simulated_logs_created": 34
-        },
-        {
-          "run_id": 6,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.006,
-          "detected_delayed_cases": "18/18",
-          "early_resolved_before_120m": "0/18 (0.0%)",
-          "incident_escalations": 18,
-          "sla_fp_on_compliant_sessions": 0,
-          "checkpoint_hits": {
-            "30": 0,
-            "60": 0,
-            "90": 0,
-            "120": 18
-          },
-          "false_alarm_parent_notifications_fp": 0,
-          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
-          "zalo_simulated_logs_created": 34
-        },
-        {
-          "run_id": 7,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.006,
-          "detected_delayed_cases": "18/18",
-          "early_resolved_before_120m": "0/18 (0.0%)",
-          "incident_escalations": 18,
-          "sla_fp_on_compliant_sessions": 0,
-          "checkpoint_hits": {
-            "30": 0,
-            "60": 0,
-            "90": 0,
-            "120": 18
-          },
-          "false_alarm_parent_notifications_fp": 0,
-          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
-          "zalo_simulated_logs_created": 34
-        },
-        {
-          "run_id": 8,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.006,
-          "detected_delayed_cases": "18/18",
-          "early_resolved_before_120m": "0/18 (0.0%)",
-          "incident_escalations": 18,
-          "sla_fp_on_compliant_sessions": 0,
-          "checkpoint_hits": {
-            "30": 0,
-            "60": 0,
-            "90": 0,
-            "120": 18
-          },
-          "false_alarm_parent_notifications_fp": 0,
-          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
-          "zalo_simulated_logs_created": 34
-        },
-        {
-          "run_id": 9,
-          "timestamp": "2026-11-13T09:02:57.356Z",
+          "timestamp": "2026-11-13T09:13:49.168Z",
           "duration_ms": 0.008,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "0/18 (0.0%)",
@@ -622,9 +496,135 @@
           "zalo_simulated_logs_created": 34
         },
         {
-          "run_id": 10,
-          "timestamp": "2026-11-13T09:02:57.356Z",
+          "run_id": 3,
+          "timestamp": "2026-11-13T09:13:49.168Z",
           "duration_ms": 0.007,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 4,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.007,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 5,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.007,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 6,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.007,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 7,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.007,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 8,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.008,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 9,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.009,
+          "detected_delayed_cases": "18/18",
+          "early_resolved_before_120m": "0/18 (0.0%)",
+          "incident_escalations": 18,
+          "sla_fp_on_compliant_sessions": 0,
+          "checkpoint_hits": {
+            "30": 0,
+            "60": 0,
+            "90": 0,
+            "120": 18
+          },
+          "false_alarm_parent_notifications_fp": 0,
+          "excuse_filter_routing_accuracy": "12/12 (100.0%)",
+          "zalo_simulated_logs_created": 34
+        },
+        {
+          "run_id": 10,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.008,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "0/18 (0.0%)",
           "incident_escalations": 18,
@@ -644,7 +644,7 @@
     "Config 3 (Without Excuse Filter)": {
       "description": "Tắt bộ lọc đơn xin nghỉ Excuse Filter (Giữ nguyên động cơ SLA 4 mốc)",
       "runs_count": 10,
-      "mean_execution_time_ms": 0.01,
+      "mean_execution_time_ms": 0.011,
       "summary": {
         "sla_detection_rate": "18/18",
         "sla_early_resolution_rate": "16/18 (88.9%)",
@@ -655,8 +655,8 @@
       "runs": [
         {
           "run_id": 1,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.011,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.017,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -673,8 +673,8 @@
         },
         {
           "run_id": 2,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.009,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.011,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -691,8 +691,8 @@
         },
         {
           "run_id": 3,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.008,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.013,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -709,8 +709,8 @@
         },
         {
           "run_id": 4,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.016,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.012,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -727,7 +727,7 @@
         },
         {
           "run_id": 5,
-          "timestamp": "2026-11-13T09:02:57.356Z",
+          "timestamp": "2026-11-13T09:13:49.168Z",
           "duration_ms": 0.011,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
@@ -745,8 +745,8 @@
         },
         {
           "run_id": 6,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.009,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.011,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -763,8 +763,8 @@
         },
         {
           "run_id": 7,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.009,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.01,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -781,8 +781,8 @@
         },
         {
           "run_id": 8,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.009,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.01,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -799,8 +799,8 @@
         },
         {
           "run_id": 9,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.009,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.01,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,
@@ -817,8 +817,8 @@
         },
         {
           "run_id": 10,
-          "timestamp": "2026-11-13T09:02:57.356Z",
-          "duration_ms": 0.008,
+          "timestamp": "2026-11-13T09:13:49.168Z",
+          "duration_ms": 0.01,
           "detected_delayed_cases": "18/18",
           "early_resolved_before_120m": "16/18 (88.9%)",
           "incident_escalations": 2,

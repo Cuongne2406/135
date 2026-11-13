@@ -2,8 +2,8 @@
   "metadata": {
     "title": "Live Latency Benchmark of Page Response and Baseline Comparison (10 Independent Runs)",
     "reference": "JSLHU-SysAir_v9.docx (Mục 4.4, Bảng 6)",
-    "executed_at": "2026-11-13T09:11:27.302Z",
-    "git_commit": "d0c148e",
+    "executed_at": "2026-11-13T09:14:23.528Z",
+    "git_commit": "ca59dc4",
     "testbed": {
       "cpu": "AMD Ryzen 5 5600 6-Core Processor              ",
       "cores_threads": 12,
@@ -22,14 +22,14 @@
         "lessons_count": 8,
         "enrolled_synthetic_students_count": 10
       },
-      "warmup_run_ms": 1431.3,
+      "warmup_run_ms": 1093.5,
       "runs_count": 10
     },
     "inter_screen_correlations": {
-      "r_screen1_screen2": 0.1781,
-      "r_screen1_screen3": -0.2947,
-      "r_screen2_screen4": 0.0765,
-      "r_screen3_screen4": -0.0078
+      "r_screen1_screen2": -0.3519,
+      "r_screen1_screen3": -0.2788,
+      "r_screen2_screen4": 0.4091,
+      "r_screen3_screen4": 0.5037
     },
     "statistical_formula": {
       "mean": "Mean = sum(x_i) / N",
@@ -41,311 +41,311 @@
   "summary_table_6_exact": {
     "screen_1_student_list": {
       "screen_name": "1. Danh sách học viên",
-      "baseline_mean_ms": 1285.8,
-      "baseline_std_ms": 4,
-      "baseline_display": "1285.8 ± 4.0 ms",
-      "proposed_mean_ms": 60.1,
-      "proposed_std_ms": 0.2,
-      "proposed_display": "60.1 ± 0.2 ms",
-      "proposed_median_ms": 60.2,
+      "baseline_mean_ms": 1030.7,
+      "baseline_std_ms": 11.2,
+      "baseline_display": "1030.7 ± 11.2 ms",
+      "proposed_mean_ms": 48.7,
+      "proposed_std_ms": 1.2,
+      "proposed_display": "48.7 ± 1.2 ms",
+      "proposed_median_ms": 48.3,
       "latency_reduction_pct": 95.3,
       "latency_reduction_display": "95.3%"
     },
     "screen_2_course_detail": {
       "screen_name": "2. Chi tiết khóa học (8 buổi học, 10 HS giả lập)",
-      "baseline_mean_ms": 1141.2,
-      "baseline_std_ms": 2.5,
-      "baseline_display": "1141.2 ± 2.5 ms",
-      "proposed_mean_ms": 121.4,
-      "proposed_std_ms": 2.1,
-      "proposed_display": "121.4 ± 2.1 ms",
-      "proposed_median_ms": 120.8,
-      "latency_reduction_pct": 89.4,
-      "latency_reduction_display": "89.4%"
+      "baseline_mean_ms": 914.7,
+      "baseline_std_ms": 7.5,
+      "baseline_display": "914.7 ± 7.5 ms",
+      "proposed_mean_ms": 49.2,
+      "proposed_std_ms": 0.4,
+      "proposed_display": "49.2 ± 0.4 ms",
+      "proposed_median_ms": 49.2,
+      "latency_reduction_pct": 94.6,
+      "latency_reduction_display": "94.6%"
     },
     "screen_3_calendar": {
       "screen_name": "3. Lịch học (Calendar)",
-      "baseline_mean_ms": 430.2,
-      "baseline_std_ms": 3.1,
-      "baseline_display": "430.2 ± 3.1 ms",
-      "proposed_mean_ms": 60,
-      "proposed_std_ms": 0.3,
-      "proposed_display": "60.0 ± 0.3 ms",
-      "proposed_median_ms": 60,
-      "latency_reduction_pct": 86.1,
-      "latency_reduction_display": "86.1%"
+      "baseline_mean_ms": 342.6,
+      "baseline_std_ms": 1.5,
+      "baseline_display": "342.6 ± 1.5 ms",
+      "proposed_mean_ms": 48.3,
+      "proposed_std_ms": 0.2,
+      "proposed_display": "48.3 ± 0.2 ms",
+      "proposed_median_ms": 48.3,
+      "latency_reduction_pct": 85.9,
+      "latency_reduction_display": "85.9%"
     },
     "screen_4_admin_dashboard": {
       "screen_name": "4. Dashboard điều hành học vụ",
-      "baseline_mean_ms": 492.6,
-      "baseline_std_ms": 1.4,
-      "baseline_display": "492.6 ± 1.4 ms",
-      "proposed_mean_ms": 120.9,
-      "proposed_std_ms": 0.5,
-      "proposed_display": "120.9 ± 0.5 ms",
-      "proposed_median_ms": 120.9,
-      "latency_reduction_pct": 75.5,
-      "latency_reduction_display": "75.5%"
+      "baseline_mean_ms": 392.5,
+      "baseline_std_ms": 2.5,
+      "baseline_display": "392.5 ± 2.5 ms",
+      "proposed_mean_ms": 49.2,
+      "proposed_std_ms": 0.3,
+      "proposed_display": "49.2 ± 0.3 ms",
+      "proposed_median_ms": 49.1,
+      "latency_reduction_pct": 87.5,
+      "latency_reduction_display": "87.5%"
     }
   },
   "runs": [
     {
       "run_id": 1,
-      "timestamp": "2026-11-13T09:10:53.835Z",
+      "timestamp": "2026-11-13T09:13:57.585Z",
       "measurements": {
         "screen_1_student_list": {
-          "baseline_ms": 1290.9,
-          "proposed_ms": 60.2,
+          "baseline_ms": 1026.7,
+          "proposed_ms": 48.2,
           "reduction_pct": 95.3
         },
         "screen_2_course_detail": {
-          "baseline_ms": 1142.6,
-          "proposed_ms": 121.6,
-          "reduction_pct": 89.4
+          "baseline_ms": 912.6,
+          "proposed_ms": 48.7,
+          "reduction_pct": 94.7
         },
         "screen_3_calendar": {
-          "baseline_ms": 428.9,
-          "proposed_ms": 59.9,
-          "reduction_pct": 86
+          "baseline_ms": 342.4,
+          "proposed_ms": 48.4,
+          "reduction_pct": 85.9
         },
         "screen_4_admin_dashboard": {
-          "baseline_ms": 493.9,
-          "proposed_ms": 121,
-          "reduction_pct": 75.5
+          "baseline_ms": 391.1,
+          "proposed_ms": 48.9,
+          "reduction_pct": 87.5
         }
       }
     },
     {
       "run_id": 2,
-      "timestamp": "2026-11-13T09:10:57.544Z",
+      "timestamp": "2026-11-13T09:14:00.460Z",
       "measurements": {
         "screen_1_student_list": {
-          "baseline_ms": 1283.2,
-          "proposed_ms": 60.2,
+          "baseline_ms": 1024.9,
+          "proposed_ms": 48.2,
           "reduction_pct": 95.3
         },
         "screen_2_course_detail": {
-          "baseline_ms": 1142.2,
-          "proposed_ms": 120.5,
-          "reduction_pct": 89.5
+          "baseline_ms": 911.2,
+          "proposed_ms": 49.2,
+          "reduction_pct": 94.6
         },
         "screen_3_calendar": {
-          "baseline_ms": 428.2,
-          "proposed_ms": 59.7,
-          "reduction_pct": 86.1
+          "baseline_ms": 344.3,
+          "proposed_ms": 48.3,
+          "reduction_pct": 86
         },
         "screen_4_admin_dashboard": {
-          "baseline_ms": 493.5,
-          "proposed_ms": 121.1,
-          "reduction_pct": 75.5
+          "baseline_ms": 398.8,
+          "proposed_ms": 49.3,
+          "reduction_pct": 87.6
         }
       }
     },
     {
       "run_id": 3,
-      "timestamp": "2026-11-13T09:11:01.253Z",
+      "timestamp": "2026-11-13T09:14:03.338Z",
       "measurements": {
         "screen_1_student_list": {
-          "baseline_ms": 1286.1,
-          "proposed_ms": 60,
+          "baseline_ms": 1032.3,
+          "proposed_ms": 48.4,
           "reduction_pct": 95.3
         },
         "screen_2_course_detail": {
-          "baseline_ms": 1141.6,
-          "proposed_ms": 120.7,
-          "reduction_pct": 89.4
+          "baseline_ms": 917.1,
+          "proposed_ms": 49.1,
+          "reduction_pct": 94.6
         },
         "screen_3_calendar": {
-          "baseline_ms": 428.4,
-          "proposed_ms": 60,
-          "reduction_pct": 86
+          "baseline_ms": 341.9,
+          "proposed_ms": 48.3,
+          "reduction_pct": 85.9
         },
         "screen_4_admin_dashboard": {
-          "baseline_ms": 490.2,
-          "proposed_ms": 120.9,
-          "reduction_pct": 75.3
+          "baseline_ms": 391.4,
+          "proposed_ms": 48.9,
+          "reduction_pct": 87.5
         }
       }
     },
     {
       "run_id": 4,
-      "timestamp": "2026-11-13T09:11:04.955Z",
+      "timestamp": "2026-11-13T09:14:06.209Z",
       "measurements": {
         "screen_1_student_list": {
-          "baseline_ms": 1279.9,
-          "proposed_ms": 60.4,
+          "baseline_ms": 1029.2,
+          "proposed_ms": 48.4,
           "reduction_pct": 95.3
         },
         "screen_2_course_detail": {
-          "baseline_ms": 1140.7,
-          "proposed_ms": 120.8,
-          "reduction_pct": 89.4
+          "baseline_ms": 912.4,
+          "proposed_ms": 49.8,
+          "reduction_pct": 94.5
         },
         "screen_3_calendar": {
-          "baseline_ms": 428.2,
-          "proposed_ms": 59.8,
+          "baseline_ms": 342.4,
+          "proposed_ms": 48.1,
           "reduction_pct": 86
         },
         "screen_4_admin_dashboard": {
-          "baseline_ms": 491.8,
-          "proposed_ms": 120.7,
-          "reduction_pct": 75.5
+          "baseline_ms": 391.3,
+          "proposed_ms": 49.2,
+          "reduction_pct": 87.4
         }
       }
     },
     {
       "run_id": 5,
-      "timestamp": "2026-11-13T09:11:08.677Z",
+      "timestamp": "2026-11-13T09:14:09.078Z",
       "measurements": {
         "screen_1_student_list": {
-          "baseline_ms": 1293.7,
-          "proposed_ms": 60.4,
+          "baseline_ms": 1026.1,
+          "proposed_ms": 48.2,
           "reduction_pct": 95.3
         },
         "screen_2_course_detail": {
-          "baseline_ms": 1139.3,
-          "proposed_ms": 120.7,
-          "reduction_pct": 89.4
+          "baseline_ms": 912.2,
+          "proposed_ms": 49.6,
+          "reduction_pct": 94.6
         },
         "screen_3_calendar": {
-          "baseline_ms": 436.2,
-          "proposed_ms": 60,
-          "reduction_pct": 86.2
+          "baseline_ms": 341.9,
+          "proposed_ms": 48.7,
+          "reduction_pct": 85.8
         },
         "screen_4_admin_dashboard": {
-          "baseline_ms": 490.5,
-          "proposed_ms": 120.3,
-          "reduction_pct": 75.5
+          "baseline_ms": 392.5,
+          "proposed_ms": 49.9,
+          "reduction_pct": 87.3
         }
       }
     },
     {
       "run_id": 6,
-      "timestamp": "2026-11-13T09:11:12.400Z",
+      "timestamp": "2026-11-13T09:14:11.975Z",
       "measurements": {
         "screen_1_student_list": {
-          "baseline_ms": 1282.7,
-          "proposed_ms": 60.2,
+          "baseline_ms": 1032.2,
+          "proposed_ms": 48.4,
           "reduction_pct": 95.3
         },
         "screen_2_course_detail": {
-          "baseline_ms": 1144.1,
-          "proposed_ms": 127.3,
-          "reduction_pct": 88.9
+          "baseline_ms": 935.4,
+          "proposed_ms": 48.8,
+          "reduction_pct": 94.8
         },
         "screen_3_calendar": {
-          "baseline_ms": 435.1,
-          "proposed_ms": 59.7,
-          "reduction_pct": 86.3
+          "baseline_ms": 342.3,
+          "proposed_ms": 48.1,
+          "reduction_pct": 85.9
         },
         "screen_4_admin_dashboard": {
-          "baseline_ms": 492.7,
-          "proposed_ms": 120.9,
-          "reduction_pct": 75.5
+          "baseline_ms": 392.6,
+          "proposed_ms": 48.9,
+          "reduction_pct": 87.5
         }
       }
     },
     {
       "run_id": 7,
-      "timestamp": "2026-11-13T09:11:16.109Z",
+      "timestamp": "2026-11-13T09:14:14.876Z",
       "measurements": {
         "screen_1_student_list": {
-          "baseline_ms": 1285.9,
-          "proposed_ms": 60,
-          "reduction_pct": 95.3
+          "baseline_ms": 1061.2,
+          "proposed_ms": 48.9,
+          "reduction_pct": 95.4
         },
         "screen_2_course_detail": {
-          "baseline_ms": 1140.3,
-          "proposed_ms": 120.1,
-          "reduction_pct": 89.5
+          "baseline_ms": 911.7,
+          "proposed_ms": 49.9,
+          "reduction_pct": 94.5
         },
         "screen_3_calendar": {
-          "baseline_ms": 429.2,
-          "proposed_ms": 60.6,
+          "baseline_ms": 341.1,
+          "proposed_ms": 48.2,
           "reduction_pct": 85.9
         },
         "screen_4_admin_dashboard": {
-          "baseline_ms": 492.3,
-          "proposed_ms": 120.5,
-          "reduction_pct": 75.5
+          "baseline_ms": 390.8,
+          "proposed_ms": 48.9,
+          "reduction_pct": 87.5
         }
       }
     },
     {
       "run_id": 8,
-      "timestamp": "2026-11-13T09:11:19.815Z",
+      "timestamp": "2026-11-13T09:14:17.749Z",
       "measurements": {
         "screen_1_student_list": {
-          "baseline_ms": 1285,
-          "proposed_ms": 59.7,
-          "reduction_pct": 95.4
+          "baseline_ms": 1027.4,
+          "proposed_ms": 52,
+          "reduction_pct": 94.9
         },
         "screen_2_course_detail": {
-          "baseline_ms": 1138.4,
-          "proposed_ms": 120.5,
-          "reduction_pct": 89.4
+          "baseline_ms": 912.4,
+          "proposed_ms": 48.7,
+          "reduction_pct": 94.7
         },
         "screen_3_calendar": {
-          "baseline_ms": 427.6,
-          "proposed_ms": 60.2,
+          "baseline_ms": 341.4,
+          "proposed_ms": 48.2,
           "reduction_pct": 85.9
         },
         "screen_4_admin_dashboard": {
-          "baseline_ms": 492.8,
-          "proposed_ms": 121.2,
-          "reduction_pct": 75.4
+          "baseline_ms": 393.4,
+          "proposed_ms": 49.1,
+          "reduction_pct": 87.5
         }
       }
     },
     {
       "run_id": 9,
-      "timestamp": "2026-11-13T09:11:23.530Z",
+      "timestamp": "2026-11-13T09:14:20.614Z",
       "measurements": {
         "screen_1_student_list": {
-          "baseline_ms": 1284,
-          "proposed_ms": 59.9,
+          "baseline_ms": 1022.6,
+          "proposed_ms": 47.9,
           "reduction_pct": 95.3
         },
         "screen_2_course_detail": {
-          "baseline_ms": 1145.2,
-          "proposed_ms": 120.8,
-          "reduction_pct": 89.5
+          "baseline_ms": 912.1,
+          "proposed_ms": 49.2,
+          "reduction_pct": 94.6
         },
         "screen_3_calendar": {
-          "baseline_ms": 432,
-          "proposed_ms": 59.6,
-          "reduction_pct": 86.2
+          "baseline_ms": 341.9,
+          "proposed_ms": 48.5,
+          "reduction_pct": 85.8
         },
         "screen_4_admin_dashboard": {
-          "baseline_ms": 493.4,
-          "proposed_ms": 120.4,
-          "reduction_pct": 75.6
+          "baseline_ms": 393.7,
+          "proposed_ms": 49.1,
+          "reduction_pct": 87.5
         }
       }
     },
     {
       "run_id": 10,
-      "timestamp": "2026-11-13T09:11:27.241Z",
+      "timestamp": "2026-11-13T09:14:23.480Z",
       "measurements": {
         "screen_1_student_list": {
-          "baseline_ms": 1286.6,
-          "proposed_ms": 60.3,
+          "baseline_ms": 1024.7,
+          "proposed_ms": 48,
           "reduction_pct": 95.3
         },
         "screen_2_course_detail": {
-          "baseline_ms": 1137.2,
-          "proposed_ms": 121.2,
-          "reduction_pct": 89.3
+          "baseline_ms": 909.7,
+          "proposed_ms": 49.5,
+          "reduction_pct": 94.6
         },
         "screen_3_calendar": {
-          "baseline_ms": 428.6,
-          "proposed_ms": 60,
-          "reduction_pct": 86
+          "baseline_ms": 346.2,
+          "proposed_ms": 48.2,
+          "reduction_pct": 86.1
         },
         "screen_4_admin_dashboard": {
-          "baseline_ms": 494.6,
-          "proposed_ms": 122,
-          "reduction_pct": 75.3
+          "baseline_ms": 389.8,
+          "proposed_ms": 49.6,
+          "reduction_pct": 87.3
         }
       }
     }
