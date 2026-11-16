@@ -1,0 +1,246 @@
+import { NextResponse } from 'next/server'
+import connectDB from '@/config/connectDB'
+import PostCourse from '@/models/course'
+import TrialCourse from '@/models/coursetry'
+import PostStudent from '@/models/student'
+import MakeupSession from '@/models/makeupSession'
+import { writeSystemLog } from '@/utils/auditLog'
+import mongoose from 'mongoose'
+import { revalidateTag } from 'next/cache'
+import { Re_coursetry } from '@/data/course'
+import { reloadCourse, reloadCoursetry } from '@/data/actions/reload'
+import authenticate from '@/utils/authenticate'
+import { sendInstantCheckinZaloNotification } from '@/services/zaloAutomation.service'
+
+export async function GET(req) {
+  try {
+    const { user } = await authenticate(req);
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url)
+    const month = +searchParams.get('month')
+    const year = +searchParams.get('year')
+    if (!Number.isInteger(month) || !Number.isInteger(year) || month < 1 || month > 12)
+      return NextResponse.json({ error: 'month/year không hợp lệ' }, { status: 400 })
+
+    await connectDB()
+    if (mongoose.connection.readyState !== 1) await mongoose.connection.asPromise()
+
+    const start = new Date(Date.UTC(year, month - 1, 1))
+    const end = new Date(Date.UTC(year, month, 1))
+
+    const officialAgg = PostCourse.aggregate([
+      { $match: { 'Detail.Day': { $gte: start, $lt: end } } },
+      { $unwind: '$Detail' },
+      { $match: { 'Detail.Day': { $gte: start, $lt: end } } },
+      { $addFields: { students: { $map: { input: { $filter: { input: '$Student', as: 'st', cond: { $anyElementTrue: [{ $map: { input: '$$st.Learn', as: 'lr', in: { $eq: ['$$lr.Lesson', '$Detail._id'] } } }] } } }, as: 'st', in: { $mergeObjects: ['$$st', { Learn: { $filter: { input: '$$st.Learn', as: 'lr', cond: { $eq: ['$$lr.Lesson', '$Detail._id'] } } } }] } } } } },
+      { $lookup: { from: 'books', localField: 'Book', foreignField: '_id', as: 'bk' } },
+      { $set: { bk: { $arrayElemAt: ['$bk', 0] } } },
+      { $set: { topic: { $arrayElemAt: [{ $filter: { input: '$bk.Topics', as: 'tp', cond: { $eq: ['$$tp._id', '$Detail.Topic'] } } }, 0] } } },
+      { $lookup: { from: 'users', localField: 'Detail.Teacher', foreignField: '_id', as: 'teacher' } },
+      { $lookup: { from: 'users', localField: 'Detail.TeachingAs', foreignField: '_id', as: 'teachingAs' } },
+      { $lookup: { from: 'areas', localField: 'Area', foreignField: '_id', as: 'ar' } },
+      { $set: { ar: { $arrayElemAt: ['$ar', 0] } } },
+      { $set: { roomDoc: { $arrayElemAt: [{ $filter: { input: '$ar.rooms', as: 'r', cond: { $eq: ['$$r._id', '$Detail.Room'] } } }, 0] } } },
+      {
+        $project: {
+          _id: '$Detail._id', courseId: '$ID', courseName: '$Name', type: { $literal: 'official' }, date: '$Detail.Day', day: { $dayOfMonth: '$Detail.Day' }, month: { $month: '$Detail.Day' }, year: { $year: '$Detail.Day' }, time: '$Detail.Time', room: { _id: { $ifNull: ['$roomDoc._id', null] }, name: { $ifNull: ['$roomDoc.name', null] }, area: '$ar.name', color: '$ar.color' }, image: '$Detail.Image', topic: '$topic', teacher: { $arrayElemAt: ['$teacher', 0] }, teachingAs: { $arrayElemAt: ['$teachingAs', 0] }, students: '$students'
+        }
+      }
+    ])
+
+    const trialAgg = TrialCourse.aggregate([
+      { $match: { 'sessions.day': { $gte: start, $lt: end } } },
+      { $unwind: '$sessions' },
+      { $match: { 'sessions.day': { $gte: start, $lt: end } } },
+      { $lookup: { from: 'books', localField: 'sessions.book', foreignField: '_id', as: 'bk' } },
+      { $set: { bk: { $arrayElemAt: ['$bk', 0] } } },
+      { $set: { topic: { $arrayElemAt: [{ $filter: { input: '$bk.Topics', as: 'tp', cond: { $eq: ['$$tp._id', '$sessions.topicId'] } } }, 0] } } },
+      { $lookup: { from: 'users', localField: 'sessions.teacher', foreignField: '_id', as: 'teacher' } },
+      { $lookup: { from: 'users', localField: 'sessions.teachingAs', foreignField: '_id', as: 'teachingAs' } },
+      { $lookup: { from: 'areas', let: { roomId: '$sessions.room' }, pipeline: [{ $unwind: '$rooms' }, { $match: { $expr: { $eq: ['$rooms._id', '$$roomId'] } } }, { $project: { _id: 0, room: '$rooms', areaName: '$name', areaColor: '$color' } }], as: 'rd' } },
+      { $set: { rd: { $arrayElemAt: ['$rd', 0] } } },
+      {
+        $project: {
+          _id: '$sessions._id', courseId: '$name', courseName: '$name', type: { $literal: 'trial' }, date: '$sessions.day', day: { $dayOfMonth: '$sessions.day' }, month: { $month: '$sessions.day' }, year: { $year: '$sessions.day' }, time: '$sessions.time', room: { _id: { $ifNull: ['$rd.room._id', null] }, name: { $ifNull: ['$rd.room.name', null] }, area: '$rd.areaName', color: '$rd.areaColor' }, image: null, topic: '$topic', teacher: { $arrayElemAt: ['$teacher', 0] }, teachingAs: { $arrayElemAt: ['$teachingAs', 0] }, students: '$sessions.students'
+        }
+      }
+    ])
+
+    const [official, trial] = await Promise.all([officialAgg, trialAgg])
+    const data = [...official, ...trial].sort((a, b) => a.date - b.date)
+    return NextResponse.json({ success: true, data })
+  } catch (err) {
+    console.error('Calendar API error:', err)
+    return NextResponse.json({ success: false, error: err.message || 'internal error' }, { status: 500 })
+  }
+}
+
+export async function POST(req) {
+  try {
+    const { user } = await authenticate(req);
+    if (!user) {
+      return NextResponse.json({ status: 1, mes: 'Chưa đăng nhập.' }, { status: 401 });
+    }
+    const isAdminOrAcademic = user.role.includes('Admin') || user.role.includes('Academic');
+
+    const { courseId, sessionId, attendanceData } = await req.json()
+    if (!courseId || !sessionId || !Array.isArray(attendanceData))
+      return NextResponse.json({ status: 1, mes: 'Thiếu tham số' }, { status: 400 })
+
+    await connectDB()
+    let sessionDate;
+    const sessionIdObj = new mongoose.Types.ObjectId(sessionId);
+
+    // Trường hợp 1: Khóa học chính thức
+    const course = await PostCourse.findOne({ _id: courseId, 'Detail._id': sessionIdObj }).lean()
+    if (course) {
+      const lesson = course.Detail.find(d => d._id.equals(sessionIdObj));
+      if (lesson) sessionDate = lesson.Day;
+
+      if (!isAdminOrAcademic) {
+        const isAuthorizedTeacher = String(course.TeacherHR) === String(user._id) ||
+          String(lesson?.Teacher) === String(user._id) ||
+          String(lesson?.TeachingAs) === String(user._id);
+        if (!isAuthorizedTeacher) {
+          return NextResponse.json({ status: 1, mes: 'Bạn không có quyền điểm danh lớp học này.' }, { status: 403 });
+        }
+      }
+
+      for (const a of attendanceData) {
+        const checkinNum = Number(a.checkin);
+        const isAbsent = checkinNum === 0 || checkinNum === 2 || checkinNum === 3;
+        const isPresent = checkinNum === 1;
+
+        const updateFields = {
+          'Student.$[stu].Learn.$[les].Checkin': checkinNum,
+          'Student.$[stu].Learn.$[les].Cmt': a.comment || [],
+        };
+        if (a.absenceReason !== undefined) {
+          updateFields['Student.$[stu].Learn.$[les].absenceReason'] = a.absenceReason;
+        }
+
+        const stuDoc = (course.Student || []).find(s => s.ID === a.studentId);
+        const learnItem = (stuDoc?.Learn || []).find(l => String(l.Lesson) === String(sessionIdObj));
+        const currentMakeupStatus = learnItem?.makeupStatus || 'NOT_REQUIRED';
+
+        if (isAbsent) {
+          // Bảng 2 quy định: Checkin = 2 -> MAKEUP_REQUIRED (vắng không phép), Checkin = 3 -> MAKEUP_PENDING (vắng có phép)
+          const targetStatus = checkinNum === 3 ? 'MAKEUP_PENDING' : 'MAKEUP_REQUIRED';
+
+          // 1. Cập nhật nếu chưa phải là MAKEUP_SCHEDULED hoặc MAKEUP_COMPLETED
+          if (currentMakeupStatus !== 'MAKEUP_SCHEDULED' && currentMakeupStatus !== 'MAKEUP_COMPLETED') {
+            updateFields['Student.$[stu].Learn.$[les].makeupStatus'] = targetStatus;
+          }
+          // 2. Tự động kiểm tra và upsert bản ghi sang MakeupSession
+          await MakeupSession.findOneAndUpdate(
+            { studentId: a.studentId, course: course._id, lesson: sessionIdObj },
+            {
+              $set: {
+                makeupStatus: (currentMakeupStatus === 'MAKEUP_SCHEDULED' || currentMakeupStatus === 'MAKEUP_COMPLETED')
+                  ? currentMakeupStatus
+                  : targetStatus,
+                originalDate: sessionDate || new Date(),
+                absenceReason: a.absenceReason || '',
+              },
+              $setOnInsert: {
+                contentToMakeup: '',
+                note: checkinNum === 3 ? 'Tự động tạo từ điểm danh vắng có phép' : 'Tự động tạo từ điểm danh vắng không phép'
+              }
+            },
+            { upsert: true, new: true }
+          );
+        } else if (isPresent) {
+          // Bảo toàn trạng thái nếu học sinh đã hoàn thành học bù (MAKEUP_COMPLETED)
+          if (currentMakeupStatus !== 'MAKEUP_COMPLETED') {
+            // 1. Đặt lại makeupStatus: NOT_REQUIRED
+            updateFields['Student.$[stu].Learn.$[les].makeupStatus'] = 'NOT_REQUIRED';
+            // 2. Tự động xóa bản ghi trong MakeupSession nếu đang ở trạng thái MAKEUP_REQUIRED hoặc MAKEUP_PENDING
+            await MakeupSession.findOneAndDelete({
+              studentId: a.studentId,
+              course: course._id,
+              lesson: sessionIdObj,
+              makeupStatus: { $in: ['MAKEUP_REQUIRED', 'MAKEUP_PENDING'] }
+            });
+          }
+        }
+
+        await PostCourse.updateOne(
+          { _id: course._id },
+          { $set: updateFields },
+          { arrayFilters: [{ 'stu.ID': a.studentId }, { 'les.Lesson': sessionIdObj }] }
+        );
+
+        // Kích hoạt thông báo Zalo Điểm danh tức thì (Checkin 1: Có mặt | Checkin 2: Cảnh báo vắng | Checkin 3: Bỏ qua)
+        sendInstantCheckinZaloNotification({
+          studentId: a.studentId,
+          courseId: course._id,
+          lessonId: sessionIdObj,
+          checkin: checkinNum
+        }).catch(err => console.error('[INSTANT_CHECKIN_ZALO_ERROR]', err));
+      }
+
+      // Ghi nhận nhật ký kiểm toán hệ thống
+      await writeSystemLog({
+        type: 'ATTENDANCE_CHECKIN',
+        status: true,
+        createBy: user._id,
+        note: `Điểm danh lớp ${course.ID} buổi ${sessionId}`,
+        details: {
+          courseId: course._id,
+          sessionId,
+          totalStudents: attendanceData.length,
+          absentCount: attendanceData.filter(a => Number(a.checkin) !== 1).length
+        }
+      });
+    } else {
+      // Trường hợp 2: Khóa học thử
+      const trialCourse = await TrialCourse.findOne({ 'sessions._id': sessionIdObj }).lean()
+      if (!trialCourse) return NextResponse.json({ status: 1, mes: 'Không tìm thấy khóa học.' }, { status: 404 })
+
+      const lesson = trialCourse.sessions.find(s => s._id.equals(sessionIdObj));
+      if (lesson) sessionDate = lesson.day;
+
+      if (!isAdminOrAcademic) {
+        const isAuthorizedTeacher = String(lesson?.teacher) === String(user._id) ||
+          String(lesson?.teachingAs) === String(user._id);
+        if (!isAuthorizedTeacher) {
+          return NextResponse.json({ status: 1, mes: 'Bạn không có quyền điểm danh lớp học thử này.' }, { status: 403 });
+        }
+      }
+
+      const studentHumanIds = attendanceData.map(a => a.studentId);
+      const studentsFound = await PostStudent.find({ ID: { $in: studentHumanIds } }, { _id: 1, ID: 1 }).lean();
+      const studentIdMap = new Map(studentsFound.map(s => [s.ID, s._id]));
+
+      for (const a of attendanceData) {
+        const student_id = studentIdMap.get(a.studentId);
+        if (!student_id) {
+          console.warn(`Không tìm thấy học sinh với ID: ${a.studentId}.`);
+          continue;
+        }
+
+        await TrialCourse.updateOne(
+          { _id: trialCourse._id },
+          {
+            $set: {
+              // Giữ nguyên logic mới: lưu checkin dưới dạng Boolean
+              'sessions.$[ses].students.$[stu].checkin': (a.checkin != 2 && a.checkin != 0),
+              'sessions.$[ses].students.$[stu].cmt': a.comment || []
+            }
+          },
+          { arrayFilters: [{ 'ses._id': sessionIdObj }, { 'stu.studentId': student_id }] }
+        )
+      }
+    }
+    reloadCoursetry();
+    revalidateTag(`data_lesson${sessionId}`, 'max');
+    reloadCourse(courseId);
+    return NextResponse.json({ status: 2, mes: 'Cập nhật điểm danh thành công!' })
+  } catch (err) {
+    console.error('Checkin update error:', err)
+    return NextResponse.json({ status: 1, mes: err.message || 'internal error' }, { status: 500 })
+  }
+}

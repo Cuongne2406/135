@@ -1,0 +1,105 @@
+import { getDriveClient } from '@/function/drive/index';
+import { Readable } from 'stream'
+
+export async function uploadImageToDrive(file, folderId) {
+    if (!file || file.size === 0) { return null; }
+
+    const scriptUrl = process.env.GOOGLE_SCRIPT_URL_UPLOAD_AVATAR;
+    if (scriptUrl) {
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const base64 = Buffer.from(arrayBuffer).toString('base64');
+            const targetFolder = folderId || process.env.GOOGLE_DRIVE_STUDENT_AVT_FOLDER_ID;
+            const fileName = `avt-${Date.now()}-${file.name || 'avatar.jpg'}`;
+
+            const response = await fetch(scriptUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    folderId: targetFolder,
+                    base64,
+                    fileName,
+                    mimeType: file.type || 'image/jpeg',
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.fileId) {
+                    return data.fileId;
+                }
+                console.error('Google Apps Script upload thất bại:', data.error);
+            } else {
+                console.error(`Google Apps Script trả về HTTP ${response.status}`);
+            }
+        } catch (scriptErr) {
+            console.error('Lỗi khi upload qua Google Apps Script relay:', scriptErr);
+        }
+    }
+
+    try {
+        const drive = await getDriveClient();
+        const fileBuffer = Buffer.from(await file.arrayBuffer());
+        const readableStream = new Readable();
+        readableStream.push(fileBuffer);
+        readableStream.push(null);
+
+        const fileMetadata = { name: `avt-${Date.now()}-${file.name}`, parents: [folderId] };
+
+        const media = { mimeType: file.type, body: readableStream };
+        const response = await drive.files.create({
+            requestBody: fileMetadata,
+            media: media,
+            fields: 'id',
+            supportsAllDrives: true,
+        });
+        if (response.data && response.data.id) {
+            return response.data.id;
+        } else {
+            console.error("Google Drive API did not return a file ID after upload.");
+            return null;
+        }
+    } catch (error) {
+        console.error('Lỗi trong quá trình tải file lên Google Drive:', error);
+        return null;
+    }
+}
+
+export async function deleteImageFromDrive(fileId) {
+    if (!fileId) {
+
+        return false;
+    }
+
+    try {
+        const drive = await getDriveClient();
+        await drive.files.delete({ fileId: fileId, supportsAllDrives: true });
+
+        return true;
+    } catch (error) {
+        if (error.code === 404) {
+            console.warn(`File ${fileId} không tìm thấy trên Google Drive để xóa.`);
+        } else {
+            console.error(`Lỗi khi xóa file ${fileId} khỏi Google Drive:`, error);
+        }
+        return false;
+    }
+}
+
+export async function getFilesInDriveFolder(folderId) {
+    if (!folderId) return [];
+    try {
+        const drive = await getDriveClient();
+        const response = await drive.files.list({
+            q: `'${folderId}' in parents and trashed = false and (mimeType contains 'image/' or mimeType contains 'video/')`,
+            fields: 'files(id, name, mimeType, thumbnailLink, createdTime)',
+            pageSize: 100,
+            supportsAllDrives: true,
+            includeItemsFromAllDrives: true,
+        });
+        return response.data.files || [];
+    } catch (error) {
+        console.error(`Lỗi khi lấy danh sách file từ Drive folder ${folderId}:`, error?.message);
+        return [];
+    }
+}

@@ -1,0 +1,46 @@
+const VIETNAM_BANKS = [
+    { code: 'MB', name: 'MB Bank', shortName: 'MB', color: '#e30019', textColor: '#ffffff', secondaryColor: '#ff4d4d' },
+    { code: 'VCB', name: 'Vietcombank', shortName: 'VCB', color: '#004999', textColor: '#ffffff', secondaryColor: '#0066cc' },
+    { code: 'ACB', name: 'ACB', shortName: 'ACB', color: '#ed1c24', textColor: '#ffffff', secondaryColor: '#ff4d4d' },
+    { code: 'AGRICOM', name: 'Agribank', shortName: 'Agribank', color: '#008442', textColor: '#ffffff', secondaryColor: '#00a651' },
+    { code: 'BIDV', name: 'BIDV', shortName: 'BIDV', color: '#00a650', textColor: '#ffffff', secondaryColor: '#33bb66' },
+    { code: 'TPB', name: 'TPBank', shortName: 'TPBank', color: '#e31c24', textColor: '#ffffff', secondaryColor: '#ff4d4d' },
+    { code: 'TCB', name: 'Techcombank', shortName: 'TCB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'VT', name: 'VietinBank', shortName: 'VietinBank', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'STB', name: 'Sacombank', shortName: 'STB', color: '#e31e24', textColor: '#ffffff', secondaryColor: '#ff4d4d' },
+    { code: 'SHB', name: 'SHB', shortName: 'SHB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'HDB', name: 'HDBank', shortName: 'HDBank', color: '#e31e24', textColor: '#ffffff', secondaryColor: '#ff4d4d' },
+    { code: 'MSB', name: 'MSB', shortName: 'MSB', color: '#e31e24', textColor: '#ffffff', secondaryColor: '#ff4d4d' },
+    { code: 'VPB', name: 'VPBank', shortName: 'VPBank', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'VIB', name: 'VIB', shortName: 'VIB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'OCB', name: 'OCB', shortName: 'OCB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'GPB', name: 'GPBank', shortName: 'GPBank', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'LPB', name: 'LPBank', shortName: 'LPBank', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'NASB', name: 'Nam A Bank', shortName: 'Nam A Bank', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'NCB', name: 'NCB', shortName: 'NCB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'SCB', name: 'SCB', shortName: 'SCB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'SEAB', name: 'SeABank', shortName: 'SeABank', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'SSB', name: 'SSB', shortName: 'SSB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'VAB', name: 'VietABank', shortName: 'VietABank', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'BAB', name: 'Bac A Bank', shortName: 'Bac A Bank', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'PVF', name: 'PVcombank', shortName: 'PVcom', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'SGB', name: 'SaiGon Bank', shortName: 'SGB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'VRB', name: 'VRB', shortName: 'VRB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'IBK', name: 'Indovina Bank', shortName: 'IBK', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'KB', name: 'Kookmin Bank', shortName: 'KB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'SHBVN', name: 'SHB Vietnam', shortName: 'SHBVN', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'WB', name: 'Woori Bank', shortName: 'Woori', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'CIMB', name: 'CIMB Bank', shortName: 'CIMB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'UOB', name: 'UOB', shortName: 'UOB', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'SC', name: 'Standard Chartered', shortName: 'Standard C', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'HSBC', name: 'HSBC', shortName: 'HSBC', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'CAKE', name: 'CAKE by VPBank', shortName: 'CAKE', color: '#e31e24', textColor: '#ffffff', secondaryColor: '#ff4d4d' },
+    { code: 'Ubank', name: 'Ubank by VPBank', shortName: 'Ubank', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+    { code: 'TNEX', name: 'TNEX', shortName: 'TNEX', color: '#003d7a', textColor: '#ffffff', secondaryColor: '#0055aa' },
+]
+
+export function getBankInfo(bankCode) {
+    return VIETNAM_BANKS.find(b => b.code === bankCode) || { code: bankCode, name: bankCode, shortName: bankCode, color: '#8e2c43', textColor: '#ffffff', secondaryColor: '#a83e56' }
+}
+
+export default VIETNAM_BANKS
