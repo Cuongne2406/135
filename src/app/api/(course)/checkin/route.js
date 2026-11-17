@@ -111,8 +111,13 @@ export async function POST(req) {
 
       for (const a of attendanceData) {
         const checkinNum = Number(a.checkin);
-        const isAbsent = checkinNum === 0 || checkinNum === 2 || checkinNum === 3;
+        if (![0, 1, 2, 3].includes(checkinNum)) {
+          return NextResponse.json({ status: 1, mes: 'Giá trị điểm danh không hợp lệ (chỉ chấp nhận 0, 1, 2, 3).' }, { status: 400 });
+        }
+
+        const isAbsent = checkinNum === 2 || checkinNum === 3;
         const isPresent = checkinNum === 1;
+        const isUnchecked = checkinNum === 0;
 
         const updateFields = {
           'Student.$[stu].Learn.$[les].Checkin': checkinNum,
@@ -125,13 +130,14 @@ export async function POST(req) {
         const stuDoc = (course.Student || []).find(s => s.ID === a.studentId);
         const learnItem = (stuDoc?.Learn || []).find(l => String(l.Lesson) === String(sessionIdObj));
         const currentMakeupStatus = learnItem?.makeupStatus || 'NOT_REQUIRED';
+        const isLockedStatus = ['MAKEUP_SCHEDULED', 'MAKEUP_COMPLETED', 'MAKEUP_ABSENT', 'MAKEUP_EXPIRED', 'MAKEUP_CANCELLED'].includes(currentMakeupStatus);
 
         if (isAbsent) {
           // Bảng 2 quy định: Checkin = 2 -> MAKEUP_REQUIRED (vắng không phép), Checkin = 3 -> MAKEUP_PENDING (vắng có phép)
           const targetStatus = checkinNum === 3 ? 'MAKEUP_PENDING' : 'MAKEUP_REQUIRED';
 
-          // 1. Cập nhật nếu chưa phải là MAKEUP_SCHEDULED hoặc MAKEUP_COMPLETED
-          if (currentMakeupStatus !== 'MAKEUP_SCHEDULED' && currentMakeupStatus !== 'MAKEUP_COMPLETED') {
+          // 1. Cập nhật nếu chưa phải là trạng thái đã xếp lịch hoặc kết thúc
+          if (!isLockedStatus) {
             updateFields['Student.$[stu].Learn.$[les].makeupStatus'] = targetStatus;
           }
           // 2. Tự động kiểm tra và upsert bản ghi sang MakeupSession
@@ -139,9 +145,7 @@ export async function POST(req) {
             { studentId: a.studentId, course: course._id, lesson: sessionIdObj },
             {
               $set: {
-                makeupStatus: (currentMakeupStatus === 'MAKEUP_SCHEDULED' || currentMakeupStatus === 'MAKEUP_COMPLETED')
-                  ? currentMakeupStatus
-                  : targetStatus,
+                makeupStatus: isLockedStatus ? currentMakeupStatus : targetStatus,
                 originalDate: sessionDate || new Date(),
                 absenceReason: a.absenceReason || '',
               },
@@ -155,9 +159,22 @@ export async function POST(req) {
         } else if (isPresent) {
           // Bảo toàn trạng thái nếu học sinh đã hoàn thành học bù (MAKEUP_COMPLETED)
           if (currentMakeupStatus !== 'MAKEUP_COMPLETED') {
-            // 1. Đặt lại makeupStatus: NOT_REQUIRED
+            if (!isLockedStatus) {
+              updateFields['Student.$[stu].Learn.$[les].makeupStatus'] = 'NOT_REQUIRED';
+            }
+            // Tự động xóa bản ghi trong MakeupSession nếu đang ở trạng thái MAKEUP_REQUIRED hoặc MAKEUP_PENDING
+            await MakeupSession.findOneAndDelete({
+              studentId: a.studentId,
+              course: course._id,
+              lesson: sessionIdObj,
+              makeupStatus: { $in: ['MAKEUP_REQUIRED', 'MAKEUP_PENDING'] }
+            });
+          }
+        } else if (isUnchecked) {
+          // checkin = 0 (chưa điểm danh): tuyệt đối KHÔNG tạo MakeupSession
+          // Nếu trước đó đang ở trạng thái chờ bù chưa xếp lịch (MAKEUP_REQUIRED / MAKEUP_PENDING) thì hoàn nguyên về NOT_REQUIRED
+          if (['MAKEUP_REQUIRED', 'MAKEUP_PENDING'].includes(currentMakeupStatus)) {
             updateFields['Student.$[stu].Learn.$[les].makeupStatus'] = 'NOT_REQUIRED';
-            // 2. Tự động xóa bản ghi trong MakeupSession nếu đang ở trạng thái MAKEUP_REQUIRED hoặc MAKEUP_PENDING
             await MakeupSession.findOneAndDelete({
               studentId: a.studentId,
               course: course._id,
@@ -173,13 +190,15 @@ export async function POST(req) {
           { arrayFilters: [{ 'stu.ID': a.studentId }, { 'les.Lesson': sessionIdObj }] }
         );
 
-        // Kích hoạt thông báo Zalo Điểm danh tức thì (Checkin 1: Có mặt | Checkin 2: Cảnh báo vắng | Checkin 3: Bỏ qua)
-        sendInstantCheckinZaloNotification({
-          studentId: a.studentId,
-          courseId: course._id,
-          lessonId: sessionIdObj,
-          checkin: checkinNum
-        }).catch(err => console.error('[INSTANT_CHECKIN_ZALO_ERROR]', err));
+        // Kích hoạt thông báo Zalo Điểm danh tức thì khi đã điểm danh (bỏ qua checkin = 0)
+        if (checkinNum !== 0) {
+          sendInstantCheckinZaloNotification({
+            studentId: a.studentId,
+            courseId: course._id,
+            lessonId: sessionIdObj,
+            checkin: checkinNum
+          }).catch(err => console.error('[INSTANT_CHECKIN_ZALO_ERROR]', err));
+        }
       }
 
       // Ghi nhận nhật ký kiểm toán hệ thống
@@ -192,7 +211,10 @@ export async function POST(req) {
           courseId: course._id,
           sessionId,
           totalStudents: attendanceData.length,
-          absentCount: attendanceData.filter(a => Number(a.checkin) !== 1).length
+          absentCount: attendanceData.filter(a => {
+            const c = Number(a.checkin);
+            return c === 2 || c === 3;
+          }).length
         }
       });
     } else {

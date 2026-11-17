@@ -221,30 +221,6 @@ export async function checkLessonAfterEnd(courseId, lessonId) {
   }
 }
 
-export async function checkStudentAbsent(courseId, studentId) {
-  await connectDB()
-  const course = await PostCourse.findById(courseId).lean()
-  if (!course) return
-
-  const student = course.Student?.find(s => s.ID === studentId || s._id?.toString() === studentId)
-  if (!student) return
-
-  const absentCount = student.Learn?.filter(l => l.Checkin === 1).length || 0
-  const threshold = await getSetting('student_absent_threshold') || 3
-
-  if (absentCount >= threshold) {
-    await createNotification({
-      title: `Học viên vắng ${absentCount} buổi liên tiếp`,
-      content: `Học viên (lớp ${course.ID}) đã vắng ${absentCount} buổi liên tiếp.`,
-      type: 'STUDENT_ABSENT_MANY',
-      level: 'WARNING',
-      ref_course: course._id,
-      ref_student: student._id,
-      targetRoles: ['teacher', 'hocvu', 'Academic'],
-    })
-  }
-}
-
 /**
  * Quét toàn bộ buổi học trong 7 ngày gần nhất để phát hiện vi phạm SLA,
  * đồng thời kiểm tra và chuyển quá hạn các yêu cầu học bù quá 30 ngày.

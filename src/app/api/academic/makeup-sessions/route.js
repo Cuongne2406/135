@@ -5,6 +5,7 @@ import PostCourse from '@/models/course'
 import PostStudent from '@/models/student'
 import authenticate from '@/utils/authenticate'
 import { checkScheduleConflict } from '@/utils/scheduleConflict'
+import { isValidInitialStatus } from '@/lib/makeupFsm'
 import mongoose from 'mongoose'
 
 /**
@@ -117,6 +118,13 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Thiếu courseId, lessonId hoặc studentId' }, { status: 400 })
         }
 
+        const targetStatus = rest.makeupStatus || 'MAKEUP_PENDING'
+        if (!isValidInitialStatus(targetStatus)) {
+            return NextResponse.json({
+                error: `Trạng thái khởi tạo không hợp lệ: ${targetStatus}. Chỉ cho phép MAKEUP_REQUIRED hoặc MAKEUP_PENDING.`
+            }, { status: 400 })
+        }
+
         await connectDB()
 
         // Check conflict if scheduling room/teacher/date/time
@@ -138,9 +146,18 @@ export async function POST(req) {
             course: new mongoose.Types.ObjectId(courseId),
             lesson: new mongoose.Types.ObjectId(lessonId),
             studentId,
-            ...rest,
+            makeupLesson: rest.makeupLesson,
+            makeupTeacher: rest.makeupTeacher,
+            makeupRoom: rest.makeupRoom,
+            roomAlert: rest.roomAlert || false,
+            originalDate: rest.originalDate,
+            absenceReason: rest.absenceReason || '',
+            makeupDate: rest.makeupDate,
+            makeupTime: rest.makeupTime,
+            contentToMakeup: rest.contentToMakeup || '',
+            note: rest.note || '',
             createdBy: auth.user._id,
-            makeupStatus: rest.makeupStatus || 'MAKEUP_PENDING'
+            makeupStatus: targetStatus
         })
 
         await PostCourse.updateOne(

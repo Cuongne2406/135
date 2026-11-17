@@ -4,6 +4,7 @@ import MakeupSession from '@/models/makeupSession'
 import PostCourse from '@/models/course'
 import authenticate from '@/utils/authenticate'
 import { checkScheduleConflict } from '@/utils/scheduleConflict'
+import { isValidStatus, isValidTransition, isTerminalStatus } from '@/lib/makeupFsm'
 import mongoose from 'mongoose'
 
 export async function PATCH(req, { params }) {
@@ -22,6 +23,22 @@ export async function PATCH(req, { params }) {
         const existingSession = await MakeupSession.findById(id).lean()
         if (!existingSession) {
             return NextResponse.json({ error: 'Không tìm thấy phiên học bù' }, { status: 404 })
+        }
+
+        // Kiểm tra hợp lệ theo FSM 8 trạng thái ở máy chủ
+        if (body.makeupStatus !== undefined) {
+            if (!isValidStatus(body.makeupStatus)) {
+                return NextResponse.json({ error: `Trạng thái học bù không hợp lệ: ${body.makeupStatus}` }, { status: 400 })
+            }
+            if (!isValidTransition(existingSession.makeupStatus, body.makeupStatus)) {
+                return NextResponse.json({
+                    error: `Không thể chuyển trạng thái từ ${existingSession.makeupStatus} sang ${body.makeupStatus} theo FSM.`
+                }, { status: 400 })
+            }
+        } else if (isTerminalStatus(existingSession.makeupStatus)) {
+            return NextResponse.json({
+                error: `Phiên học bù đã ở trạng thái kết thúc (${existingSession.makeupStatus}), không thể chỉnh sửa.`
+            }, { status: 400 })
         }
 
         const targetDate = body.makeupDate || existingSession.makeupDate
@@ -44,12 +61,33 @@ export async function PATCH(req, { params }) {
             }
         }
 
-        const updateData = { ...body, updatedBy: auth.user._id }
+        const allowedFields = [
+            'makeupLesson',
+            'makeupTeacher',
+            'makeupRoom',
+            'roomAlert',
+            'makeupStatus',
+            'makeupDate',
+            'makeupTime',
+            'contentToMakeup',
+            'note',
+            'absenceReason'
+        ]
+        const updateData = { updatedBy: auth.user._id }
+        for (const key of allowedFields) {
+            if (body[key] !== undefined) {
+                updateData[key] = body[key]
+            }
+        }
         if (body.makeupStatus === 'MAKEUP_COMPLETED') {
             updateData.completedAt = new Date()
         }
 
-        const session = await MakeupSession.findByIdAndUpdate(id, { $set: updateData }, { new: true }).lean()
+        const session = await MakeupSession.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        ).lean()
         if (!session) {
             return NextResponse.json({ error: 'Không tìm thấy phiên học bù' }, { status: 404 })
         }
