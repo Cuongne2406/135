@@ -52,6 +52,7 @@ sys-air-*.json
 logs/*
 !logs/ablation_experiment_raw_logs.json
 !logs/latency_benchmark_10runs.json
+!logs/integration_test_results.json
 data/*
 !data/seeded_40_sessions_and_attendance.json
 scratch/

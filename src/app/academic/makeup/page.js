@@ -61,6 +61,9 @@ export default function MakeupPage() {
             if (res.ok) {
                 setMsg('Cập nhật trạng thái thành công')
                 fetchSessions()
+            } else {
+                const err = await res.json().catch(() => ({}))
+                setMsg(err.error || 'Không thể cập nhật trạng thái học bù')
             }
         } catch (err) {
             console.error(err)
@@ -69,12 +72,16 @@ export default function MakeupPage() {
     }
 
     const handleDelete = async (id) => {
-        if (!confirm('Xóa phiên học bù này?')) return
+        if (!confirm('Hủy phiên học bù này theo FSM?')) return
         try {
             const res = await fetch(`/api/academic/makeup-sessions/${id}`, { method: 'DELETE' })
             if (res.ok) {
-                setMsg('Đã xóa phiên học bù')
+                const json = await res.json().catch(() => ({}))
+                setMsg(json.message || 'Đã hủy phiên học bù')
                 fetchSessions()
+            } else {
+                const err = await res.json().catch(() => ({}))
+                setMsg(err.error || 'Không thể xóa/hủy phiên học bù ở trạng thái hiện tại')
             }
         } catch (err) {
             console.error(err)

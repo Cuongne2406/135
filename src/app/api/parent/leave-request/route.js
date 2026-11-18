@@ -6,6 +6,7 @@ import Student from '@/models/student';
 import '@/models/book';
 import '@/models/users';
 import { verifyParentToken, PARENT_COOKIE_NAME, isLeaveRequestAllowed } from '@/utils/parentAuth';
+import { isValidInitialStatus, isValidTransition } from '@/lib/makeupFsm';
 import { 
     sendLeaveRequestNotifications, 
     sendLeaveCancelNotifications 
@@ -88,9 +89,42 @@ export async function POST(request) {
             }, { status: 404 });
         }
 
-        const learnIndex = (course.Student[stuIndex].Learn || []).findIndex(
+        const studentLearn = course.Student[stuIndex].Learn || [];
+        const learnIndex = studentLearn.findIndex(
             l => String(l.Lesson) === String(lessonId)
         );
+        const existingLearn = learnIndex !== -1 ? studentLearn[learnIndex] : null;
+
+        // Bảo vệ Lớp 1: không ghi đè nếu giáo viên đã điểm danh (1: Có mặt, 2: Vắng không phép)
+        if (existingLearn && existingLearn.Checkin !== 0 && existingLearn.Checkin !== 3) {
+            return NextResponse.json({
+                success: false,
+                mes: 'Buổi học đã được giáo viên điểm danh, không thể gửi đơn xin nghỉ trực tuyến.'
+            }, { status: 400 });
+        }
+
+        // Kiểm tra FSM Lớp 2 trước khi tạo/cập nhật yêu cầu học bù
+        const existingMakeup = await MakeupSession.findOne({
+            studentId: activeStudentId,
+            course: course._id,
+            lesson: lesson._id
+        }).sort({ createdAt: -1 }).lean();
+
+        const currentStatus = existingMakeup?.makeupStatus || existingLearn?.makeupStatus || 'NOT_REQUIRED';
+
+        if (!existingMakeup && currentStatus === 'NOT_REQUIRED') {
+            if (!isValidInitialStatus('MAKEUP_PENDING')) {
+                return NextResponse.json({
+                    success: false,
+                    mes: 'Trạng thái khởi tạo MAKEUP_PENDING không hợp lệ.'
+                }, { status: 400 });
+            }
+        } else if (!isValidTransition(currentStatus, 'MAKEUP_PENDING')) {
+            return NextResponse.json({
+                success: false,
+                mes: `Không thể gửi đơn xin nghỉ khi trạng thái học bù đang là ${currentStatus} theo quy tắc FSM.`
+            }, { status: 400 });
+        }
 
         if (learnIndex !== -1) {
             course.Student[stuIndex].Learn[learnIndex].Checkin = 3;
@@ -111,22 +145,29 @@ export async function POST(request) {
         await course.save();
 
         // 3. Tự động ghi nhận / cập nhật vào MakeupSession để Học vụ tiện theo dõi
-        await MakeupSession.findOneAndUpdate(
-            {
+        if (existingMakeup) {
+            await MakeupSession.findByIdAndUpdate(
+                existingMakeup._id,
+                {
+                    $set: {
+                        originalDate: lesson.Day,
+                        absenceReason: fullReason,
+                        note: 'Phụ huynh gửi/cập nhật đơn xin nghỉ trực tuyến từ Sổ liên lạc'
+                    }
+                },
+                { new: true, runValidators: true }
+            );
+        } else {
+            await MakeupSession.create({
                 studentId: activeStudentId,
                 course: course._id,
-                lesson: lesson._id
-            },
-            {
-                $set: {
-                    makeupStatus: 'MAKEUP_PENDING',
-                    originalDate: lesson.Day,
-                    absenceReason: fullReason,
-                    note: 'Phụ huynh gửi đơn xin nghỉ trực tuyến từ Sổ liên lạc'
-                }
-            },
-            { upsert: true, new: true }
-        );
+                lesson: lesson._id,
+                makeupStatus: 'MAKEUP_PENDING',
+                originalDate: lesson.Day,
+                absenceReason: fullReason,
+                note: 'Phụ huynh gửi đơn xin nghỉ trực tuyến từ Sổ liên lạc'
+            });
+        }
 
         // 4. Kích hoạt thông báo tự động (In-App SSE cho GV/Học vụ + Tin Zalo xác nhận cho Phụ huynh)
         const studentDoc = await Student.findOne({ ID: activeStudentId }).lean();
@@ -202,26 +243,79 @@ export async function DELETE(request) {
         }
 
         const stuIndex = course.Student.findIndex(s => s.ID === activeStudentId);
-        if (stuIndex !== -1) {
-            const learnIndex = (course.Student[stuIndex].Learn || []).findIndex(
-                l => String(l.Lesson) === String(lessonId)
-            );
-
-            if (learnIndex !== -1) {
-                // Đưa trạng thái về 0 (Chưa điểm danh) và xóa lý do vắng
-                course.Student[stuIndex].Learn[learnIndex].Checkin = 0;
-                course.Student[stuIndex].Learn[learnIndex].absenceReason = '';
-                course.Student[stuIndex].Learn[learnIndex].makeupStatus = 'NOT_REQUIRED';
-                await course.save();
-            }
+        if (stuIndex === -1) {
+            return NextResponse.json({
+                success: false,
+                mes: 'Không tìm thấy học sinh trong khóa học.'
+            }, { status: 404 });
         }
 
-        // Cập nhật MakeupSession thành MAKEUP_CANCELLED hoặc xóa
-        await MakeupSession.deleteOne({
+        const studentLearn = course.Student[stuIndex].Learn || [];
+        const learnIndex = studentLearn.findIndex(
+            l => String(l.Lesson) === String(lessonId)
+        );
+        const existingLearn = learnIndex !== -1 ? studentLearn[learnIndex] : null;
+        const lessonOid = targetLesson?._id || lessonId;
+
+        const existingMakeup = await MakeupSession.findOne({
             studentId: activeStudentId,
             course: course._id,
-            lesson: lessonId
-        });
+            lesson: lessonOid
+        }).sort({ createdAt: -1 }).lean();
+
+        if (!existingLearn && !existingMakeup) {
+            return NextResponse.json({
+                success: false,
+                mes: 'Không tìm thấy đơn xin nghỉ phép để hủy.'
+            }, { status: 404 });
+        }
+
+        if (existingLearn && existingLearn.Checkin !== 3) {
+            const msg = (existingLearn.Checkin === 1 || existingLearn.Checkin === 2)
+                ? 'Buổi học đã được giáo viên điểm danh, không thể hủy đơn xin nghỉ.'
+                : 'Buổi học hiện chưa có đơn xin nghỉ phép để hủy.';
+            return NextResponse.json({ success: false, mes: msg }, { status: 400 });
+        }
+
+        const currentStatus = existingMakeup?.makeupStatus || existingLearn?.makeupStatus || 'NOT_REQUIRED';
+
+        // Quy trình nghiệp vụ: Khi Học vụ đã xếp lịch bù (MAKEUP_SCHEDULED), phụ huynh phải liên hệ Học vụ chứ không tự ý hủy trên hệ thống
+        if (currentStatus === 'MAKEUP_SCHEDULED') {
+            return NextResponse.json({
+                success: false,
+                mes: 'Buổi học bù đã được Học vụ xếp lịch (MAKEUP_SCHEDULED). Quý phụ huynh vui lòng liên hệ trực tiếp Học vụ để thay đổi hoặc hủy lịch học bù.'
+            }, { status: 400 });
+        }
+
+        if (!isValidTransition(currentStatus, 'MAKEUP_CANCELLED')) {
+            return NextResponse.json({
+                success: false,
+                mes: `Không thể hủy đơn xin nghỉ từ trạng thái ${currentStatus} theo quy tắc FSM.`
+            }, { status: 400 });
+        }
+
+        // Đưa Lớp 1 về 0 (Chưa điểm danh) và chuyển Lớp 2 sang MAKEUP_CANCELLED theo đúng FSM
+        if (learnIndex !== -1) {
+            course.Student[stuIndex].Learn[learnIndex].Checkin = 0;
+            course.Student[stuIndex].Learn[learnIndex].absenceReason = '';
+            course.Student[stuIndex].Learn[learnIndex].makeupStatus = 'MAKEUP_CANCELLED';
+            await course.save();
+        }
+
+        if (existingMakeup) {
+            await MakeupSession.findByIdAndUpdate(
+                existingMakeup._id,
+                {
+                    $set: {
+                        makeupStatus: 'MAKEUP_CANCELLED',
+                        note: existingMakeup.note
+                            ? `${existingMakeup.note} | Phụ huynh đã hủy đơn xin nghỉ`
+                            : 'Phụ huynh đã hủy đơn xin nghỉ'
+                    }
+                },
+                { new: true, runValidators: true }
+            );
+        }
 
         // Kích hoạt thông báo hủy đơn cho GV/Học vụ và xác nhận qua Zalo cho Phụ huynh
         const studentDoc = await Student.findOne({ ID: activeStudentId }).lean();

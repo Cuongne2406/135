@@ -282,7 +282,15 @@ async function runAllTests() {
     GET: makeupGetHandler,
     POST: makeupPostHandler
   } = await import('../src/app/api/academic/makeup-sessions/route.js');
-  const { PATCH: makeupPatchHandler } = await import('../src/app/api/academic/makeup-sessions/[id]/route.js');
+  const {
+    PATCH: makeupPatchHandler,
+    DELETE: makeupDeleteHandler
+  } = await import('../src/app/api/academic/makeup-sessions/[id]/route.js');
+  const {
+    POST: leavePostHandler,
+    DELETE: leaveDeleteHandler
+  } = await import('../src/app/api/parent/leave-request/route.js');
+  const { signParentToken, PARENT_COOKIE_NAME } = await import('../src/utils/parentAuth.js');
   const { DELETE: areaDeleteHandler } = await import('../src/app/api/(area)/area/[id]/route.js');
   const cookieName = getCookieName();
 
@@ -708,12 +716,122 @@ async function runAllTests() {
       params: Promise.resolve({ id: absentIdForBadCancelTest })
     });
 
+    // Negative Test 6 & 7: Lệnh xóa học bù (DELETE /api/academic/makeup-sessions/[id]) phải chặn COMPLETED và ABSENT với HTTP 400
+    const reqDelCompleted = makeReq(
+      `http://localhost:3000/api/academic/makeup-sessions/${completedIdForResurrectTest}`,
+      'DELETE'
+    );
+    const resDelCompleted = await makeupDeleteHandler(reqDelCompleted, {
+      params: Promise.resolve({ id: completedIdForResurrectTest })
+    });
+    const reqDelAbsent = makeReq(
+      `http://localhost:3000/api/academic/makeup-sessions/${absentIdForBadCancelTest}`,
+      'DELETE'
+    );
+    const resDelAbsent = await makeupDeleteHandler(reqDelAbsent, {
+      params: Promise.resolve({ id: absentIdForBadCancelTest })
+    });
+
+    // Positive Test DELETE học bù: Tạo 1 phiên nháp MAKEUP_PENDING trên buổi phụ tách biệt -> gọi DELETE -> chuyển sang MAKEUP_CANCELLED (không xóa cứng)
+    const dummyLessonId = new mongoose.Types.ObjectId();
+    const tempMakeupDoc = await MakeupSession.create({
+      course: samplePending.course,
+      lesson: dummyLessonId,
+      studentId: samplePending.studentId,
+      makeupStatus: 'MAKEUP_PENDING',
+      originalDate: new RealDate()
+    });
+    const reqDelValid = makeReq(
+      `http://localhost:3000/api/academic/makeup-sessions/${tempMakeupDoc._id}`,
+      'DELETE'
+    );
+    const resDelValid = await makeupDeleteHandler(reqDelValid, {
+      params: Promise.resolve({ id: String(tempMakeupDoc._id) })
+    });
+    const tempMakeupAfterDel: any = await MakeupSession.findById(tempMakeupDoc._id).lean();
+    const isSoftCancelledByDelete =
+      resDelValid.status === 200 && tempMakeupAfterDel?.makeupStatus === 'MAKEUP_CANCELLED';
+    await MakeupSession.findByIdAndDelete(tempMakeupDoc._id);
+
     // SO BĂM LỚP 1 SAU KHI CHẠY TOÀN BỘ FSM LỚP 2
     const { hash: layer1HashAfterFsm, matrix: layer1MatrixAfterFsm } = await snapshotLayer1();
     const isHashInvariant = layer1HashAfterCheckin === layer1HashAfterFsm;
     const overwrittenCount = layer1MatrixAfterCheckin.filter(
       (b, idx) => b.checkin !== layer1MatrixAfterFsm[idx]?.checkin
     ).length;
+
+    // Kiểm tra thêm API đơn xin nghỉ của Phụ huynh (POST & DELETE /api/parent/leave-request) tuân thủ FSM trên buổi học tương lai tách biệt
+    const futureLessonOid = new mongoose.Types.ObjectId();
+    const tomorrow = new RealDate(RealDate.now() + 24 * 60 * 60 * 1000);
+    const targetCourseDoc: any = await PostCourse.findById(samplePending.course);
+    const testParentStuId = samplePending.studentId;
+    const testParentStuDoc: any = await Student.findOne({ ID: testParentStuId }).lean();
+    const parentJwt = signParentToken({
+      phone: testParentStuDoc?.Phone || '0900000001',
+      activeStudentId: testParentStuId
+    });
+    const makeParentReq = (method: string, bodyObj?: any) =>
+      buildAuthedRequest(
+        NextRequest,
+        'http://localhost:3000/api/parent/leave-request',
+        method,
+        PARENT_COOKIE_NAME,
+        parentJwt,
+        bodyObj
+      );
+
+    targetCourseDoc.Detail.push({
+      _id: futureLessonOid,
+      Topic: targetCourseDoc.Detail[0]?.Topic,
+      Day: tomorrow,
+      Room: targetCourseDoc.Detail[0]?.Room,
+      Time: '08:00 - 09:30',
+      Teacher: targetCourseDoc.Detail[0]?.Teacher,
+      Type: 'Chính thức'
+    });
+    await targetCourseDoc.save();
+
+    // 1. Gửi đơn xin nghỉ hợp lệ (Checkin=0 -> Checkin=3, MAKEUP_PENDING)
+    const resLeavePostOk = await leavePostHandler(
+      makeParentReq('POST', { lessonId: String(futureLessonOid), reason: 'Bé bị ốm' })
+    );
+    // 2. Giả lập Học vụ đã xếp lịch bù (MAKEUP_SCHEDULED) -> Phụ huynh tự bấm hủy đơn (DELETE) phải bị chặn HTTP 400
+    await MakeupSession.findOneAndUpdate(
+      { studentId: testParentStuId, course: targetCourseDoc._id, lesson: futureLessonOid },
+      { $set: { makeupStatus: 'MAKEUP_SCHEDULED' } }
+    );
+    const resLeaveCancelWhenScheduled = await leaveDeleteHandler(
+      makeParentReq('DELETE', { lessonId: String(futureLessonOid) })
+    );
+    // 3. Khi đang ở MAKEUP_PENDING -> Phụ huynh hủy đơn (DELETE) hợp lệ -> HTTP 200 & chuyển sang MAKEUP_CANCELLED
+    await MakeupSession.findOneAndUpdate(
+      { studentId: testParentStuId, course: targetCourseDoc._id, lesson: futureLessonOid },
+      { $set: { makeupStatus: 'MAKEUP_PENDING' } }
+    );
+    const resLeaveCancelValid = await leaveDeleteHandler(
+      makeParentReq('DELETE', { lessonId: String(futureLessonOid) })
+    );
+    const leaveMakeupAfterCancel: any = await MakeupSession.findOne({
+      studentId: testParentStuId,
+      course: targetCourseDoc._id,
+      lesson: futureLessonOid
+    }).lean();
+    // 4. Sau khi đã ở trạng thái kết thúc MAKEUP_CANCELLED -> Gửi lại POST xin nghỉ cùng buổi đó phải bị chặn HTTP 400
+    const resLeavePostAfterCancel = await leavePostHandler(
+      makeParentReq('POST', { lessonId: String(futureLessonOid), reason: 'Xin nghỉ lại' })
+    );
+
+    // Dọn sạch buổi học tương lai thử nghiệm để giữ nguyên dữ liệu 40 buổi cho các ca TC-03..TC-07
+    await MakeupSession.deleteMany({ lesson: futureLessonOid });
+    await PostCourse.updateOne(
+      { _id: targetCourseDoc._id },
+      {
+        $pull: {
+          Detail: { _id: futureLessonOid },
+          'Student.$[].Learn': { Lesson: futureLessonOid }
+        }
+      }
+    );
 
     const assertions = [
       {
@@ -722,13 +840,21 @@ async function runAllTests() {
         message: `POST với MAKEUP_COMPLETED bị máy chủ từ chối (HTTP ${resBadInit.status})`
       },
       {
-        name: 'PATCH blocks illegal FSM transitions (400)',
+        name: 'PATCH & DELETE block illegal FSM transitions and soft-cancel to MAKEUP_CANCELLED',
         passed:
           resJump.status === 400 &&
           resInvalidStr.status === 400 &&
           resResurrect.status === 400 &&
-          resBadCancel.status === 400,
-        message: `Chặn nhảy cóc (${resJump.status}), chuỗi lạ (${resInvalidStr.status}), hồi sinh (${resResurrect.status}), hủy từ ABSENT (${resBadCancel.status})`
+          resBadCancel.status === 400 &&
+          resDelCompleted.status === 400 &&
+          resDelAbsent.status === 400 &&
+          isSoftCancelledByDelete &&
+          resLeavePostOk.status === 200 &&
+          resLeaveCancelWhenScheduled.status === 400 &&
+          resLeaveCancelValid.status === 200 &&
+          leaveMakeupAfterCancel?.makeupStatus === 'MAKEUP_CANCELLED' &&
+          resLeavePostAfterCancel.status === 400,
+        message: `PATCH chặn sai (${resJump.status}/${resInvalidStr.status}/${resResurrect.status}/${resBadCancel.status}), DELETE học bù chặn COMPLETED/ABSENT (${resDelCompleted.status}/${resDelAbsent.status}) & soft-cancel=${isSoftCancelledByDelete}, Đơn xin nghỉ chặn hủy khi SCHEDULED (${resLeaveCancelWhenScheduled.status}) & chuyển MAKEUP_CANCELLED (${resLeaveCancelValid.status})`
       },
       {
         name: 'All 12 makeup sessions cycled through real API (4/2/3/3)',
@@ -753,7 +879,7 @@ async function runAllTests() {
 
     results.push({
       id: 'TC-02',
-      name: 'FSM 8 trạng thái qua API thật (POST/PATCH/GET) & Chứng minh Hash Lớp 1 bất biến',
+      name: 'FSM 8 trạng thái qua API thật (POST/PATCH/GET/DELETE & Leave Request) & Chứng minh Hash Lớp 1 bất biến',
       status: assertions.every(a => a.passed) ? 'PASSED' : 'FAILED',
       duration_ms: Number((performance.now() - t0).toFixed(2)),
       details: {
@@ -767,7 +893,11 @@ async function runAllTests() {
           jump_completed: resJump.status,
           invalid_enum: resInvalidStr.status,
           resurrect_terminal: resResurrect.status,
-          cancel_from_absent: resBadCancel.status
+          cancel_from_absent: resBadCancel.status,
+          delete_completed: resDelCompleted.status,
+          delete_absent: resDelAbsent.status,
+          parent_cancel_when_scheduled: resLeaveCancelWhenScheduled.status,
+          parent_post_after_cancelled: resLeavePostAfterCancel.status
         },
         sha256_hash_before: layer1HashAfterCheckin,
         sha256_hash_after: layer1HashAfterFsm,

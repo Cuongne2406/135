@@ -122,22 +122,44 @@ export async function DELETE(req, { params }) {
         }
 
         await connectDB()
-        const session = await MakeupSession.findByIdAndDelete(id).lean()
-        if (!session) {
+        const existingSession = await MakeupSession.findById(id).lean()
+        if (!existingSession) {
             return NextResponse.json({ error: 'Không tìm thấy phiên học bù' }, { status: 404 })
         }
 
+        if (!isValidTransition(existingSession.makeupStatus, 'MAKEUP_CANCELLED')) {
+            return NextResponse.json({
+                error: `Không thể xóa/hủy phiên học bù từ trạng thái ${existingSession.makeupStatus} theo quy tắc FSM.`
+            }, { status: 400 })
+        }
+
+        const cancelNote = existingSession.note
+            ? `${existingSession.note} | Đã hủy qua lệnh xóa học vụ`
+            : 'Đã hủy qua lệnh xóa học vụ'
+
+        const session = await MakeupSession.findByIdAndUpdate(
+            id,
+            {
+                $set: {
+                    makeupStatus: 'MAKEUP_CANCELLED',
+                    updatedBy: auth.user._id,
+                    note: cancelNote
+                }
+            },
+            { new: true, runValidators: true }
+        ).lean()
+
         await PostCourse.updateOne(
             {
-                _id: session.course,
-                'Student.ID': session.studentId,
-                'Student.Learn.Lesson': session.lesson
+                _id: existingSession.course,
+                'Student.ID': existingSession.studentId,
+                'Student.Learn.Lesson': existingSession.lesson
             },
-            { $set: { 'Student.$[stu].Learn.$[les].makeupStatus': 'NOT_REQUIRED' } },
-            { arrayFilters: [{ 'stu.ID': session.studentId }, { 'les.Lesson': session.lesson }] }
+            { $set: { 'Student.$[stu].Learn.$[les].makeupStatus': 'MAKEUP_CANCELLED' } },
+            { arrayFilters: [{ 'stu.ID': existingSession.studentId }, { 'les.Lesson': existingSession.lesson }] }
         )
 
-        return NextResponse.json({ message: 'Đã xóa phiên học bù' })
+        return NextResponse.json({ message: 'Đã hủy phiên học bù sang MAKEUP_CANCELLED theo FSM', session })
     } catch (err) {
         console.error('Delete makeup session error:', err)
         return NextResponse.json({ error: err.message }, { status: 500 })
