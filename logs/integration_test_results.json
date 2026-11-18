@@ -1,0 +1,283 @@
+{
+  "metadata": {
+    "title": "AIR Manager - Real Integration Test Suite Report (7 Test Cases)",
+    "reference": "JSLHU-SysAir_v9.docx & Mentor Review Guidelines",
+    "executed_at": "2026-11-18T14:32:36.149Z",
+    "git_commit_hash": "8845e07",
+    "database_target": "air_testbed_sandbox",
+    "outbound_network_telemetry": {
+      "zaloBotBlocked": 221,
+      "appscriptBlocked": 210,
+      "otherExternalBlocked": 0,
+      "realOutboundSent": 0
+    },
+    "environment": {
+      "os": "Windows_NT 10.0.26200 (x64)",
+      "node_version": "v24.12.0",
+      "cpu": "AMD Ryzen 5 5600 6-Core Processor              ",
+      "total_memory_gb": 16
+    },
+    "summary": {
+      "total_test_cases": 7,
+      "passed_test_cases": 7,
+      "failed_test_cases": 0,
+      "success_rate": "100.0%",
+      "total_execution_time_ms": 107549.82
+    }
+  },
+  "test_cases": [
+    {
+      "id": "TC-01",
+      "name": "Điểm danh thật qua POST /api/checkin, chặn checkin=0 & chụp Hash Lớp 1",
+      "status": "PASSED",
+      "duration_ms": 45484.53,
+      "details": {
+        "total_checkin_records": 400,
+        "makeup_after_checkin_0": 0,
+        "auto_created_makeups": 12,
+        "sha256_hash_before_layer2": "a0c0a4cf178bb7c9c1c954ff9d8737cbe9fe0d3bad5010cd92d612d934e7b0fe"
+      },
+      "assertions": [
+        {
+          "name": "Checkin = 0 does not create makeup session (Fix #2)",
+          "passed": true,
+          "message": "POST checkin=0 trả 200, số MakeupSession phát sinh = 0 (kỳ vọng 0)"
+        },
+        {
+          "name": "Invalid checkin code rejected (400)",
+          "passed": true,
+          "message": "POST checkin=99 bị từ chối với HTTP 400"
+        },
+        {
+          "name": "40 sessions checked in via real POST /api/checkin",
+          "passed": true,
+          "message": "Hoàn tất 40/40 buổi qua API thật, tổng bản ghi Lớp 1 = 400 (40 buổi × 10 HS)"
+        },
+        {
+          "name": "Auto-created exactly 12 Layer 2 makeup records (6 REQUIRED, 6 PENDING)",
+          "passed": true,
+          "message": "Tự động tạo 12/12 bản ghi học bù (6 REQUIRED, 6 PENDING)"
+        }
+      ]
+    },
+    {
+      "id": "TC-02",
+      "name": "FSM 8 trạng thái qua API thật (POST/PATCH/GET/DELETE & Leave Request) & Chứng minh Hash Lớp 1 bất biến",
+      "status": "PASSED",
+      "duration_ms": 6137.12,
+      "details": {
+        "total_makeup_sessions": 12,
+        "completedCount": 4,
+        "absentCount": 2,
+        "expiredCount": 3,
+        "cancelledCount": 3,
+        "negative_http_codes": {
+          "invalid_init": 400,
+          "jump_completed": 400,
+          "invalid_enum": 400,
+          "resurrect_terminal": 400,
+          "cancel_from_absent": 400,
+          "delete_completed": 400,
+          "delete_absent": 400,
+          "parent_cancel_when_scheduled": 400,
+          "parent_post_after_cancelled": 400
+        },
+        "sha256_hash_before": "a0c0a4cf178bb7c9c1c954ff9d8737cbe9fe0d3bad5010cd92d612d934e7b0fe",
+        "sha256_hash_after": "a0c0a4cf178bb7c9c1c954ff9d8737cbe9fe0d3bad5010cd92d612d934e7b0fe",
+        "hash_invariant": true,
+        "overwritten_count": 0
+      },
+      "assertions": [
+        {
+          "name": "POST rejects invalid initial status (400)",
+          "passed": true,
+          "message": "POST với MAKEUP_COMPLETED bị máy chủ từ chối (HTTP 400)"
+        },
+        {
+          "name": "PATCH & DELETE block illegal FSM transitions and soft-cancel to MAKEUP_CANCELLED",
+          "passed": true,
+          "message": "PATCH chặn sai (400/400/400/400), DELETE học bù chặn COMPLETED/ABSENT (400/400) & soft-cancel=true, Đơn xin nghỉ chặn hủy khi SCHEDULED (400) & chuyển MAKEUP_CANCELLED (200)"
+        },
+        {
+          "name": "All 12 makeup sessions cycled through real API (4/2/3/3)",
+          "passed": true,
+          "message": "12 ca học bù chuyển qua API thật trong CSDL: 4 COMPLETED, 2 ABSENT, 3 EXPIRED, 3 CANCELLED"
+        },
+        {
+          "name": "Layer 1 SHA-256 Checkin Hash Invariance after Layer 2 FSM",
+          "passed": true,
+          "message": "Mã băm Lớp 1 trước & sau FSM Lớp 2 khớp tuyệt đối (a0c0a4cf178bb7c9..., 0 bị ghi đè)"
+        }
+      ]
+    },
+    {
+      "id": "TC-03",
+      "name": "Động cơ SLA thật (checkLessonAfterEnd) với Fake Clock 30/60/90/120 phút",
+      "status": "PASSED",
+      "duration_ms": 46428.72,
+      "details": {
+        "alerts_at_10m": 0,
+        "checkpoint_distribution": {
+          "30m": 8,
+          "60m": 5,
+          "90m": 3,
+          "120m": 2
+        },
+        "early_resolved_in_db": 16,
+        "incidents_escalated": 2,
+        "compliant_fp": 0
+      },
+      "assertions": [
+        {
+          "name": "Zero alerts before 30m (T0+10m)",
+          "passed": true,
+          "message": "Tại T0+10' (fake clock): 0 cảnh báo phát sinh"
+        },
+        {
+          "name": "SLA 4-checkpoint detection via real checkLessonAfterEnd (8/5/3/2)",
+          "passed": true,
+          "message": "Hàm thật phát hiện đúng: 8/8 (30m), 5/5 (60m), 3/3 (90m), 2/2 INCIDENT (120m)"
+        },
+        {
+          "name": "Early auto-resolution rate (16/18)",
+          "passed": true,
+          "message": "Tự động đóng RESOLVED trong CSDL 16/16 ca khắc phục trước 120'"
+        },
+        {
+          "name": "Zero false positives on 22 compliant lessons",
+          "passed": true,
+          "message": "0 cảnh báo sai trên 22 buổi đúng hạn (FP = 0)"
+        }
+      ]
+    },
+    {
+      "id": "TC-04",
+      "name": "Bộ lọc đơn xin nghỉ (Excuse Filter) & Chặn 100% network Zalo/AppsScript",
+      "status": "PASSED",
+      "duration_ms": 7902.3,
+      "details": {
+        "excused_suppressed": 6,
+        "unexcused_dispatched": 6,
+        "present_dispatched": 28,
+        "mocked_zalo_bot_calls": 20,
+        "mocked_appscript_calls": 14,
+        "real_outbound_sent": 0
+      },
+      "assertions": [
+        {
+          "name": "Excused leaves suppressed (Checkin = 3)",
+          "passed": true,
+          "message": "Chặn gửi đúng 6/6 học sinh có đơn xin nghỉ (Checkin = 3)"
+        },
+        {
+          "name": "Unexcused leaves dispatched (Checkin = 2)",
+          "passed": true,
+          "message": "Phát đúng 6/6 cảnh báo vắng không phép (Checkin = 2)"
+        },
+        {
+          "name": "Present checkins dispatched (Checkin = 1)",
+          "passed": true,
+          "message": "Phát đúng 28/28 thông báo có mặt (Checkin = 1)"
+        },
+        {
+          "name": "Outbound Zalo Bot API & Google Apps Script intercepted (0 real calls)",
+          "passed": true,
+          "message": "Đã chặn thành công 20 request Zalo Bot API & 14 request Google Apps Script (0 tin thật ra ngoài)"
+        }
+      ]
+    },
+    {
+      "id": "TC-05",
+      "name": "Cơ chế chống gửi trùng thông báo Zalo trong cửa sổ 24 giờ",
+      "status": "PASSED",
+      "duration_ms": 475.93,
+      "details": {
+        "first_call_status": "SENT",
+        "second_call_status": "DUPLICATE_SUPPRESSED",
+        "suppression_reason": "DUPLICATE_WITHIN_24H",
+        "zalo_log_count": 1
+      },
+      "assertions": [
+        {
+          "name": "First dispatch recorded",
+          "passed": true,
+          "message": "Lượt gửi đầu tiên được tiếp nhận và lưu ZaloMessageLog"
+        },
+        {
+          "name": "Duplicate call within 24h suppressed",
+          "passed": true,
+          "message": "Lượt gửi thứ 2 trong 24h bị chặn: DUPLICATE_SUPPRESSED (DUPLICATE_WITHIN_24H)"
+        },
+        {
+          "name": "Single log entry preserved",
+          "passed": true,
+          "message": "Số bản ghi ZaloMessageLog giữ nguyên = 1 (không nhân bản)"
+        }
+      ]
+    },
+    {
+      "id": "TC-06",
+      "name": "Kiểm tra xung đột lịch phòng học qua hàm thật checkScheduleConflict",
+      "status": "PASSED",
+      "duration_ms": 523.61,
+      "details": {
+        "overlapping_conflict": true,
+        "contiguous_conflict": false,
+        "free_slot_conflict": false,
+        "other_date_conflict": false
+      },
+      "assertions": [
+        {
+          "name": "Overlapping slot detected as conflict",
+          "passed": true,
+          "message": "Phát hiện xung đột khi chồng lấn 08:30-10:00 vs 09:00-10:30 (Công thức 1)"
+        },
+        {
+          "name": "Contiguous boundary EndA = StartB permitted",
+          "passed": true,
+          "message": "Cho phép 2 ca nối tiếp sát nút 10:00-11:30 (EndA = StartB)"
+        },
+        {
+          "name": "Free slot same day permitted",
+          "passed": true,
+          "message": "Khung giờ trống 14:00-15:30 hợp lệ"
+        },
+        {
+          "name": "Other date permitted",
+          "passed": true,
+          "message": "Ngày khác (2026-07-02) không xung đột"
+        }
+      ]
+    },
+    {
+      "id": "TC-07",
+      "name": "Cascading Cleanup khi xóa phòng học qua API thật DELETE /api/area/[id]",
+      "status": "PASSED",
+      "duration_ms": 597.61,
+      "details": {
+        "http_status": 200,
+        "room_still_exists": false,
+        "orphan_course_references": 0,
+        "orphan_makeup_references": 0,
+        "alerted_makeup_sessions": 1
+      },
+      "assertions": [
+        {
+          "name": "DELETE /api/area/[id]?roomId=... succeeded (200)",
+          "passed": true,
+          "message": "API xóa phòng trả HTTP 200, phòng đã bị gỡ khỏi Area"
+        },
+        {
+          "name": "Course detail room references cleared to null",
+          "passed": true,
+          "message": "Số buổi học còn tham chiếu phòng đã xóa = 0"
+        },
+        {
+          "name": "Makeup room references cleared & roomAlert triggered",
+          "passed": true,
+          "message": "Tham chiếu phòng học bù = 0, cờ roomAlert bật = 1"
+        }
+      ]
+    }
+  ]
+}
