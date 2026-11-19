@@ -2,11 +2,11 @@
   "metadata": {
     "title": "AIR Manager - Real Integration Test Suite Report (7 Test Cases)",
     "reference": "JSLHU-SysAir_v9.docx & Mentor Review Guidelines",
-    "executed_at": "2026-11-18T14:32:36.149Z",
-    "git_commit_hash": "8845e07",
+    "executed_at": "2026-11-19T03:20:59.097Z",
+    "git_commit_hash": "b1c1d59",
     "database_target": "air_testbed_sandbox",
     "outbound_network_telemetry": {
-      "zaloBotBlocked": 221,
+      "zaloBotBlocked": 222,
       "appscriptBlocked": 210,
       "otherExternalBlocked": 0,
       "realOutboundSent": 0
@@ -22,7 +22,7 @@
       "passed_test_cases": 7,
       "failed_test_cases": 0,
       "success_rate": "100.0%",
-      "total_execution_time_ms": 107549.82
+      "total_execution_time_ms": 114206.63
     }
   },
   "test_cases": [
@@ -30,7 +30,7 @@
       "id": "TC-01",
       "name": "Điểm danh thật qua POST /api/checkin, chặn checkin=0 & chụp Hash Lớp 1",
       "status": "PASSED",
-      "duration_ms": 45484.53,
+      "duration_ms": 37610.95,
       "details": {
         "total_checkin_records": 400,
         "makeup_after_checkin_0": 0,
@@ -64,7 +64,7 @@
       "id": "TC-02",
       "name": "FSM 8 trạng thái qua API thật (POST/PATCH/GET/DELETE & Leave Request) & Chứng minh Hash Lớp 1 bất biến",
       "status": "PASSED",
-      "duration_ms": 6137.12,
+      "duration_ms": 6914.95,
       "details": {
         "total_makeup_sessions": 12,
         "completedCount": 4,
@@ -94,9 +94,9 @@
           "message": "POST với MAKEUP_COMPLETED bị máy chủ từ chối (HTTP 400)"
         },
         {
-          "name": "PATCH & DELETE block illegal FSM transitions and soft-cancel to MAKEUP_CANCELLED",
+          "name": "PATCH & DELETE block illegal FSM transitions, soft-cancel to MAKEUP_CANCELLED, and allow new makeup if teacher later marks absent",
           "passed": true,
-          "message": "PATCH chặn sai (400/400/400/400), DELETE học bù chặn COMPLETED/ABSENT (400/400) & soft-cancel=true, Đơn xin nghỉ chặn hủy khi SCHEDULED (400) & chuyển MAKEUP_CANCELLED (200)"
+          "message": "PATCH chặn sai (400/400/400/400), DELETE học bù chặn COMPLETED/ABSENT (400/400) & soft-cancel=true, Đơn xin nghỉ chặn hủy khi SCHEDULED (400) & chuyển MAKEUP_CANCELLED (200), GV điểm danh vắng sau hủy đơn tạo mới MAKEUP_REQUIRED=true"
         },
         {
           "name": "All 12 makeup sessions cycled through real API (4/2/3/3)",
@@ -114,7 +114,7 @@
       "id": "TC-03",
       "name": "Động cơ SLA thật (checkLessonAfterEnd) với Fake Clock 30/60/90/120 phút",
       "status": "PASSED",
-      "duration_ms": 46428.72,
+      "duration_ms": 57979.45,
       "details": {
         "alerts_at_10m": 0,
         "checkpoint_distribution": {
@@ -154,7 +154,7 @@
       "id": "TC-04",
       "name": "Bộ lọc đơn xin nghỉ (Excuse Filter) & Chặn 100% network Zalo/AppsScript",
       "status": "PASSED",
-      "duration_ms": 7902.3,
+      "duration_ms": 9686.65,
       "details": {
         "excused_suppressed": 6,
         "unexcused_dispatched": 6,
@@ -190,7 +190,7 @@
       "id": "TC-05",
       "name": "Cơ chế chống gửi trùng thông báo Zalo trong cửa sổ 24 giờ",
       "status": "PASSED",
-      "duration_ms": 475.93,
+      "duration_ms": 603.27,
       "details": {
         "first_call_status": "SENT",
         "second_call_status": "DUPLICATE_SUPPRESSED",
@@ -219,7 +219,7 @@
       "id": "TC-06",
       "name": "Kiểm tra xung đột lịch phòng học qua hàm thật checkScheduleConflict",
       "status": "PASSED",
-      "duration_ms": 523.61,
+      "duration_ms": 663.26,
       "details": {
         "overlapping_conflict": true,
         "contiguous_conflict": false,
@@ -253,7 +253,7 @@
       "id": "TC-07",
       "name": "Cascading Cleanup khi xóa phòng học qua API thật DELETE /api/area/[id]",
       "status": "PASSED",
-      "duration_ms": 597.61,
+      "duration_ms": 748.1,
       "details": {
         "http_status": 200,
         "room_still_exists": false,
