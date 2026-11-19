@@ -821,6 +821,45 @@ async function runAllTests() {
       makeParentReq('POST', { lessonId: String(futureLessonOid), reason: 'Xin nghỉ lại' })
     );
 
+    // 5. Khi phụ huynh đã hủy đơn (Checkin=0, MAKEUP_CANCELLED) mà giáo viên điểm danh vắng (Checkin=2)
+    //    -> hệ thống phải tạo yêu cầu học bù MỚI (MAKEUP_REQUIRED), đồng thời giữ nguyên bản ghi MAKEUP_CANCELLED cũ
+    const reqCheckinAfterParentCancel = makeReq('http://localhost:3000/api/checkin', 'POST', {
+      courseId: String(targetCourseDoc._id),
+      sessionId: String(futureLessonOid),
+      attendanceData: [
+        {
+          studentId: testParentStuId,
+          checkin: 2,
+          comment: [],
+          absenceReason: 'Vắng không phép sau khi phụ huynh hủy đơn xin nghỉ'
+        }
+      ]
+    });
+    const resCheckinAfterParentCancel = await runNext('/api/(course)/checkin/route', () =>
+      checkinPostHandler(reqCheckinAfterParentCancel)
+    );
+    const makeupsAfterTeacherAbsent: any[] = await MakeupSession.find({
+      studentId: testParentStuId,
+      course: targetCourseDoc._id,
+      lesson: futureLessonOid
+    })
+      .sort({ createdAt: 1 })
+      .lean();
+    const courseAfterTeacherAbsent: any = await PostCourse.findById(targetCourseDoc._id).lean();
+    const stuAfterTeacherAbsent = (courseAfterTeacherAbsent?.Student || []).find(
+      (s: any) => s.ID === testParentStuId
+    );
+    const learnAfterTeacherAbsent = (stuAfterTeacherAbsent?.Learn || []).find(
+      (l: any) => String(l.Lesson) === String(futureLessonOid)
+    );
+    const isNewMakeupCreatedAfterParentCancel =
+      resCheckinAfterParentCancel.status === 200 &&
+      makeupsAfterTeacherAbsent.length === 2 &&
+      makeupsAfterTeacherAbsent[0]?.makeupStatus === 'MAKEUP_CANCELLED' &&
+      makeupsAfterTeacherAbsent[1]?.makeupStatus === 'MAKEUP_REQUIRED' &&
+      learnAfterTeacherAbsent?.Checkin === 2 &&
+      learnAfterTeacherAbsent?.makeupStatus === 'MAKEUP_REQUIRED';
+
     // Dọn sạch buổi học tương lai thử nghiệm để giữ nguyên dữ liệu 40 buổi cho các ca TC-03..TC-07
     await MakeupSession.deleteMany({ lesson: futureLessonOid });
     await PostCourse.updateOne(
@@ -840,7 +879,7 @@ async function runAllTests() {
         message: `POST với MAKEUP_COMPLETED bị máy chủ từ chối (HTTP ${resBadInit.status})`
       },
       {
-        name: 'PATCH & DELETE block illegal FSM transitions and soft-cancel to MAKEUP_CANCELLED',
+        name: 'PATCH & DELETE block illegal FSM transitions, soft-cancel to MAKEUP_CANCELLED, and allow new makeup if teacher later marks absent',
         passed:
           resJump.status === 400 &&
           resInvalidStr.status === 400 &&
@@ -853,8 +892,9 @@ async function runAllTests() {
           resLeaveCancelWhenScheduled.status === 400 &&
           resLeaveCancelValid.status === 200 &&
           leaveMakeupAfterCancel?.makeupStatus === 'MAKEUP_CANCELLED' &&
-          resLeavePostAfterCancel.status === 400,
-        message: `PATCH chặn sai (${resJump.status}/${resInvalidStr.status}/${resResurrect.status}/${resBadCancel.status}), DELETE học bù chặn COMPLETED/ABSENT (${resDelCompleted.status}/${resDelAbsent.status}) & soft-cancel=${isSoftCancelledByDelete}, Đơn xin nghỉ chặn hủy khi SCHEDULED (${resLeaveCancelWhenScheduled.status}) & chuyển MAKEUP_CANCELLED (${resLeaveCancelValid.status})`
+          resLeavePostAfterCancel.status === 400 &&
+          isNewMakeupCreatedAfterParentCancel,
+        message: `PATCH chặn sai (${resJump.status}/${resInvalidStr.status}/${resResurrect.status}/${resBadCancel.status}), DELETE học bù chặn COMPLETED/ABSENT (${resDelCompleted.status}/${resDelAbsent.status}) & soft-cancel=${isSoftCancelledByDelete}, Đơn xin nghỉ chặn hủy khi SCHEDULED (${resLeaveCancelWhenScheduled.status}) & chuyển MAKEUP_CANCELLED (${resLeaveCancelValid.status}), GV điểm danh vắng sau hủy đơn tạo mới MAKEUP_REQUIRED=${isNewMakeupCreatedAfterParentCancel}`
       },
       {
         name: 'All 12 makeup sessions cycled through real API (4/2/3/3)',

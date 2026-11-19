@@ -129,33 +129,59 @@ export async function POST(req) {
 
         const stuDoc = (course.Student || []).find(s => s.ID === a.studentId);
         const learnItem = (stuDoc?.Learn || []).find(l => String(l.Lesson) === String(sessionIdObj));
+        const previousCheckin = Number(learnItem?.Checkin ?? 0);
         const currentMakeupStatus = learnItem?.makeupStatus || 'NOT_REQUIRED';
-        const isLockedStatus = ['MAKEUP_SCHEDULED', 'MAKEUP_COMPLETED', 'MAKEUP_ABSENT', 'MAKEUP_EXPIRED', 'MAKEUP_CANCELLED'].includes(currentMakeupStatus);
+        // Nếu phụ huynh đã hủy đơn xin nghỉ trước buổi học (Checkin quay về 0, makeupStatus = MAKEUP_CANCELLED)
+        // mà sau đó giáo viên điểm danh vắng, cho phép tạo một yêu cầu học bù mới (vẫn giữ bản ghi MAKEUP_CANCELLED cũ)
+        const canCreateNewAfterParentCancel = previousCheckin === 0 && currentMakeupStatus === 'MAKEUP_CANCELLED';
+        const isLockedStatus =
+          ['MAKEUP_SCHEDULED', 'MAKEUP_COMPLETED', 'MAKEUP_ABSENT', 'MAKEUP_EXPIRED'].includes(currentMakeupStatus) ||
+          (currentMakeupStatus === 'MAKEUP_CANCELLED' && !canCreateNewAfterParentCancel);
 
         if (isAbsent) {
           // Bảng 2 quy định: Checkin = 2 -> MAKEUP_REQUIRED (vắng không phép), Checkin = 3 -> MAKEUP_PENDING (vắng có phép)
           const targetStatus = checkinNum === 3 ? 'MAKEUP_PENDING' : 'MAKEUP_REQUIRED';
 
-          // 1. Cập nhật nếu chưa phải là trạng thái đã xếp lịch hoặc kết thúc
+          // 1. Cập nhật nếu chưa phải là trạng thái đã xếp lịch hoặc kết thúc bị khóa
           if (!isLockedStatus) {
             updateFields['Student.$[stu].Learn.$[les].makeupStatus'] = targetStatus;
           }
-          // 2. Tự động kiểm tra và upsert bản ghi sang MakeupSession
-          await MakeupSession.findOneAndUpdate(
-            { studentId: a.studentId, course: course._id, lesson: sessionIdObj },
-            {
-              $set: {
-                makeupStatus: isLockedStatus ? currentMakeupStatus : targetStatus,
-                originalDate: sessionDate || new Date(),
-                absenceReason: a.absenceReason || '',
+          // 2. Tạo bản ghi học bù mới nếu trước đó phụ huynh đã hủy đơn, hoặc upsert bản ghi đang hoạt động
+          if (canCreateNewAfterParentCancel) {
+            await MakeupSession.create({
+              studentId: a.studentId,
+              course: course._id,
+              lesson: sessionIdObj,
+              makeupStatus: targetStatus,
+              originalDate: sessionDate || new Date(),
+              absenceReason: a.absenceReason || '',
+              contentToMakeup: '',
+              note: checkinNum === 3
+                ? 'Tự động tạo mới từ điểm danh vắng có phép (sau khi đơn xin nghỉ trước đó đã hủy)'
+                : 'Tự động tạo mới từ điểm danh vắng không phép (sau khi đơn xin nghỉ trước đó đã hủy)'
+            });
+          } else if (!isLockedStatus) {
+            await MakeupSession.findOneAndUpdate(
+              {
+                studentId: a.studentId,
+                course: course._id,
+                lesson: sessionIdObj,
+                makeupStatus: { $ne: 'MAKEUP_CANCELLED' }
               },
-              $setOnInsert: {
-                contentToMakeup: '',
-                note: checkinNum === 3 ? 'Tự động tạo từ điểm danh vắng có phép' : 'Tự động tạo từ điểm danh vắng không phép'
-              }
-            },
-            { upsert: true, new: true }
-          );
+              {
+                $set: {
+                  makeupStatus: targetStatus,
+                  originalDate: sessionDate || new Date(),
+                  absenceReason: a.absenceReason || '',
+                },
+                $setOnInsert: {
+                  contentToMakeup: '',
+                  note: checkinNum === 3 ? 'Tự động tạo từ điểm danh vắng có phép' : 'Tự động tạo từ điểm danh vắng không phép'
+                }
+              },
+              { upsert: true, new: true }
+            );
+          }
         } else if (isPresent) {
           // Bảo toàn trạng thái nếu học sinh đã hoàn thành học bù (MAKEUP_COMPLETED)
           if (currentMakeupStatus !== 'MAKEUP_COMPLETED') {
